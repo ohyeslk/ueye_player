@@ -1,4 +1,0 @@
-sceneSetups:
-- path: Assets/Cardboard/DemoScene/DemoEdited.unity
-  isLoaded: 1
-  isActive: 1
