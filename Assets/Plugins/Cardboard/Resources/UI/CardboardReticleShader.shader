@@ -18,6 +18,7 @@ Shader "Cardboard/CardboardReticle" {
     _InnerDiameter ("InnerDiameter", Range(0, 10.0)) = 1.5
     _OuterDiameter ("OuterDiameter", Range(0.00872665, 10.0)) = 2.0
     _DistanceInMeters ("DistanceInMeters", Range(0.0, 100.0)) = 2.0
+    _Angle("Angle(In rad)" , range( 0 , 7 )) = 7
   }
 
   SubShader {
@@ -42,6 +43,7 @@ Shader "Cardboard/CardboardReticle" {
       uniform float _InnerDiameter;
       uniform float _OuterDiameter;
       uniform float _DistanceInMeters;
+      uniform float _Angle;
 
       struct vertexInput {
         float4 vertex : POSITION;
@@ -49,6 +51,7 @@ Shader "Cardboard/CardboardReticle" {
 
       struct fragmentInput{
           float4 position : SV_POSITION;
+          float4 vert : TEXCOORD0;
       };
 
       fragmentInput vert(vertexInput i) {
@@ -58,11 +61,19 @@ Shader "Cardboard/CardboardReticle" {
 
         fragmentInput o;
         o.position = mul (UNITY_MATRIX_MVP, vert_out);
+        o.vert = i.vertex;
         return o;
       }
 
       fixed4 frag(fragmentInput i) : SV_Target {
         fixed4 ret = fixed4(_Color.x, _Color.y, _Color.z, 1.0);
+        float4 vert = i.vert;
+        float PI = 3.1415926;
+        float angle = (vert.y > 0) ? ( ( vert.x > 0) ? atan( vert.x / vert.y ) : atan( vert.x / vert.y ) + PI * 2 ) 
+        : atan( vert.x / vert.y ) + PI;
+
+        if ( angle > _Angle )
+        	ret.a = 0;
         return ret;
       }
 

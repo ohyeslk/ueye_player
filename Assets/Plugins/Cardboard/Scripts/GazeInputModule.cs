@@ -286,7 +286,7 @@ public class GazeInputModule : BaseInputModule {
     return new Vector2(outPolar, outElevation);
   }
 
-  GameObject GetCurrentGameObject() {
+  protected GameObject GetCurrentGameObject() {
     if (pointerData != null && pointerData.enterEventCamera != null) {
       return pointerData.pointerCurrentRaycast.gameObject;
     }
@@ -294,7 +294,7 @@ public class GazeInputModule : BaseInputModule {
     return null;
   }
 
-  Vector3 GetIntersectionPosition() {
+  protected Vector3 GetIntersectionPosition() {
     // Check for camera
     Camera cam = pointerData.enterEventCamera;
     if (cam == null) {

@@ -16,205 +16,273 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.EventSystems;
 
-[AddComponentMenu("Cardboard/UI/CardboardReticle")]
-[RequireComponent(typeof(Renderer))]
-public class CardboardReticle : MonoBehaviour, ICardboardPointer {
-  /// Number of segments making the reticle circle.
-  public int reticleSegments = 20;
+[AddComponentMenu ("Cardboard/UI/CardboardReticle")]
+[RequireComponent (typeof(Renderer))]
+public class CardboardReticle : MonoBehaviour, ICardboardPointer
+{
+	/// Number of segments making the reticle circle.
+	public int reticleSegments = 20;
 
-  /// Growth speed multiplier for the reticle/
-  public float reticleGrowthSpeed = 8.0f;
+	/// Growth speed multiplier for the reticle/
+	public float reticleGrowthSpeed = 8.0f;
 
-  // Private members
-  private Material materialComp;
-  private GameObject targetObj;
+	// Private members
+	private Material materialComp;
+	private Material materialOut;
+	private GameObject targetObj;
 
-  // Current inner angle of the reticle (in degrees).
-  private float reticleInnerAngle = 0.0f;
-  // Current outer angle of the reticle (in degrees).
-  private float reticleOuterAngle = 0.5f;
-  // Current distance of the reticle (in meters).
-  private float reticleDistanceInMeters = 10.0f;
+	// Current inner angle of the reticle (in degrees).
+	private float reticleInnerAngle = 0.0f;
+	// Current outer angle of the reticle (in degrees).
+	private float reticleOuterAngle = 0.5f;
+	// Current distance of the reticle (in meters).
+	private float reticleDistanceInMeters = 10.0f;
 
-  // Minimum inner angle of the reticle (in degrees).
-  private const float kReticleMinInnerAngle = 0.0f;
-  // Minimum outer angle of the reticle (in degrees).
-  private const float kReticleMinOuterAngle = 0.5f;
-  // Angle at which to expand the reticle when intersecting with an object
-  // (in degrees).
-  private const float kReticleGrowthAngle = 1.5f;
+	// Minimum inner angle of the reticle (in degrees).
+	private const float kReticleMinInnerAngle = 0.0f;
+	// Minimum outer angle of the reticle (in degrees).
+	private const float kReticleMinOuterAngle = 0.5f;
+	// Angle at which to expand the reticle when intersecting with an object
+	// (in degrees).
+	private const float kReticleGrowthAngle = 1.5f;
 
-  // Minimum distance of the reticle (in meters).
-  private const float kReticleDistanceMin = 0.75f;
-  // Maximum distance of the reticle (in meters).
-  private const float kReticleDistanceMax = 10.0f;
+	// Minimum distance of the reticle (in meters).
+	private const float kReticleDistanceMin = 0.75f;
+	// Maximum distance of the reticle (in meters).
+	private const float kReticleDistanceMax = 10.0f;
 
-  // Current inner and outer diameters of the reticle,
-  // before distance multiplication.
-  private float reticleInnerDiameter = 0.0f;
-  private float reticleOuterDiameter = 0.0f;
+	// Current inner and outer diameters of the reticle,
+	// before distance multiplication.
+	private float reticleInnerDiameter = 0.0f;
+	private float reticleOuterDiameter = 0.0f;
 
-  void Start () {
-    CreateReticleVertices();
+	[SerializeField] private float outInnerDiameterAngle = 2.5f;
+	[SerializeField] private float outOuterDiameterAngle = 3f;
 
-    materialComp = gameObject.GetComponent<Renderer>().material;
-  }
+	private float outAngle = 6f;
 
-  void OnEnable() {
-    GazeInputModule.cardboardPointer = this;
-  }
+	[SerializeField] GameObject outObj;
+	[SerializeField] float senseTime = 0.5f;
+	[SerializeField] float confirmTime = 0.5f;
+	[SerializeField] AnimationCurve confirmCurve;
+	void Start ()
+	{
+		CreateReticleVertices (gameObject);
+		CreateReticleVertices (outObj);
 
-  void OnDisable() {
-    if (GazeInputModule.cardboardPointer == this) {
-      GazeInputModule.cardboardPointer = null;
-    }
-  }
+		materialComp = gameObject.GetComponent<Renderer> ().material;
+		materialOut = outObj.GetComponent<Renderer> ().material;
+	}
 
-  void Update() {
-    UpdateDiameters();
-  }
+	void OnEnable ()
+	{
+		GazeInputModule.cardboardPointer = this;
+	}
 
-  /// This is called when the 'BaseInputModule' system should be enabled.
-  public void OnGazeEnabled() {
+	void OnDisable ()
+	{
+		if (GazeInputModule.cardboardPointer == this) {
+			GazeInputModule.cardboardPointer = null;
+		}
+	}
 
-  }
+	void Update ()
+	{
+		UpdateDiameters ();
+	}
 
-  /// This is called when the 'BaseInputModule' system should be disabled.
-  public void OnGazeDisabled() {
+	/// This is called when the 'BaseInputModule' system should be enabled.
+	public void OnGazeEnabled ()
+	{
 
-  }
+	}
 
-  /// Called when the user is looking on a valid GameObject. This can be a 3D
-  /// or UI element.
-  ///
-  /// The camera is the event camera, the target is the object
-  /// the user is looking at, and the intersectionPosition is the intersection
-  /// point of the ray sent from the camera on the object.
-  public void OnGazeStart(Camera camera, GameObject targetObject, Vector3 intersectionPosition) {
-    SetGazeTarget(intersectionPosition);
-  }
+	/// This is called when the 'BaseInputModule' system should be disabled.
+	public void OnGazeDisabled ()
+	{
 
-  /// Called every frame the user is still looking at a valid GameObject. This
-  /// can be a 3D or UI element.
-  ///
-  /// The camera is the event camera, the target is the object the user is
-  /// looking at, and the intersectionPosition is the intersection point of the
-  /// ray sent from the camera on the object.
-  public void OnGazeStay(Camera camera, GameObject targetObject, Vector3 intersectionPosition) {
-    SetGazeTarget(intersectionPosition);
-  }
+	}
 
-  /// Called when the user's look no longer intersects an object previously
-  /// intersected with a ray projected from the camera.
-  /// This is also called just before **OnGazeDisabled** and may have have any of
-  /// the values set as **null**.
-  ///
-  /// The camera is the event camera and the target is the object the user
-  /// previously looked at.
-  public void OnGazeExit(Camera camera, GameObject targetObject) {
-    reticleDistanceInMeters = kReticleDistanceMax;
-    reticleInnerAngle = kReticleMinInnerAngle;
-    reticleOuterAngle = kReticleMinOuterAngle;
-  }
 
-  /// Called when the Cardboard trigger is initiated. This is practically when
-  /// the user begins pressing the trigger.
-  public void OnGazeTriggerStart(Camera camera) {
-    // Put your reticle trigger start logic here :)
-  }
 
-  /// Called when the Cardboard trigger is finished. This is practically when
-  /// the user releases the trigger.
-  public void OnGazeTriggerEnd(Camera camera) {
-    // Put your reticle trigger end logic here :)
-  }
+	float startViewTime = Mathf.Infinity;
+	GameObject m_target;
+	GameObject TargetObj {
+		get {
+			return m_target;
+		}
+		set {
+			if (m_target != value) {
+				if (value != null) {
+					startViewTime = Time.time;
+				} else {
+					startViewTime = Mathf.Infinity;
+				}
+			}
+			m_target = value;
+		}
+	}
 
-  private void CreateReticleVertices() {
-    Mesh mesh = new Mesh();
-    gameObject.AddComponent<MeshFilter>();
-    GetComponent<MeshFilter>().mesh = mesh;
+	/// Called when the user is looking on a valid GameObject. This can be a 3D
+	/// or UI element.
+	///
+	/// The camera is the event camera, the target is the object
+	/// the user is looking at, and the intersectionPosition is the intersection
+	/// point of the ray sent from the camera on the object.
+	public void OnGazeStart (Camera camera, GameObject targetObject, Vector3 intersectionPosition)
+	{
+		SetGazeTarget (intersectionPosition, targetObject);
+	}
 
-    int segments_count = reticleSegments;
-    int vertex_count = (segments_count+1)*2;
+	/// Called every frame the user is still looking at a valid GameObject. This
+	/// can be a 3D or UI element.
+	///
+	/// The camera is the event camera, the target is the object the user is
+	/// looking at, and the intersectionPosition is the intersection point of the
+	/// ray sent from the camera on the object.
+	public void OnGazeStay (Camera camera, GameObject targetObject, Vector3 intersectionPosition)
+	{
+		SetGazeTarget (intersectionPosition, targetObject);
+	}
 
-    #region Vertices
+	/// Called when the user's look no longer intersects an object previously
+	/// intersected with a ray projected from the camera.
+	/// This is also called just before **OnGazeDisabled** and may have have any of
+	/// the values set as **null**.
+	///
+	/// The camera is the event camera and the target is the object the user
+	/// previously looked at.
+	public void OnGazeExit (Camera camera, GameObject targetObject)
+	{
+		TargetObj = null;
+		reticleDistanceInMeters = kReticleDistanceMax;
+		reticleInnerAngle = kReticleMinInnerAngle;
+		reticleOuterAngle = kReticleMinOuterAngle;
+	}
 
-    Vector3[] vertices = new Vector3[vertex_count];
+	/// Called when the Cardboard trigger is initiated. This is practically when
+	/// the user begins pressing the trigger.
+	public void OnGazeTriggerStart (Camera camera)
+	{
+		// Put your reticle trigger start logic here :)
+	}
 
-    const float kTwoPi = Mathf.PI * 2.0f;
-    int vi = 0;
-    for (int si = 0; si <= segments_count; ++si) {
-      // Add two vertices for every circle segment: one at the beginning of the
-      // prism, and one at the end of the prism.
-      float angle = (float)si / (float)(segments_count) * kTwoPi;
+	/// Called when the Cardboard trigger is finished. This is practically when
+	/// the user releases the trigger.
+	public void OnGazeTriggerEnd (Camera camera)
+	{
+		// Put your reticle trigger end logic here :)
+	}
 
-      float x = Mathf.Sin(angle);
-      float y = Mathf.Cos(angle);
+	private void CreateReticleVertices (GameObject obj)
+	{
+		Mesh mesh = new Mesh ();
+		obj.AddComponent<MeshFilter> ();
+		obj.GetComponent<MeshFilter> ().mesh = mesh;
 
-      vertices[vi++] = new Vector3(x, y, 0.0f); // Outer vertex.
-      vertices[vi++] = new Vector3(x, y, 1.0f); // Inner vertex.
-    }
-    #endregion
+		int segments_count = reticleSegments;
+		int vertex_count = (segments_count + 1) * 2;
 
-    #region Triangles
-    int indices_count = (segments_count+1)*3*2;
-    int[] indices = new int[indices_count];
+		#region Vertices
 
-    int vert = 0;
-    int idx = 0;
-    for (int si = 0; si < segments_count; ++si) {
-      indices[idx++] = vert+1;
-      indices[idx++] = vert;
-      indices[idx++] = vert+2;
+		Vector3[] vertices = new Vector3[vertex_count];
 
-      indices[idx++] = vert+1;
-      indices[idx++] = vert+2;
-      indices[idx++] = vert+3;
+		const float kTwoPi = Mathf.PI * 2.0f;
+		int vi = 0;
+		for (int si = 0; si <= segments_count; ++si) {
+			// Add two vertices for every circle segment: one at the beginning of the
+			// prism, and one at the end of the prism.
+			float angle = (float)si / (float)(segments_count) * kTwoPi;
 
-      vert += 2;
-    }
-    #endregion
+			float x = Mathf.Sin (angle);
+			float y = Mathf.Cos (angle);
 
-    mesh.vertices = vertices;
-    mesh.triangles = indices;
-    mesh.RecalculateBounds();
-    mesh.Optimize();
-  }
+			vertices [vi++] = new Vector3 (x, y, 0.0f); // Outer vertex.
+			vertices [vi++] = new Vector3 (x, y, 1.0f); // Inner vertex.
+		}
+		#endregion
 
-  private void UpdateDiameters() {
-    reticleDistanceInMeters =
-      Mathf.Clamp(reticleDistanceInMeters, kReticleDistanceMin, kReticleDistanceMax);
+		#region Triangles
+		int indices_count = (segments_count + 1) * 3 * 2;
+		int[] indices = new int[indices_count];
 
-    if (reticleInnerAngle < kReticleMinInnerAngle) {
-      reticleInnerAngle = kReticleMinInnerAngle;
-    }
+		int vert = 0;
+		int idx = 0;
+		for (int si = 0; si < segments_count; ++si) {
+			indices [idx++] = vert + 1;
+			indices [idx++] = vert;
+			indices [idx++] = vert + 2;
 
-    if (reticleOuterAngle < kReticleMinOuterAngle) {
-      reticleOuterAngle = kReticleMinOuterAngle;
-    }
+			indices [idx++] = vert + 1;
+			indices [idx++] = vert + 2;
+			indices [idx++] = vert + 3;
 
-    float inner_half_angle_radians = Mathf.Deg2Rad * reticleInnerAngle * 0.5f;
-    float outer_half_angle_radians = Mathf.Deg2Rad * reticleOuterAngle * 0.5f;
+			vert += 2;
+		}
+		#endregion
 
-    float inner_diameter = 2.0f * Mathf.Tan(inner_half_angle_radians);
-    float outer_diameter = 2.0f * Mathf.Tan(outer_half_angle_radians);
+		mesh.vertices = vertices;
+		mesh.triangles = indices;
+		mesh.RecalculateBounds ();
+		mesh.Optimize ();
+	}
 
-    reticleInnerDiameter =
-        Mathf.Lerp(reticleInnerDiameter, inner_diameter, Time.deltaTime * reticleGrowthSpeed);
-    reticleOuterDiameter =
-        Mathf.Lerp(reticleOuterDiameter, outer_diameter, Time.deltaTime * reticleGrowthSpeed);
+	private void UpdateDiameters ()
+	{
+		// Update Inner Diameters
+		reticleDistanceInMeters =
+      Mathf.Clamp (reticleDistanceInMeters, kReticleDistanceMin, kReticleDistanceMax);
 
-    materialComp.SetFloat("_InnerDiameter", reticleInnerDiameter * reticleDistanceInMeters);
-    materialComp.SetFloat("_OuterDiameter", reticleOuterDiameter * reticleDistanceInMeters);
-    materialComp.SetFloat("_DistanceInMeters", reticleDistanceInMeters);
-  }
+		if (reticleInnerAngle < kReticleMinInnerAngle) {
+			reticleInnerAngle = kReticleMinInnerAngle;
+		}
 
-  private void SetGazeTarget(Vector3 target) {
-    Vector3 targetLocalPosition = transform.parent.InverseTransformPoint(target);
+		if (reticleOuterAngle < kReticleMinOuterAngle) {
+			reticleOuterAngle = kReticleMinOuterAngle;
+		}
 
-    reticleDistanceInMeters =
-        Mathf.Clamp(targetLocalPosition.z, kReticleDistanceMin, kReticleDistanceMax);
-    reticleInnerAngle = kReticleMinInnerAngle + kReticleGrowthAngle;
-    reticleOuterAngle = kReticleMinOuterAngle + kReticleGrowthAngle;
-  }
+		float inner_half_angle_radians = Mathf.Deg2Rad * reticleInnerAngle * 0.5f;
+		float outer_half_angle_radians = Mathf.Deg2Rad * reticleOuterAngle * 0.5f;
+
+		float inner_diameter = 2.0f * Mathf.Tan (inner_half_angle_radians);
+		float outer_diameter = 2.0f * Mathf.Tan (outer_half_angle_radians);
+
+		reticleInnerDiameter =
+        Mathf.Lerp (reticleInnerDiameter, inner_diameter, Time.deltaTime * reticleGrowthSpeed);
+		reticleOuterDiameter =
+        Mathf.Lerp (reticleOuterDiameter, outer_diameter, Time.deltaTime * reticleGrowthSpeed);
+
+		materialComp.SetFloat ("_InnerDiameter", reticleInnerDiameter * reticleDistanceInMeters);
+		materialComp.SetFloat ("_OuterDiameter", reticleOuterDiameter * reticleDistanceInMeters);
+		materialComp.SetFloat ("_DistanceInMeters", reticleDistanceInMeters);
+		materialComp.SetFloat ("_Angle", Mathf.PI * 2f);
+
+		// Update Outer Diameters
+
+		float process = Mathf.Clamp01(( Time.time - startViewTime - senseTime) / confirmTime );
+
+		if ( confirmCurve != null )
+			process = confirmCurve.Evaluate( process);
+		outAngle = process * 2f * Mathf.PI;
+
+		Debug.Log("Start time " + startViewTime  + " process " + process + " angle " + outAngle);
+
+		materialOut.SetFloat ("_InnerDiameter", 2.0f * Mathf.Tan (Mathf.Deg2Rad * 0.5f * outInnerDiameterAngle) * reticleDistanceInMeters);
+		materialOut.SetFloat ("_OuterDiameter", 2.0f * Mathf.Tan (Mathf.Deg2Rad * 0.5f * outOuterDiameterAngle) * reticleDistanceInMeters);
+		materialOut.SetFloat ("_DistanceInMeters", reticleDistanceInMeters);
+		materialOut.SetFloat ("_Angle", outAngle);
+	}
+
+	private void SetGazeTarget (Vector3 target, GameObject obj)
+	{
+		Vector3 targetLocalPosition = transform.parent.InverseTransformPoint (target);
+
+		reticleDistanceInMeters =
+        Mathf.Clamp (targetLocalPosition.z, kReticleDistanceMin, kReticleDistanceMax);
+		reticleInnerAngle = kReticleMinInnerAngle + kReticleGrowthAngle;
+		reticleOuterAngle = kReticleMinOuterAngle + kReticleGrowthAngle;
+
+		TargetObj = obj;
+
+	}
 }
