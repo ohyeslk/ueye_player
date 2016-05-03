@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-public class VideoSelectWindow : MonoBehaviour  {
+public class VideoSelectWindow : UIWindow  {
 	/// <summary>
 	/// The prefabe of the unit in the window
 	/// </summary>
@@ -22,6 +22,27 @@ public class VideoSelectWindow : MonoBehaviour  {
 	/// </summary>
 	List<VideoInfoUnit> unitList = new List<VideoInfoUnit>();
 	// Use this for initialization
+
+
+	void OnDisable()
+	{
+		VREvents.ActiveWindow -= VREvents_ActiveWindow;
+	}
+
+	void OnEnable()
+	{
+		VREvents.ActiveWindow += VREvents_ActiveWindow;
+	}
+
+	void VREvents_ActiveWindow (Message msg)
+	{
+		if ( msg.GetMessage("window").ToString().Equals( "select") )
+		{
+			Panel.gameObject.SetActive(true);
+		}else{
+			Panel.gameObject.SetActive(false);
+		}
+	}
 
 	void Awake () {
 		if ( VideoInfoUnitPrefab == null )

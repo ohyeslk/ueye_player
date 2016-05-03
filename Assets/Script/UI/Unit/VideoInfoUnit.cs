@@ -15,15 +15,36 @@ public class VideoInfoUnit : UISensor {
 	}
 	[SerializeField] HoverAnimation hoverAnimation;
 
-	VideoInfoUnitState m_state = VideoInfoUnitState.Normal;
+	private VideoInfoUnitState inner_state = VideoInfoUnitState.Normal;
+	private VideoInfoUnitState m_state
+	{
+		get {
+			return inner_state;
+		}
+		set {
+			inner_state = value;
+		}
+	}
 	public VideoInfoUnitState State
 	{
 		get {
 			return m_state;
 		}
 	}
+
+	VideoInfo m_info = new VideoInfo();
+
+	public VideoInfo Info{
+		get { return m_info; }
+	}
+
+	/// <summary>
+	/// record the start time of hovering 
+               	/// </summary>
+
 	public void Init(VideoInfo info , VideoUnitInitAnimation anim )
 	{
+		m_info = info;
 		if ( videoPost != null )
 			videoPost.sprite  = info.Post;
 		if ( videoName != null )
@@ -41,7 +62,33 @@ public class VideoInfoUnit : UISensor {
 	{
 		m_state = VideoInfoUnitState.Normal;
 	}
+
+
 	override public void OnHover(UIHoverEvent e)
+	{
+		base.OnHover(e);
+		UpdateState(e);
+	}
+
+	override public void OnFocus()
+	{
+		var varg = new UISensorArg(this);
+		varg.focusTime = focusTime;
+		varg.confirmTime = confirmTime;
+		varg.type = UISensorArg.SensorType.VideoUnit;
+		VREvents.FireUIFocus(varg);
+	}
+
+	override public void OnConfirm()
+	{
+		var varg = new UISensorArg(this);
+		varg.focusTime = focusTime;
+		varg.confirmTime = confirmTime;
+		varg.type = UISensorArg.SensorType.VideoUnit;
+		VREvents.FireUIConfirm(varg);
+	}
+
+	void UpdateState(UIHoverEvent e)
 	{
 		if ( State == VideoInfoUnitState.Normal ) {
 			if ( e.hoverPhase == UIHoverEvent.HoverPhase.Begin )
@@ -63,7 +110,6 @@ public class VideoInfoUnit : UISensor {
 				if ( videoName.GetComponent<Outline>() )
 					videoName.GetComponent<Outline>().enabled = false;
 				m_state = VideoInfoUnitState.Normal;
-					
 			}
 		}
 	}

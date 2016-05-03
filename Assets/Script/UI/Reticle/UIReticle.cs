@@ -1,23 +1,11 @@
-﻿// Copyright 2015 Google Inc. All rights reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+﻿
 using UnityEngine;
 using System.Collections;
 using UnityEngine.EventSystems;
 
 [AddComponentMenu ("Cardboard/UI/CardboardReticle")]
 [RequireComponent (typeof(Renderer))]
-public class CardboardReticle : MonoBehaviour, ICardboardPointer
+public class UIReticle : MonoBehaviour, ICardboardPointer
 {
 	/// Number of segments making the reticle circle.
 	public int reticleSegments = 20;
@@ -78,16 +66,32 @@ public class CardboardReticle : MonoBehaviour, ICardboardPointer
 		materialOut = outParameter.outObj.GetComponent<Renderer> ().material;
 	}
 
-	void OnEnable ()
-	{
-		GazeInputModule.cardboardPointer = this;
-	}
 
 	void OnDisable ()
 	{
 		if (GazeInputModule.cardboardPointer == this) {
 			GazeInputModule.cardboardPointer = null;
 		}
+		VREvents.UIConfirm -= VREvents_ConfirmVideo;
+		VREvents.UIFocus -= VREvents_FocusVideo;
+	}
+
+	void OnEnable ()
+	{
+		GazeInputModule.cardboardPointer = this;
+		VREvents.UIConfirm += VREvents_ConfirmVideo;
+		VREvents.UIFocus += VREvents_FocusVideo;
+	}
+
+	void VREvents_FocusVideo (UISensorArg varg)
+	{
+		outParameter.focusTime = varg.focusTime;
+	}
+
+	void VREvents_ConfirmVideo (UISensorArg varg)
+	{
+		outParameter.confirmTime = varg.confirmTime;
+
 	}
 
 	void Update ()
@@ -235,7 +239,7 @@ public class CardboardReticle : MonoBehaviour, ICardboardPointer
 	{
 		// Update Inner Diameters
 		reticleDistanceInMeters =
-      Mathf.Clamp (reticleDistanceInMeters, kReticleDistanceMin, kReticleDistanceMax);
+			Mathf.Clamp (reticleDistanceInMeters, kReticleDistanceMin, kReticleDistanceMax);
 
 		if (reticleInnerAngle < kReticleMinInnerAngle) {
 			reticleInnerAngle = kReticleMinInnerAngle;
@@ -252,9 +256,9 @@ public class CardboardReticle : MonoBehaviour, ICardboardPointer
 		float outer_diameter = 2.0f * Mathf.Tan (outer_half_angle_radians);
 
 		reticleInnerDiameter =
-        Mathf.Lerp (reticleInnerDiameter, inner_diameter, Time.deltaTime * reticleGrowthSpeed);
+			Mathf.Lerp (reticleInnerDiameter, inner_diameter, Time.deltaTime * reticleGrowthSpeed);
 		reticleOuterDiameter =
-        Mathf.Lerp (reticleOuterDiameter, outer_diameter, Time.deltaTime * reticleGrowthSpeed);
+			Mathf.Lerp (reticleOuterDiameter, outer_diameter, Time.deltaTime * reticleGrowthSpeed);
 
 		materialComp.SetFloat ("_InnerDiameter", reticleInnerDiameter * reticleDistanceInMeters);
 		materialComp.SetFloat ("_OuterDiameter", reticleOuterDiameter * reticleDistanceInMeters);
@@ -269,7 +273,7 @@ public class CardboardReticle : MonoBehaviour, ICardboardPointer
 			process = outParameter.confirmCurve.Evaluate( process);
 		outAngle = process * 2f * Mathf.PI;
 
-		Debug.Log("Start time " + startViewTime  + " process " + process + " angle " + outAngle);
+//		Debug.Log("Start time " + startViewTime  + " process " + process + " angle " + outAngle);
 
 		materialOut.SetFloat ("_InnerDiameter", 2.0f * Mathf.Tan (Mathf.Deg2Rad * 0.5f * outParameter.outInnerDiameterAngle) * reticleDistanceInMeters);
 		materialOut.SetFloat ("_OuterDiameter", 2.0f * Mathf.Tan (Mathf.Deg2Rad * 0.5f * outParameter.outOuterDiameterAngle) * reticleDistanceInMeters);
@@ -282,7 +286,7 @@ public class CardboardReticle : MonoBehaviour, ICardboardPointer
 		Vector3 targetLocalPosition = transform.parent.InverseTransformPoint (target);
 
 		reticleDistanceInMeters =
-        Mathf.Clamp (targetLocalPosition.z, kReticleDistanceMin, kReticleDistanceMax);
+			Mathf.Clamp (targetLocalPosition.z, kReticleDistanceMin, kReticleDistanceMax);
 		reticleInnerAngle = kReticleMinInnerAngle + kReticleGrowthAngle;
 		reticleOuterAngle = kReticleMinOuterAngle + kReticleGrowthAngle;
 

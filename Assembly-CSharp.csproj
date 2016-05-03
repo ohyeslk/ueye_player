@@ -45,13 +45,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\Script\Core\Events.cs" />
-     <Compile Include="Assets\Script\UI\Grid.cs" />
+     <Compile Include="Assets\Script\Core\VREvents.cs" />
+     <Compile Include="Assets\Script\Core\WindowManager.cs" />
+     <Compile Include="Assets\Script\UI\Basic\Grid.cs" />
+     <Compile Include="Assets\Script\UI\Basic\UISensor.cs" />
+     <Compile Include="Assets\Script\UI\Reticle\UIReticle.cs" />
      <Compile Include="Assets\Script\UI\UIInputModel.cs" />
-     <Compile Include="Assets\Script\UI\UIReticle.cs" />
-     <Compile Include="Assets\Script\UI\UISensor.cs" />
-     <Compile Include="Assets\Script\UI\VideoInfoUnit.cs" />
-     <Compile Include="Assets\Script\UI\VideoSelectWindow.cs" />
+     <Compile Include="Assets\Script\UI\Unit\ReturnButton.cs" />
+     <Compile Include="Assets\Script\UI\Unit\VideoInfoUnit.cs" />
+     <Compile Include="Assets\Script\UI\Window\UIWindow.cs" />
+     <Compile Include="Assets\Script\UI\Window\VideoPlayWindow.cs" />
+     <Compile Include="Assets\Script\UI\Window\VideoSelectWindow.cs" />
      <None Include="Assets\Plugins\Cardboard\Resources\SkyboxMesh.shader" />
      <None Include="Assets\Plugins\Cardboard\Distortion\CardboardDistortion.cginc" />
      <None Include="Assets\Plugins\EasyMovieTexture\Unlit_SphereInside.shader" />
