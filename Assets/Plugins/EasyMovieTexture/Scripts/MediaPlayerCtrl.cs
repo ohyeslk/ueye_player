@@ -2670,7 +2670,7 @@ public class MediaPlayerCtrl : MonoBehaviour
 
             if (audioSource != null)
            {
-				if (listAudioPts [i] >= 0) {
+				if (listAudioPts != null  &&  listAudioPts [i] >= 0) {
 					if(m_strFileName.Contains(".m3u8") || m_strFileName.StartsWith("rtmp",StringComparison.OrdinalIgnoreCase) )
 					{
 

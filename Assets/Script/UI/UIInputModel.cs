@@ -49,9 +49,7 @@ public class UIInputModel : GazeInputModule {
 
 			lastSensor = hoverSensor;
 		}
-
 	}
-
 }
 
 [System.Serializable]

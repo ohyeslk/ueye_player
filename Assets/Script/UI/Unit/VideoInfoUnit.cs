@@ -7,6 +7,8 @@ public class VideoInfoUnit : UISensor {
 	[SerializeField] Image videoPost;
 	[SerializeField] Text videoName;
 
+	VideoSelectWindow parent;
+
 	[System.Serializable]
 	public struct HoverAnimation
 	{
@@ -42,7 +44,7 @@ public class VideoInfoUnit : UISensor {
 	/// record the start time of hovering 
                	/// </summary>
 
-	public void Init(VideoInfo info , VideoUnitInitAnimation anim )
+	public void Init(VideoInfo info , VideoUnitInitAnimation anim , VideoSelectWindow _p )
 	{
 		m_info = info;
 		if ( videoPost != null )
@@ -56,6 +58,8 @@ public class VideoInfoUnit : UISensor {
 		videoPost.transform.DORotate( new Vector3( 90, 90, 90 ) , anim.duration ).From().SetDelay(anim.delay );
 		videoPost.DOFade( 0 , anim.duration ).From().SetDelay(anim.delay );
 		videoName.DOFade( 0 , anim.duration ).From().SetDelay(anim.delay ).OnComplete(CompleteInit);
+
+		parent = _p;
 	}
 
 	void CompleteInit()
@@ -63,29 +67,16 @@ public class VideoInfoUnit : UISensor {
 		m_state = VideoInfoUnitState.Normal;
 	}
 
+	public override void OnConfirm ()
+	{
+		base.OnConfirm ();
+		parent.PlayVideo( Info );
+	}
 
 	override public void OnHover(UIHoverEvent e)
 	{
 		base.OnHover(e);
 		UpdateState(e);
-	}
-
-	override public void OnFocus()
-	{
-		var varg = new UISensorArg(this);
-		varg.focusTime = focusTime;
-		varg.confirmTime = confirmTime;
-		varg.type = UISensorArg.SensorType.VideoUnit;
-		VREvents.FireUIFocus(varg);
-	}
-
-	override public void OnConfirm()
-	{
-		var varg = new UISensorArg(this);
-		varg.focusTime = focusTime;
-		varg.confirmTime = confirmTime;
-		varg.type = UISensorArg.SensorType.VideoUnit;
-		VREvents.FireUIConfirm(varg);
 	}
 
 	void UpdateState(UIHoverEvent e)

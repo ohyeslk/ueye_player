@@ -20,9 +20,21 @@ public class VREvents
 	/// </summary>
 	public delegate void MessageEventHandler(Message msg); 
 
+	public static event MessageEventHandler WindowReturn;
+	public static void FireWindowReturn(Message arg){if ( WindowReturn != null ) WindowReturn(arg) ; }
 
-	public static event MessageEventHandler ActiveWindow;
-	public static void FireActiveWindow(Message arg){if ( ActiveWindow != null ) ActiveWindow(arg) ; }
+	public static event MessageEventHandler PlayVideo;
+	public static void FirePlayVideo(Message arg){if ( PlayVideo != null ) PlayVideo(arg) ; }
+
+	/// <summary>
+	/// Active window event handler. Handle the window events
+	/// </summary>
+	public delegate void WindowEventHandler(WindowArg arg );
+
+	public static event WindowEventHandler ActiveWindow;
+	public static void FireActiveWindow(WindowArg arg){if ( ActiveWindow != null ) ActiveWindow(arg) ; }
+
+
 
 	/// <summary>
 	/// Video event handler. handle the event with UI message
@@ -34,8 +46,6 @@ public class VREvents
 
 	public static event UISensorEventHandler UIConfirm;
 	public static void FireUIConfirm(UISensorArg arg){if ( UIConfirm != null ) UIConfirm(arg) ; }
-
-
 
 
 }
@@ -52,14 +62,18 @@ public class UISensorArg : BasicArg
 	public UISensorArg(object _this ): base ( _this ){}
 	public float focusTime;
 	public float confirmTime;
-	public enum SensorType
+}
+
+public class WindowArg : BasicArg
+{
+	public WindowArg( object _this ): base ( _this ){}
+	public enum Type
 	{
-		None,
-		VideoUnit,
-		Return,
-		Play,
+		SELECT_WINDOW,
+		PLAY_WINDOW,
 	}
-	public SensorType type;
+	public Type type;
+
 }
 
 	

@@ -37,10 +37,18 @@ public class UISensor : MonoBehaviour {
 
 	virtual public void OnFocus()
 	{
+		var varg = new UISensorArg(this);
+		varg.focusTime = focusTime;
+		varg.confirmTime = confirmTime;
+		VREvents.FireUIFocus(varg);
 	}
 
 	virtual public void OnConfirm()
 	{
+		var varg = new UISensorArg(this);
+		varg.focusTime = focusTime;
+		varg.confirmTime = confirmTime;
+		VREvents.FireUIConfirm(varg);
 	}
 
 	virtual public void OnHover( UIHoverEvent e ) {

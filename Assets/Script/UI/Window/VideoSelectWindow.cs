@@ -34,9 +34,9 @@ public class VideoSelectWindow : UIWindow  {
 		VREvents.ActiveWindow += VREvents_ActiveWindow;
 	}
 
-	void VREvents_ActiveWindow (Message msg)
+	void VREvents_ActiveWindow (WindowArg arg)
 	{
-		if ( msg.GetMessage("window").ToString().Equals( "select") )
+		if ( arg.type == WindowArg.Type.SELECT_WINDOW )
 		{
 			Panel.gameObject.SetActive(true);
 		}else{
@@ -56,7 +56,19 @@ public class VideoSelectWindow : UIWindow  {
 		{
 			CreateVideoInfoUnit(i);
 		}
+	}
 
+	public void PlayVideo( VideoInfo info )
+	{
+		Debug.Log("PlayVideo");
+		Message msg = new Message(this);
+		msg.AddMessage( Global.MSG_PLAYVIDEO_INFO_KEY , info );
+		VREvents.FirePlayVideo( msg );
+
+
+		WindowArg arg = new WindowArg(this);
+		arg.type = WindowArg.Type.PLAY_WINDOW;
+		VREvents.FireActiveWindow( arg );
 	}
 
 	/// <summary>
@@ -85,7 +97,7 @@ public class VideoSelectWindow : UIWindow  {
 			animation.duration = 0.5f;
 
 			// initilze the unit
-			unit.Init( info , animation );
+			unit.Init( info , animation , this );
 
 			// save the unit in the listx
 			unitList.Add(unit);
@@ -94,7 +106,7 @@ public class VideoSelectWindow : UIWindow  {
 	
 	// Update is called once per frame
 	void Update () {
-		CheckSelection();
+		// CheckSelection();
 	}
 	/// <summary>
 	/// the unit hovered in last frame(update every frame)
@@ -103,35 +115,34 @@ public class VideoSelectWindow : UIWindow  {
 	/// <summary>
 	/// check if the user see any unit
 	/// </summary>
-	void CheckSelection()
-	{
-		CardboardHead head = Cardboard.Controller.Head;
-		RaycastHit hit;
-		VideoInfoUnit hoverUnit = null;
-		UIHoverEvent hoverEvent = new UIHoverEvent();
-
-		if ( Physics.Raycast(head.Gaze, out hit, Mathf.Infinity) )
-		{
-			Debug.Log("Hit " + hoverUnit.name );
-			hoverUnit = hit.collider.GetComponent<VideoInfoUnit>();
-			hoverEvent.point = hit.point;
-		}
-			
-		if ( hoverUnit != null ){
-			if ( lastHoverUnit == null )
-				hoverEvent.hoverPhase = UIHoverEvent.HoverPhase.Begin;
-			else
-				hoverEvent.hoverPhase = UIHoverEvent.HoverPhase.Middle;
-			
-			hoverUnit.OnHover(hoverEvent);
-
-		}
-		else if ( lastHoverUnit != null ) {
-			hoverEvent.hoverPhase = UIHoverEvent.HoverPhase.End;
-			lastHoverUnit.OnHover(hoverEvent);
-		}
-
-		lastHoverUnit = hoverUnit;
-
-	}
+//	void CheckSelection()
+//	{
+//		CardboardHead head = Cardboard.Controller.Head;
+//		RaycastHit hit;
+//		VideoInfoUnit hoverUnit = null;
+//		UIHoverEvent hoverEvent = new UIHoverEvent();
+//
+//		if ( Physics.Raycast(head.Gaze, out hit, Mathf.Infinity) )
+//		{
+//			Debug.Log("Hit " + hoverUnit.name );
+//			hoverUnit = hit.collider.GetComponent<VideoInfoUnit>();
+//			hoverEvent.point = hit.point;
+//		}
+//			
+//		if ( hoverUnit != null ){
+//			if ( lastHoverUnit == null )
+//				hoverEvent.hoverPhase = UIHoverEvent.HoverPhase.Begin;
+//			else
+//				hoverEvent.hoverPhase = UIHoverEvent.HoverPhase.Middle;
+//			
+//			hoverUnit.OnHover(hoverEvent);
+//
+//		}
+//		else if ( lastHoverUnit != null ) {
+//			hoverEvent.hoverPhase = UIHoverEvent.HoverPhase.End;
+//			lastHoverUnit.OnHover(hoverEvent);
+//		}
+//
+//		lastHoverUnit = hoverUnit;
+//	}
 }

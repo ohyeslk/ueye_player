@@ -45,13 +45,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Script\Core\Global.cs" />
      <Compile Include="Assets\Script\Core\VREvents.cs" />
      <Compile Include="Assets\Script\Core\WindowManager.cs" />
      <Compile Include="Assets\Script\UI\Basic\Grid.cs" />
      <Compile Include="Assets\Script\UI\Basic\UISensor.cs" />
      <Compile Include="Assets\Script\UI\Reticle\UIReticle.cs" />
      <Compile Include="Assets\Script\UI\UIInputModel.cs" />
-     <Compile Include="Assets\Script\UI\Unit\ReturnButton.cs" />
+     <Compile Include="Assets\Script\UI\Unit\UIButton.cs" />
      <Compile Include="Assets\Script\UI\Unit\VideoInfoUnit.cs" />
      <Compile Include="Assets\Script\UI\Window\UIWindow.cs" />
      <Compile Include="Assets\Script\UI\Window\VideoPlayWindow.cs" />
@@ -62,6 +63,7 @@
      <None Include="Assets\Plugins\Cardboard\Resources\UnlitTexture.shader" />
      <None Include="Assets\Plugins\EasyMovieTexture\Chromakey.shader" />
      <None Include="Assets\Plugins\DOTween\DOTween50.xml" />
+     <None Include="Assets\Shader\MovieShader.shader" />
      <None Include="Assets\Plugins\EasyMovieTexture\Chromakey2.shader" />
      <None Include="Assets\Plugins\Android\AndroidManifest.xml" />
      <None Include="Assets\Plugins\DOTween\readme.txt" />
@@ -70,7 +72,7 @@
      <None Include="Assets\Plugins\Cardboard\Resources\UI\CardboardReticleShader.shader" />
      <None Include="Assets\Plugins\DOTween\DOTween46.xml" />
      <None Include="Assets\Plugins\Cardboard\Resources\SolidColor.shader" />
-     <None Include="Assets\360Shader.shader" />
+     <None Include="Assets\Shader\360Shader.shader" />
  <Reference Include="UnityEngine.UI">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

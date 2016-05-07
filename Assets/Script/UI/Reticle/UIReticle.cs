@@ -72,23 +72,23 @@ public class UIReticle : MonoBehaviour, ICardboardPointer
 		if (GazeInputModule.cardboardPointer == this) {
 			GazeInputModule.cardboardPointer = null;
 		}
-		VREvents.UIConfirm -= VREvents_ConfirmVideo;
-		VREvents.UIFocus -= VREvents_FocusVideo;
+		VREvents.UIConfirm -= OnConfirmSensor;
+		VREvents.UIFocus -= OnFocusSensor;
 	}
 
 	void OnEnable ()
 	{
 		GazeInputModule.cardboardPointer = this;
-		VREvents.UIConfirm += VREvents_ConfirmVideo;
-		VREvents.UIFocus += VREvents_FocusVideo;
+		VREvents.UIConfirm += OnConfirmSensor;
+		VREvents.UIFocus += OnFocusSensor;
 	}
 
-	void VREvents_FocusVideo (UISensorArg varg)
+	void OnFocusSensor (UISensorArg varg)
 	{
 		outParameter.focusTime = varg.focusTime;
 	}
 
-	void VREvents_ConfirmVideo (UISensorArg varg)
+	void OnConfirmSensor (UISensorArg varg)
 	{
 		outParameter.confirmTime = varg.confirmTime;
 
