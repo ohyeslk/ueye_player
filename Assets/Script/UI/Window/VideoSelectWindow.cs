@@ -27,11 +27,28 @@ public class VideoSelectWindow : UIWindow  {
 	void OnDisable()
 	{
 		VREvents.ActiveWindow -= VREvents_ActiveWindow;
+		VREvents.PostVideoList -= RecieveVideoList;
 	}
 
 	void OnEnable()
 	{
 		VREvents.ActiveWindow += VREvents_ActiveWindow;
+		VREvents.PostVideoList += RecieveVideoList;
+	}
+
+	void RecieveVideoList( URLRequestMessage msg )
+	{
+		if ( msg.postObj == this )
+		{
+			Debug.Log("Recieve video list");
+			List<VideoInfo> videoList = (List<VideoInfo>)msg.GetMessage(Global.MSG_POSTVIDEO_VIDEO_KEY );
+
+			foreach(VideoInfo info in videoList )
+			{
+				// Debug.Log("Video " + info.title + " URL " + info.playUrl );
+				CreateVideoInfoUnit( info );
+			}
+		}
 	}
 
 	void VREvents_ActiveWindow (WindowArg arg)
@@ -52,15 +69,21 @@ public class VideoSelectWindow : UIWindow  {
 	}
 
 	void Start() {
-		for( int i = 0 ; i < 8 ; ++ i )
-		{
-			CreateVideoInfoUnit(i);
-		}
+
+		RequestVideoList();
+			
+	}
+
+	public void RequestVideoList()
+	{
+		URLRequestMessage msg = new URLRequestMessage(this);
+		msg.AddMessage(Global.MSG_REQUESTVIDEO_NUMBER_KEY , "8");
+		VREvents.FireRequestVideoList(msg);
 	}
 
 	public void PlayVideo( VideoInfo info )
 	{
-		Debug.Log("PlayVideo");
+		Debug.Log("PlayVideo " + info.title );
 		Message msg = new Message(this);
 		msg.AddMessage( Global.MSG_PLAYVIDEO_INFO_KEY , info );
 		VREvents.FirePlayVideo( msg );
@@ -75,7 +98,7 @@ public class VideoSelectWindow : UIWindow  {
 	/// create a unit according to the prefab
 	/// </summary>
 	/// <param name="index">the index of the unit </param>
-	void CreateVideoInfoUnit( int index )
+	void CreateVideoInfoUnit( VideoInfo info )
 	{
 		if ( VideoInfoUnitPrefab != null )
 		{
@@ -87,13 +110,11 @@ public class VideoSelectWindow : UIWindow  {
 			VideoInfoUnit unit = unitObj.GetComponent<VideoInfoUnit>();
 
 			//TODO : initilize the video infor online
-			VideoInfo info = new VideoInfo();
 			info.Post = spriteList[Random.Range(0,spriteList.Length)] ;
-			info.name = spriteList[Random.Range(0,spriteList.Length)].name ;
 
 			// set up the animation for the info unit
 			VideoUnitInitAnimation animation = new VideoUnitInitAnimation();
-			animation.delay = index * 0.1f;
+			animation.delay = unitList.Count * 0.1f;
 			animation.duration = 0.5f;
 
 			// initilze the unit

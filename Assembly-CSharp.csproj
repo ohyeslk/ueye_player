@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Script\Core\Global.cs" />
+     <Compile Include="Assets\Script\Core\HTTPManager.cs" />
      <Compile Include="Assets\Script\Core\VREvents.cs" />
      <Compile Include="Assets\Script\Core\WindowManager.cs" />
      <Compile Include="Assets\Script\UI\Basic\Grid.cs" />
@@ -61,6 +62,7 @@
      <None Include="Assets\Plugins\Cardboard\Resources\SkyboxMesh.shader" />
      <None Include="Assets\Plugins\Cardboard\Distortion\CardboardDistortion.cginc" />
      <None Include="Assets\Plugins\EasyMovieTexture\Unlit_SphereInside.shader" />
+     <None Include="Assets\Plugins\JSON\readme.txt" />
      <None Include="Assets\Plugins\Cardboard\Resources\UnlitTexture.shader" />
      <None Include="Assets\Plugins\EasyMovieTexture\Chromakey.shader" />
      <None Include="Assets\Plugins\DOTween\DOTween50.xml" />

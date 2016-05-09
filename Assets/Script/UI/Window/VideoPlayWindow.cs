@@ -31,11 +31,12 @@ public class VideoPlayWindow : UIWindow {
 	void OnPlayVideoEvent (Message msg)
 	{
 		VideoInfo info = (VideoInfo)msg.GetMessage(Global.MSG_PLAYVIDEO_INFO_KEY);
+		Debug.Log("Play Video " + info.title + " " + info.playUrl );
+		video.m_strFileName = info.playUrl;
+//		Debug.Log("Play Video" + info.playUrl );
 		BecomeVisible(true);
 		OnPlayVideo();
 	}
-
-
 
 	void VREvents_ActiveWindow (WindowArg arg)
 	{

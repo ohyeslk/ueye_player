@@ -35,31 +35,69 @@ public class VideoInfoUnit : UISensor {
 	}
 
 	VideoInfo m_info = new VideoInfo();
+	VideoUnitInitAnimation m_anim;
 
 	public VideoInfo Info{
 		get { return m_info; }
 	}
 
+	void OnDisable()
+	{
+		VREvents.PostTexture -= RecieveTexture;
+	}
+
+	void OnEnable()
+	{
+		VREvents.PostTexture += RecieveTexture;
+	}
+
+	void RecieveTexture( URLRequestMessage msg )
+	{
+		if ( msg.postObj == this )
+		{
+			Texture2D tex = (Texture2D)msg.GetMessage(Global.MSG_REQUEST_TEXTURE_TEXTURE_KEY);
+			Rect rec = new Rect(0,0,tex.width ,tex.height );
+			videoPost.sprite = Sprite.Create( tex , rec , new Vector2(0.5f,0.5f) , 100);
+
+			PlayInitAnimation();
+		}
+	}
+
 	/// <summary>
 	/// record the start time of hovering 
                	/// </summary>
-
 	public void Init(VideoInfo info , VideoUnitInitAnimation anim , VideoSelectWindow _p )
 	{
+		// initilize the sprite first
+		URLRequestMessage msg = new URLRequestMessage(this);
+		msg.url = info.coverUrl;
+		VREvents.FireRequesTexture( msg );
+
+
+		m_state = VideoInfoUnitState.Init;
+		m_anim = anim;
+		parent = _p;
+
 		m_info = info;
 		if ( videoPost != null )
 			videoPost.sprite  = info.Post;
 		if ( videoName != null )
-			videoName.text = info.name;
+			videoName.text = info.title;
 
-		m_state = VideoInfoUnitState.Init;
+		videoPost.gameObject.SetActive( false );
+		videoName.gameObject.SetActive( false );
+	}
 
+	void PlayInitAnimation()
+	{
+		VideoUnitInitAnimation anim = m_anim;
+
+		videoPost.gameObject.SetActive( true );
+		videoName.gameObject.SetActive( true );
 		videoPost.transform.DOScale( Vector3.zero , anim.duration ).From().SetDelay(anim.delay);
 		videoPost.transform.DORotate( new Vector3( 90, 90, 90 ) , anim.duration ).From().SetDelay(anim.delay );
 		videoPost.DOFade( 0 , anim.duration ).From().SetDelay(anim.delay );
 		videoName.DOFade( 0 , anim.duration ).From().SetDelay(anim.delay ).OnComplete(CompleteInit);
-
-		parent = _p;
 	}
 
 	void CompleteInit()
@@ -71,6 +109,7 @@ public class VideoInfoUnit : UISensor {
 	{
 		base.OnConfirm ();
 		parent.PlayVideo( Info );
+
 	}
 
 	override public void OnHover(UIHoverEvent e)
@@ -109,7 +148,10 @@ public class VideoInfoUnit : UISensor {
 public struct VideoInfo
 {
 	public Sprite Post;
-	public string name;
+	public string title;
+	public string playUrl;
+	public string coverUrl;
+	public string description;
 }
 [System.Serializable]
 public struct VideoUnitInitAnimation
