@@ -40,7 +40,7 @@ public class VideoSelectWindow : UIWindow  {
 	{
 		if ( msg.postObj == this )
 		{
-			Debug.Log("Recieve video list");
+//			Debug.Log("Recieve video list");
 			List<VideoInfo> videoList = (List<VideoInfo>)msg.GetMessage(Global.MSG_POSTVIDEO_VIDEO_KEY );
 
 			foreach(VideoInfo info in videoList )

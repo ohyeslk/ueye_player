@@ -1748,7 +1748,6 @@ public class MediaPlayerCtrl : MonoBehaviour
 	
 	private unsafe bool Call_Load(string strFileName, int iSeek)
 	{
-		
 		fCurrentSeekTime = 0.0f;
 		fLastFrameTime = 0.0f;
 
@@ -2485,7 +2484,7 @@ public class MediaPlayerCtrl : MonoBehaviour
                 if (audioSource != null)
                 {
 
-					if (listAudioPts [i] >= 0) {
+				if (listAudioPts!= null && listAudioPts [i] >= 0) {
 						if(m_strFileName.Contains(".m3u8") || m_strFileName.StartsWith("rtmp",StringComparison.OrdinalIgnoreCase) )
 						{
 

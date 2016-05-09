@@ -28,6 +28,7 @@ public class HTTPManager : MonoBehaviour {
 	/// <param name="msg">Message.</param>
 	void RequestVideoInfo( URLRequestMessage msg )
 	{
+		Debug.Log(" Request Video Info ");
 		string url = msg.url;
 		if ( url == null )
 		{
@@ -106,6 +107,7 @@ public class HTTPManager : MonoBehaviour {
 
 	IEnumerator WaitForRequest(string url , RequestHandler handler , URLRequestMessage postMsg)
 	{
+//		Debug.Log( "Wait for request " + url  + " " + postMsg.postObj);
 		WWW www = new WWW(url);
 		yield return www;
 
