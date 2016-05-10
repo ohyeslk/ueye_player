@@ -15,7 +15,6 @@ public class UIInputModel : GazeInputModule {
 	public void ProcessUI()
 	{
 		// deal with the hover 
-		{
 			UIHoverEvent hoverEvent = new UIHoverEvent();
 			hoverEvent.point = GetIntersectionPosition();
 			UISensor hoverSensor = null ;
@@ -48,8 +47,30 @@ public class UIInputModel : GazeInputModule {
 			}
 
 			lastSensor = hoverSensor;
-		}
 	}
+
+
+	public GameObject m_fingerTargetObject;
+
+	PointerEventData FingerPoint;
+
+	public void OnFingerDown(FingerDownEvent e )
+	{
+		if ( FingerPoint == null ) {
+			FingerPoint = new PointerEventData(eventSystem);
+		}
+
+		FingerPoint.Reset();
+		FingerPoint.position = e.Position;
+		eventSystem.RaycastAll(FingerPoint, m_RaycastResultCache);
+		FingerPoint.pointerCurrentRaycast = FindFirstRaycast(m_RaycastResultCache);
+		m_fingerTargetObject = FingerPoint.pointerCurrentRaycast.gameObject;
+		m_RaycastResultCache.Clear();
+
+		ExecuteEvents.Execute (m_fingerTargetObject, new PointerEventData (eventSystem), ExecuteEvents.pointerClickHandler);
+
+	}
+
 }
 
 [System.Serializable]

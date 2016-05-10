@@ -37,4 +37,5 @@ public class ModeSwitchButton : MonoBehaviour {
 			cardboard.VRModeEnabled = !cardboard.VRModeEnabled;
 		UpdateIcon();
 	}
+
 }

@@ -63,6 +63,7 @@
      <None Include="Assets\Plugins\Cardboard\Distortion\CardboardDistortion.cginc" />
      <None Include="Assets\Plugins\EasyMovieTexture\Unlit_SphereInside.shader" />
      <None Include="Assets\Plugins\JSON\readme.txt" />
+     <None Include="Assets\Plugins\FingerGestures\Readme.txt" />
      <None Include="Assets\Plugins\Cardboard\Resources\UnlitTexture.shader" />
      <None Include="Assets\Plugins\EasyMovieTexture\Chromakey.shader" />
      <None Include="Assets\Plugins\DOTween\DOTween50.xml" />

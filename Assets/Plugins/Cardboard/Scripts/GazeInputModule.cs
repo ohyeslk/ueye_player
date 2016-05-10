@@ -105,6 +105,7 @@ public class GazeInputModule : BaseInputModule {
   }
 
   public override void Process() {
+	
     // Save the previous Game Object
     GameObject gazeObjectPrevious = GetCurrentGameObject();
 
@@ -290,7 +291,7 @@ public class GazeInputModule : BaseInputModule {
     if (pointerData != null && pointerData.enterEventCamera != null) {
       return pointerData.pointerCurrentRaycast.gameObject;
     }
-
+	
     return null;
   }
 

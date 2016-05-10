@@ -1741,9 +1741,6 @@ public class MediaPlayerCtrl : MonoBehaviour
 			Destroy (audioClip);
 			audioClip = null;
 		}
-
-
-
 	}
 	
 	private unsafe bool Call_Load(string strFileName, int iSeek)
@@ -2484,7 +2481,7 @@ public class MediaPlayerCtrl : MonoBehaviour
                 if (audioSource != null)
                 {
 
-				if (listAudioPts!= null && listAudioPts [i] >= 0) {
+				if (listAudioPts!= null && listAudioPts.Count > i && listAudioPts [i] >= 0) {
 						if(m_strFileName.Contains(".m3u8") || m_strFileName.StartsWith("rtmp",StringComparison.OrdinalIgnoreCase) )
 						{
 
