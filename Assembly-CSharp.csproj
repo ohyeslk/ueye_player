@@ -49,6 +49,7 @@
      <Compile Include="Assets\Script\Core\HTTPManager.cs" />
      <Compile Include="Assets\Script\Core\VREvents.cs" />
      <Compile Include="Assets\Script\Core\WindowManager.cs" />
+     <Compile Include="Assets\Script\UI\Basic\CameraHolder.cs" />
      <Compile Include="Assets\Script\UI\Basic\Grid.cs" />
      <Compile Include="Assets\Script\UI\Basic\UISensor.cs" />
      <Compile Include="Assets\Script\UI\Reticle\UIReticle.cs" />
