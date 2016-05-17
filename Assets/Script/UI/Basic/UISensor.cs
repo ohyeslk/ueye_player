@@ -35,6 +35,14 @@ public class UISensor : MonoBehaviour {
 		}
 	}
 
+
+	public float FocusTime
+	{
+		get {
+			return ( HoveredTime > focusTime )? HoveredTime - focusTime : 0;
+		}
+	}
+
 	virtual public void OnFocus()
 	{
 		var varg = new UISensorArg(this);
@@ -52,41 +60,70 @@ public class UISensor : MonoBehaviour {
 	}
 
 	virtual public void OnHover( UIHoverEvent e ) {
-		UpdateStartTime(e);
-		UpdateTimeRelatedAction(e);
+		Debug.Log( " On Hover " + name );
+		if ( CheckStartTime(e) )
+			UpdateState();
 	}
 
-	protected void UpdateStartTime(UIHoverEvent e)
-	{
-		if ( e.hoverPhase == UIHoverEvent.HoverPhase.Begin )
-			startHoverTime = Time.time;
-		else if ( e.hoverPhase == UIHoverEvent.HoverPhase.End )
-			startHoverTime = Mathf.Infinity;
+	virtual public void OnMotion( FingerMotionEvent e ) {
+		
 	}
 
-	protected void UpdateTimeRelatedAction(UIHoverEvent e)
+	/// <summary>
+	/// Checks the start time.
+	/// </summary>
+	/// <returns><c>true</c>, if in the middle of the hover, <c>false</c> otherwise.</returns>
+	/// <param name="e">E.</param>
+	protected bool CheckStartTime(UIHoverEvent e)
 	{
 		if ( e.hoverPhase == UIHoverEvent.HoverPhase.Middle )
-		{
-			if ( HoveredTime < focusTime )
-			{
-				m_time_state = TimeBaseActionState.Hovered;
-			}
-			else if ( HoveredTime < focusTime + confirmTime )
-			{
-				m_time_state = TimeBaseActionState.Focused;
-			}
-			else
-			{
-				m_time_state = TimeBaseActionState.Confirmed;
-			}
-		}
+			return true;
+		
+		if ( e.hoverPhase == UIHoverEvent.HoverPhase.Begin )
+			StartHover();
 		else if ( e.hoverPhase == UIHoverEvent.HoverPhase.End )
-		{
-			m_time_state = TimeBaseActionState.None;
-		}
+			EndHover();
+		
+		return false;
 	}
 
+	protected void StartHover()
+	{
+		startHoverTime = Time.time;
+	}
+
+	protected void EndHover()
+	{
+		startHoverTime = Mathf.Infinity;
+		m_time_state = TimeBaseActionState.None;
+	}
+		
+	protected void UpdateState()
+	{
+		if ( FocusTime <= 0 )
+		{
+			m_time_state = TimeBaseActionState.Hovered;
+		}
+		else if ( HoveredTime < focusTime + confirmTime )
+		{
+			m_time_state = TimeBaseActionState.Focused;
+		}
+		else
+		{
+			m_time_state = TimeBaseActionState.Confirmed;
+		}
+		
+	}
+
+	public void Reset()
+	{
+		startHoverTime = Mathf.Infinity;
+		m_time_state = TimeBaseActionState.None;
+	}
+
+	public float GetTotalFocusTime () { return focusTime ; }
+	public float GetTotalConfirmTime () { return confirmTime ; }
+		
 }
 
 

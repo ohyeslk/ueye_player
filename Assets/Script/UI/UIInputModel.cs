@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Collections;
+using System.Collections.Generic;
 
 public class UIInputModel : GazeInputModule {
 
@@ -49,26 +50,93 @@ public class UIInputModel : GazeInputModule {
 			lastSensor = hoverSensor;
 	}
 
+	protected override GameObject GetCurrentGameObject ()
+	{
+		if ( LogicManager.VRMode == VRMode.VR_3D )
+			return base.GetCurrentGameObject();
+		else
+		{
+			if (FingerPointData != null && FingerPointData.enterEventCamera != null) {
+				return FingerPointData.pointerCurrentRaycast.gameObject;
+			}
+
+		}
+		return null;
+	}
+
+	protected override Vector3 GetIntersectionPosition ()
+	{
+		if ( LogicManager.VRMode == VRMode.VR_3D ) 
+			return base.GetIntersectionPosition ();
+		else
+		{
+			if ( FingerPointData != null )
+			{
+				Camera cam = FingerPointData.enterEventCamera;
+				if (cam == null) {
+					return Vector3.zero;
+				}
+
+				float intersectionDistance = FingerPointData.pointerCurrentRaycast.distance + cam.nearClipPlane;
+				Vector3 intersectionPosition = cam.transform.position + cam.transform.forward * intersectionDistance;
+
+				return intersectionPosition;
+			}
+			return Vector3.zero;
+		}
+	}
 
 	public GameObject m_fingerTargetObject;
 
-	PointerEventData FingerPoint;
+	/// <summary>
+	/// pointer event data used in 2d mode
+	/// </summary>
+	private PointerEventData FingerPointData;
 
 	public void OnFingerDown(FingerDownEvent e )
 	{
-		if ( FingerPoint == null ) {
-			FingerPoint = new PointerEventData(eventSystem);
+		{
+			if ( FingerPointData == null ) {
+				FingerPointData = new PointerEventData(eventSystem);
+			}
+
+//			Debug.Log( "On Down" + e.Name );
+
+			List<RaycastResult> rayCastResults = new List<RaycastResult>();
+			FingerPointData.Reset();
+			FingerPointData.position = e.Position;
+			eventSystem.RaycastAll(FingerPointData, rayCastResults);
+			FingerPointData.pointerCurrentRaycast = FindFirstRaycast(rayCastResults);
+			m_fingerTargetObject = FingerPointData.pointerCurrentRaycast.gameObject;
+			rayCastResults.Clear();
+
+			ExecuteEvents.Execute (m_fingerTargetObject, new PointerEventData (eventSystem), ExecuteEvents.pointerClickHandler);
 		}
+	}
 
-		FingerPoint.Reset();
-		FingerPoint.position = e.Position;
-		eventSystem.RaycastAll(FingerPoint, m_RaycastResultCache);
-		FingerPoint.pointerCurrentRaycast = FindFirstRaycast(m_RaycastResultCache);
-		m_fingerTargetObject = FingerPoint.pointerCurrentRaycast.gameObject;
-		m_RaycastResultCache.Clear();
+	public void OnFingerStationary( FingerMotionEvent e )
+	{
+		{
+			if ( FingerPointData == null ) {
+				FingerPointData = new PointerEventData(eventSystem);
+			}
+			FingerPointData.Reset();
 
-		ExecuteEvents.Execute (m_fingerTargetObject, new PointerEventData (eventSystem), ExecuteEvents.pointerClickHandler);
+			if ( e.Phase != FingerMotionPhase.Ended )
+			{
+				FingerPointData.position = e.Position;
+				List<RaycastResult> rayCastResults = new List<RaycastResult>();
+				eventSystem.RaycastAll( FingerPointData, rayCastResults );
+				FingerPointData.pointerCurrentRaycast = FindFirstRaycast(rayCastResults);
+				m_fingerTargetObject = FingerPointData.pointerCurrentRaycast.gameObject;
+				rayCastResults.Clear();
+			}else
+			{
+				FingerPointData = null;
+			}
 
+	//		ExecuteEvents.Execute (m_fingerTargetObject, new PointerEventData (eventSystem), ExecuteEvents.updateSelectedHandler);
+		}
 	}
 
 }

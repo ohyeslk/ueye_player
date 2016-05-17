@@ -31,7 +31,7 @@ public class UIReticle : MonoBehaviour, ICardboardPointer
 	private const float kReticleMinOuterAngle = 0.5f;
 	// Angle at which to expand the reticle when intersecting with an object
 	// (in degrees).
-	private const float kReticleGrowthAngle = 1.5f;
+	private const float kReticleGrowthAngle = 0.8f;
 
 	// Minimum distance of the reticle (in meters).
 	private const float kReticleDistanceMin = 0.75f;
@@ -74,6 +74,7 @@ public class UIReticle : MonoBehaviour, ICardboardPointer
 		}
 		VREvents.UIConfirm -= OnConfirmSensor;
 		VREvents.UIFocus -= OnFocusSensor;
+		VREvents.SwitchVRMode -= OnSwitchVRMode;
 	}
 
 	void OnEnable ()
@@ -81,6 +82,24 @@ public class UIReticle : MonoBehaviour, ICardboardPointer
 		GazeInputModule.cardboardPointer = this;
 		VREvents.UIConfirm += OnConfirmSensor;
 		VREvents.UIFocus += OnFocusSensor;
+		VREvents.SwitchVRMode += OnSwitchVRMode;
+	}
+
+	void OnSwitchVRMode( Message msg )
+	{
+		VRMode to = (VRMode)msg.GetMessage(Global.MSG_SWITCHVRMODE_MODE_KEY );
+		Debug.Log("Reticle  to " + to );
+		if ( to == VRMode.VR_2D )
+		{
+			MeshRenderer[] renders = GetComponentsInChildren<MeshRenderer>();
+			foreach( MeshRenderer r in renders )
+				r.enabled = false;
+		}else
+		{
+			MeshRenderer[] renders = GetComponentsInChildren<MeshRenderer>();
+			foreach( MeshRenderer r in renders )
+				r.enabled = true;
+		}
 	}
 
 	void OnFocusSensor (UISensorArg varg)

@@ -60,7 +60,7 @@ public class GazeInputModule : BaseInputModule {
   [HideInInspector]
   public Vector2 hotspot = new Vector2(0.5f, 0.5f);
 
-  private PointerEventData pointerData;
+  protected PointerEventData pointerData;
   private Vector2 lastHeadPose;
 
   // GazePointer callbacks
@@ -287,7 +287,7 @@ public class GazeInputModule : BaseInputModule {
     return new Vector2(outPolar, outElevation);
   }
 
-  protected GameObject GetCurrentGameObject() {
+  virtual protected GameObject GetCurrentGameObject() {
     if (pointerData != null && pointerData.enterEventCamera != null) {
       return pointerData.pointerCurrentRaycast.gameObject;
     }
@@ -295,8 +295,11 @@ public class GazeInputModule : BaseInputModule {
     return null;
   }
 
-  protected Vector3 GetIntersectionPosition() {
+  virtual protected Vector3 GetIntersectionPosition() {
     // Check for camera
+	if ( pointerData == null )
+		return Vector3.zero;
+		
     Camera cam = pointerData.enterEventCamera;
     if (cam == null) {
       return Vector3.zero;

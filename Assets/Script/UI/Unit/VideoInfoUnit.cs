@@ -4,10 +4,12 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using DG.Tweening;
 
-public class VideoInfoUnit : UISensor , IPointerClickHandler {
+public class VideoInfoUnit : MonoBehaviour {
 	[SerializeField] Image videoPost;
 	[SerializeField] Text videoName;
-
+	[SerializeField] VideoInfoUnitSensor Sensor2D;
+	[SerializeField] VideoInfoUnitSensor Sensor3D;
+	[SerializeField] VideoUnitConfirmAnimation confirmAni;
 	VideoSelectWindow parent;
 
 	[System.Serializable]
@@ -35,6 +37,16 @@ public class VideoInfoUnit : UISensor , IPointerClickHandler {
 		}
 	}
 
+	public UISensor tempSensor
+	{
+		get {
+			if ( LogicManager.VRMode == VRMode.VR_2D )
+				return Sensor2D;
+			else
+				return Sensor3D;
+		}
+	}
+
 	VideoInfo m_info = new VideoInfo();
 	VideoUnitInitAnimation m_anim;
 
@@ -45,11 +57,29 @@ public class VideoInfoUnit : UISensor , IPointerClickHandler {
 	void OnDisable()
 	{
 		VREvents.PostTexture -= RecieveTexture;
+		VREvents.SwitchVRMode -= OnSwitchVRMode;
 	}
 
 	void OnEnable()
 	{
 		VREvents.PostTexture += RecieveTexture;
+		VREvents.SwitchVRMode += OnSwitchVRMode;
+	}
+
+	void OnSwitchVRMode( Message msg )
+	{
+		Sensor3D.Reset();
+		Sensor2D.Reset();
+		VRMode to = (VRMode) msg.GetMessage(Global.MSG_SWITCHVRMODE_MODE_KEY ) ;
+		if ( to == VRMode.VR_2D )
+		{
+			Sensor3D.SetEnable( false );
+			Sensor2D.SetEnable( true );
+		}else
+		{
+			Sensor3D.SetEnable( true );
+			Sensor2D.SetEnable( false );
+		}
 	}
 
 	void RecieveTexture( URLRequestMessage msg )
@@ -74,7 +104,6 @@ public class VideoInfoUnit : UISensor , IPointerClickHandler {
 		msg.url = info.coverUrl;
 		VREvents.FireRequesTexture( msg );
 
-
 		m_state = VideoInfoUnitState.Init;
 		m_anim = anim;
 		parent = _p;
@@ -87,6 +116,9 @@ public class VideoInfoUnit : UISensor , IPointerClickHandler {
 
 		videoPost.gameObject.SetActive( false );
 		videoName.gameObject.SetActive( false );
+
+		ResetConfirm();
+
 	}
 
 	void PlayInitAnimation()
@@ -105,18 +137,24 @@ public class VideoInfoUnit : UISensor , IPointerClickHandler {
 	{
 		m_state = VideoInfoUnitState.Normal;
 	}
-
-	public override void OnConfirm ()
+		
+	public  void OnConfirm ()
 	{
-		base.OnConfirm ();
+		Debug.Log("[On Confirm]" + name);
+		tempSensor.OnConfirm ();
 		parent.PlayVideo( Info );
-
 	}
 
-	override public void OnHover(UIHoverEvent e)
+	 public void OnHover(UIHoverEvent e)
 	{
-		base.OnHover(e);
+		Debug.Log("[On Hover] " + name + " " + e.hoverPhase );
 		UpdateState(e);
+		UpdateConfirm(e);
+	}
+
+	public void OnFucus( )
+	{
+		
 	}
 
 	void UpdateState(UIHoverEvent e)
@@ -126,36 +164,70 @@ public class VideoInfoUnit : UISensor , IPointerClickHandler {
 			{
 				videoPost.transform.DOScale( hoverAnimation.scale , hoverAnimation.duration );
 
-				if ( videoName.GetComponent<Outline>() )
-					videoName.GetComponent<Outline>().enabled = true;
+//				if ( videoName.GetComponent<Outline>() )
+//					videoName.GetComponent<Outline>().enabled = true;
+
 				m_state = VideoInfoUnitState.Hovered;
 			}
 		}
 		if ( State == VideoInfoUnitState.Hovered )
 		{
+
 			if ( e.hoverPhase == UIHoverEvent.HoverPhase.End )
 			{
 				videoPost.transform.DOKill();
 				videoPost.transform.DOScale( Vector3.one , hoverAnimation.duration );
 
-				if ( videoName.GetComponent<Outline>() )
-					videoName.GetComponent<Outline>().enabled = false;
+//				if ( videoName.GetComponent<Outline>() )
+//					videoName.GetComponent<Outline>().enabled = false;
 				m_state = VideoInfoUnitState.Normal;
 			}
 		}
 	}
 
-	/// <summary>
-	/// When the VR Mode is 2D, the info unit sense the click action
-	/// </summary>
-	/// <param name="eventData">Event data.</param>
-	public void OnPointerClick( PointerEventData eventData)
+	float confirmProcess = 0 ;
+	void UpdateConfirm( UIHoverEvent e )
 	{
-		if (LogicManager.VRMode == VRMode.VR_2D )
+		if ( e.hoverPhase == UIHoverEvent.HoverPhase.Middle )
 		{
-			OnConfirm();
+			if ( tempSensor.FocusTime >0 )
+			{
+				confirmAni.confirmRing.fillAmount =
+					confirmAni.confirmCurve.Evaluate( tempSensor.FocusTime / tempSensor.GetTotalConfirmTime());
+			}
 		}
+		if ( e.hoverPhase == UIHoverEvent.HoverPhase.Begin )
+		{
+			confirmAni.confirm.DOKill();
+			confirmAni.confirmRing.DOKill();
+			confirmAni.confirm.transform.DOKill();
+			float time = tempSensor.GetTotalFocusTime();
+			confirmAni.confirm.enabled = true;
+			confirmAni.confirmRing.enabled = true;
+			confirmAni.confirm.DOFade( 1f , time );
+			confirmAni.confirm.transform.DOLocalMoveY( confirmAni.posY + confirmAni.moveY , 0 );
+			confirmAni.confirm.transform.DOLocalMoveY( confirmAni.posY , time );
+		}else if ( e.hoverPhase == UIHoverEvent.HoverPhase.End )
+		{
+			float time = tempSensor.GetTotalFocusTime() / 2f;
+			confirmAni.confirm.transform.DOLocalMoveY( confirmAni.posY + confirmAni.moveY , time );
+			confirmAni.confirm.DOFade( 0 , time  );
+			confirmAni.confirmRing.DOFillAmount( 0 , time ).OnComplete(ResetConfirm);
+		}
+		
 	}
+
+	void ResetConfirm()
+	{
+		confirmAni.confirmRing.fillAmount = 0;
+		Color col = confirmAni.confirm.color ;
+		col.a = 0.01f;
+		confirmAni.confirm.color = col;
+		confirmAni.confirmRing.enabled = false;
+	}
+		
+
+
 
 }
 [System.Serializable]
@@ -174,10 +246,27 @@ public struct VideoUnitInitAnimation
 	public float duration;
 }
 
+[System.Serializable]
+public struct VideoUnitConfirmAnimation
+{
+	public Image confirm;
+	public Image confirmRing;
+	public AnimationCurve confirmCurve;
+	public float posY;
+					public float moveY;
+}
+
 public enum VideoInfoUnitState
 {
 	None,
 	Init,
 	Normal,
 	Hovered,
+}
+
+[System.Serializable]
+public struct VideoUnitSelectParameter
+{
+	public float selectTime;
+	public float process;
 }

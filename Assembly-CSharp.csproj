@@ -57,6 +57,7 @@
      <Compile Include="Assets\Script\UI\UIInputModel.cs" />
      <Compile Include="Assets\Script\UI\Unit\UIButton.cs" />
      <Compile Include="Assets\Script\UI\Unit\VideoInfoUnit.cs" />
+     <Compile Include="Assets\Script\UI\Unit\VideoInfoUnitSensor.cs" />
      <Compile Include="Assets\Script\UI\Window\ModeSwitchButton.cs" />
      <Compile Include="Assets\Script\UI\Window\UIWindow.cs" />
      <Compile Include="Assets\Script\UI\Window\VideoPlayWindow.cs" />

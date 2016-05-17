@@ -107,7 +107,7 @@ public class VideoSelectWindow : UIWindow  {
 			unitObj.transform.localScale = Vector3.one;
 			unitObj.transform.localPosition = Vector3.zero;
 
-			VideoInfoUnit unit = unitObj.GetComponent<VideoInfoUnit>();
+			VideoInfoUnit unit = unitObj.GetComponentInChildren<VideoInfoUnit>();
 
 			//TODO : initilize the video infor online
 			info.Post = spriteList[Random.Range(0,spriteList.Length)] ;

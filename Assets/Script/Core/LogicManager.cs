@@ -21,7 +21,7 @@ public class LogicManager : MonoBehaviour {
 				instance = FindObjectOfType(typeof(LogicManager)) as LogicManager;
 				if (instance == null)
 				{
-					instance = new GameObject("tk2dUIAudioManager").AddComponent<LogicManager>();
+					instance = new GameObject("LogicManager").AddComponent<LogicManager>();
 				}
 			}
 			return instance;
@@ -43,6 +43,7 @@ public class LogicManager : MonoBehaviour {
 
 	static public void SwitchVRMode()
 	{
+		Debug.Log( "Switch VRMode " );
 		if ( m_vr_mode == VRMode.VR_3D )
 		{
 			SetVRMode( VRMode.VR_2D);
@@ -54,17 +55,26 @@ public class LogicManager : MonoBehaviour {
 
 	static public void SetVRMode(VRMode to)
 	{
+		Debug.Log("Set VRMode to " + to + " Cardboard " + CardBoard );
+		m_vr_mode = to;
 		if ( to == VRMode.VR_2D )
 		{
-			m_vr_mode = VRMode.VR_2D;
 			if ( CardBoard != null ) CardBoard.VRModeEnabled = false;
 		}else // to 3d mode
 		{
-			m_vr_mode = VRMode.VR_3D;
 			if ( CardBoard != null ) CardBoard.VRModeEnabled = true;
-			
 		}
+
+		Message msg = new Message( Instance );
+		msg.AddMessage(Global.MSG_SWITCHVRMODE_MODE_KEY, to );
+		VREvents.FireSwitchVRMode( msg );
 	}
+
+	void Start()
+	{
+		SetVRMode(Global.initMode);
+	}
+
 }
 
 
