@@ -12,10 +12,6 @@ public class VideoSelectWindow : UIWindow  {
 	/// The grid panel to save the units
 	/// </summary>
 	[SerializeField] GridLayoutGroup Panel;
-	/// <summary>
-	/// FOR TEST: the lib of the sprite 
-	/// </summary>
-	[SerializeField] Sprite[] spriteList;
 
 	/// <summary>
 	/// the list to save the unit 
@@ -108,9 +104,6 @@ public class VideoSelectWindow : UIWindow  {
 			unitObj.transform.localPosition = Vector3.zero;
 
 			VideoInfoUnit unit = unitObj.GetComponentInChildren<VideoInfoUnit>();
-
-			//TODO : initilize the video infor online
-			info.Post = spriteList[Random.Range(0,spriteList.Length)] ;
 
 			// set up the animation for the info unit
 			VideoUnitInitAnimation animation = new VideoUnitInitAnimation();

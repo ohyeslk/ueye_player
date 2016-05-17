@@ -109,12 +109,12 @@ public class VideoInfoUnit : MonoBehaviour {
 		parent = _p;
 
 		m_info = info;
-		if ( videoPost != null )
-			videoPost.sprite  = info.Post;
+//		if ( videoPost != null )
+//			videoPost.sprite  = info.Post;
 		if ( videoName != null )
 			videoName.text = info.title;
 
-		videoPost.gameObject.SetActive( false );
+//		videoPost.gameObject.SetActive( false );
 		videoName.gameObject.SetActive( false );
 
 		ResetConfirm();
