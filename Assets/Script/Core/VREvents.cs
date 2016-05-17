@@ -22,6 +22,9 @@ public class VREvents
 	public static event MessageEventHandler WindowReturn;
 	public static void FireWindowReturn(Message arg){if ( WindowReturn != null ) WindowReturn(arg) ; }
 
+	public static event MessageEventHandler SwitchVRMode;
+	public static void FireSwitchVRMode(Message arg) { if ( SwitchVRMode != null ) SwitchVRMode(arg); }
+
 
 	public static event MessageEventHandler PlayVideo;
 	public static void FirePlayVideo(Message arg){if ( PlayVideo != null ) PlayVideo(arg) ; }

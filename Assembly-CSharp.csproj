@@ -47,6 +47,7 @@
   <ItemGroup>
      <Compile Include="Assets\Script\Core\Global.cs" />
      <Compile Include="Assets\Script\Core\HTTPManager.cs" />
+     <Compile Include="Assets\Script\Core\LogicManager.cs" />
      <Compile Include="Assets\Script\Core\VREvents.cs" />
      <Compile Include="Assets\Script\Core\WindowManager.cs" />
      <Compile Include="Assets\Script\UI\Basic\CameraHolder.cs" />

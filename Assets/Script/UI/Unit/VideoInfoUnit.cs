@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using DG.Tweening;
 
-public class VideoInfoUnit : UISensor {
+public class VideoInfoUnit : UISensor , IPointerClickHandler {
 	[SerializeField] Image videoPost;
 	[SerializeField] Text videoName;
 
@@ -143,6 +144,19 @@ public class VideoInfoUnit : UISensor {
 			}
 		}
 	}
+
+	/// <summary>
+	/// When the VR Mode is 2D, the info unit sense the click action
+	/// </summary>
+	/// <param name="eventData">Event data.</param>
+	public void OnPointerClick( PointerEventData eventData)
+	{
+		if (LogicManager.VRMode == VRMode.VR_2D )
+		{
+			OnConfirm();
+		}
+	}
+
 }
 [System.Serializable]
 public struct VideoInfo
