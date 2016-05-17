@@ -9,6 +9,7 @@ public class VideoInfoUnit : MonoBehaviour {
 	[SerializeField] Text videoName;
 	[SerializeField] VideoInfoUnitSensor Sensor2D;
 	[SerializeField] VideoInfoUnitSensor Sensor3D;
+	[SerializeField] VideoInfoUnitSensor confirmSensor3D;
 	[SerializeField] VideoUnitConfirmAnimation confirmAni;
 	VideoSelectWindow parent;
 
@@ -75,10 +76,13 @@ public class VideoInfoUnit : MonoBehaviour {
 		{
 			Sensor3D.SetEnable( false );
 			Sensor2D.SetEnable( true );
-		}else
+			confirmSensor3D.SetEnable( false );
+
+		}else // 3D mode
 		{
 			Sensor3D.SetEnable( true );
 			Sensor2D.SetEnable( false );
+			confirmSensor3D.SetEnable( true );
 		}
 	}
 
@@ -141,17 +145,46 @@ public class VideoInfoUnit : MonoBehaviour {
 	public  void OnConfirm ()
 	{
 		Debug.Log("[On Confirm]" + name);
+		return;
 		tempSensor.OnConfirm ();
 		parent.PlayVideo( Info );
 	}
 
 	 public void OnHover(UIHoverEvent e)
 	{
-		Debug.Log("[On Hover] " + name + " " + e.hoverPhase );
 		UpdateState(e);
 		UpdateConfirm(e);
 	}
 
+	/// <summary>
+	/// show all the confirm components
+	/// </summary>
+	public void ShowConfirm()
+	{
+		if ( confirmAni.confirm.color.a < 0.1f )
+		{
+		confirmAni.confirm.DOKill();
+		confirmAni.confirmRing.DOKill();
+		confirmAni.confirm.transform.DOKill();
+		float time = tempSensor.GetTotalFocusTime();
+		confirmAni.confirm.enabled = true;
+		confirmAni.confirmRing.enabled = true;
+		confirmAni.confirm.DOFade( 1f , time );
+		confirmAni.confirm.transform.DOLocalMoveY( confirmAni.posY + confirmAni.moveY , 0 );
+		confirmAni.confirm.transform.DOLocalMoveY( confirmAni.posY , time );
+		}
+	}
+
+	public void HideConfirm()
+	{
+		if ( confirmAni.confirm.color.a > 0.9f )
+		{
+			float time = tempSensor.GetTotalFocusTime() / 2f;
+			confirmAni.confirm.transform.DOLocalMoveY( confirmAni.posY + confirmAni.moveY , time );
+			confirmAni.confirm.DOFade( 0 , time  );
+			confirmAni.confirmRing.DOFillAmount( 0 , time ).OnComplete(ResetConfirm);
+		}
+	}
 	public void OnFucus( )
 	{
 		
@@ -190,31 +223,34 @@ public class VideoInfoUnit : MonoBehaviour {
 	{
 		if ( e.hoverPhase == UIHoverEvent.HoverPhase.Middle )
 		{
-			if ( tempSensor.FocusTime >0 )
+			if ( tempSensor.FocusTime > 0 )
 			{
 				confirmAni.confirmRing.fillAmount =
-					confirmAni.confirmCurve.Evaluate( tempSensor.FocusTime / tempSensor.GetTotalConfirmTime());
+					confirmAni.confirmCurve.Evaluate( tempSensor.FocusTime / ( tempSensor.GetTotalConfirmTime() + tempSensor.GetTotalFocusTime()));
+			}
+
+		}
+
+		if ( LogicManager.VRMode == VRMode.VR_2D )
+		{
+			if ( e.hoverPhase == UIHoverEvent.HoverPhase.Begin)
+			{
+				ShowConfirm();
+			}
+
+			if ( e.hoverPhase == UIHoverEvent.HoverPhase.End  )
+			{
+				HideConfirm();
 			}
 		}
-		if ( e.hoverPhase == UIHoverEvent.HoverPhase.Begin )
+		if ( LogicManager.VRMode == VRMode.VR_3D )
 		{
-			confirmAni.confirm.DOKill();
-			confirmAni.confirmRing.DOKill();
-			confirmAni.confirm.transform.DOKill();
-			float time = tempSensor.GetTotalFocusTime();
-			confirmAni.confirm.enabled = true;
-			confirmAni.confirmRing.enabled = true;
-			confirmAni.confirm.DOFade( 1f , time );
-			confirmAni.confirm.transform.DOLocalMoveY( confirmAni.posY + confirmAni.moveY , 0 );
-			confirmAni.confirm.transform.DOLocalMoveY( confirmAni.posY , time );
-		}else if ( e.hoverPhase == UIHoverEvent.HoverPhase.End )
-		{
-			float time = tempSensor.GetTotalFocusTime() / 2f;
-			confirmAni.confirm.transform.DOLocalMoveY( confirmAni.posY + confirmAni.moveY , time );
-			confirmAni.confirm.DOFade( 0 , time  );
-			confirmAni.confirmRing.DOFillAmount( 0 , time ).OnComplete(ResetConfirm);
+			if ( e.hoverPhase == UIHoverEvent.HoverPhase.End  )
+			{
+				float time = tempSensor.GetTotalFocusTime() / 2f;
+				confirmAni.confirmRing.DOFillAmount( 0 , time );
+			}
 		}
-		
 	}
 
 	void ResetConfirm()

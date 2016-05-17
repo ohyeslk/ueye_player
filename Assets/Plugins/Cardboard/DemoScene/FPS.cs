@@ -27,7 +27,7 @@ public class FPS : MonoBehaviour {
   void LateUpdate() {
     float interp = Time.deltaTime / (0.5f + Time.deltaTime);
     float currentFPS = 1.0f / Time.deltaTime;
-    fps = Mathf.Lerp(fps, currentFPS, interp);
+    fps = Mathf.Lerp(fps, currentFPS, 0.5f);
     text.text = Mathf.RoundToInt(fps) + "fps";
   }
 }

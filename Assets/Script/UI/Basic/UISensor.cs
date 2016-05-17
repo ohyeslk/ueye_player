@@ -60,7 +60,6 @@ public class UISensor : MonoBehaviour {
 	}
 
 	virtual public void OnHover( UIHoverEvent e ) {
-		Debug.Log( " On Hover " + name );
 		if ( CheckStartTime(e) )
 			UpdateState();
 	}

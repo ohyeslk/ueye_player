@@ -16,22 +16,42 @@ public class VideoInfoUnitSensor : UISensor {
 		}
 	}
 
+	public bool isConfirmSensor = false;
+
 	public override void OnConfirm ()
 	{
-		base.OnConfirm();
-		P.OnConfirm();
+		if ( !isConfirmSensor )
+		{
+			base.OnConfirm();
+			P.OnConfirm();
+		}
 	}
 		
 	public override void OnHover (UIHoverEvent e)
 	{
 		base.OnHover(e);
-		P.OnHover(e);
+		if ( isConfirmSensor )
+		{
+			if ( e.hoverPhase == UIHoverEvent.HoverPhase.Begin )
+				P.ShowConfirm();
+			else if ( e.hoverPhase == UIHoverEvent.HoverPhase.End)
+			{
+				if ( e.next == null || e.next.transform.parent != transform )
+					P.HideConfirm();
+			}
+		}
+		else{
+			P.OnHover(e);
+		}
 	}
 
 	public override void OnFocus ()
 	{
-		base.OnFocus();
-		P.OnFucus();
+		if ( !isConfirmSensor )
+		{
+			base.OnFocus();
+			P.OnFucus();
+		}
 	}
 
 

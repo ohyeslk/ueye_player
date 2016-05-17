@@ -43,6 +43,7 @@ public class UIInputModel : GazeInputModule {
 				if ( lastSensor != hoverSensor )
 				{
 					hoverEvent.hoverPhase = UIHoverEvent.HoverPhase.End;
+					hoverEvent.next = hoverSensor;
 					lastSensor.OnHover(hoverEvent);
 				}
 			}
@@ -162,4 +163,6 @@ public class UIHoverEvent : UIEvent
 	public Vector3 point;
 
 	public float duration;
+
+	public UISensor next;
 }
