@@ -7,9 +7,6 @@ using DG.Tweening;
 public class VideoInfoUnit : MonoBehaviour {
 	[SerializeField] Image videoPost;
 	[SerializeField] Text videoName;
-	[SerializeField] VideoInfoUnitSensor Sensor2D;
-	[SerializeField] VideoInfoUnitSensor Sensor3D;
-	[SerializeField] VideoInfoUnitSensor confirmSensor3D;
 	[SerializeField] VideoUnitConfirmAnimation confirmAni;
 	VideoSelectWindow parent;
 
@@ -38,15 +35,6 @@ public class VideoInfoUnit : MonoBehaviour {
 		}
 	}
 
-	public UISensor tempSensor
-	{
-		get {
-			if ( LogicManager.VRMode == VRMode.VR_2D )
-				return Sensor2D;
-			else
-				return Sensor3D;
-		}
-	}
 
 	VideoInfo m_info = new VideoInfo();
 	VideoUnitInitAnimation m_anim;
@@ -58,32 +46,11 @@ public class VideoInfoUnit : MonoBehaviour {
 	void OnDisable()
 	{
 		VREvents.PostTexture -= RecieveTexture;
-		VREvents.SwitchVRMode -= OnSwitchVRMode;
 	}
 
 	void OnEnable()
 	{
 		VREvents.PostTexture += RecieveTexture;
-		VREvents.SwitchVRMode += OnSwitchVRMode;
-	}
-
-	void OnSwitchVRMode( Message msg )
-	{
-		Sensor3D.Reset();
-		Sensor2D.Reset();
-		VRMode to = (VRMode) msg.GetMessage(Global.MSG_SWITCHVRMODE_MODE_KEY ) ;
-		if ( to == VRMode.VR_2D )
-		{
-			Sensor3D.SetEnable( false );
-			Sensor2D.SetEnable( true );
-			confirmSensor3D.SetEnable( false );
-
-		}else // 3D mode
-		{
-			Sensor3D.SetEnable( true );
-			Sensor2D.SetEnable( false );
-			confirmSensor3D.SetEnable( true );
-		}
 	}
 
 	void RecieveTexture( URLRequestMessage msg )
@@ -100,7 +67,7 @@ public class VideoInfoUnit : MonoBehaviour {
 
 	/// <summary>
 	/// record the start time of hovering 
-               	/// </summary>
+    /// </summary>
 	public void Init(VideoInfo info , VideoUnitInitAnimation anim , VideoSelectWindow _p )
 	{
 		// initilize the sprite first
@@ -113,12 +80,9 @@ public class VideoInfoUnit : MonoBehaviour {
 		parent = _p;
 
 		m_info = info;
-//		if ( videoPost != null )
-//			videoPost.sprite  = info.Post;
 		if ( videoName != null )
 			videoName.text = info.title;
 
-//		videoPost.gameObject.SetActive( false );
 		videoName.gameObject.SetActive( false );
 
 		ResetConfirm();
@@ -142,48 +106,57 @@ public class VideoInfoUnit : MonoBehaviour {
 		m_state = VideoInfoUnitState.Normal;
 	}
 		
-	public  void OnConfirm ()
+	public void OnConfirm ()
 	{
 		Debug.Log("[On Confirm]" + name);
 		return;
-		tempSensor.OnConfirm ();
 		parent.PlayVideo( Info );
 	}
 
-	 public void OnHover(UIHoverEvent e)
+	public void OnHover(UIHoverEvent e)
 	{
 		UpdateState(e);
-		UpdateConfirm(e);
 	}
 
 	/// <summary>
-	/// show all the confirm components
+	/// Show the confirm button 
 	/// </summary>
-	public void ShowConfirm()
+	public void OnShowConfirm()
 	{
-		if ( confirmAni.confirm.color.a < 0.1f )
-		{
 		confirmAni.confirm.DOKill();
 		confirmAni.confirmRing.DOKill();
 		confirmAni.confirm.transform.DOKill();
-		float time = tempSensor.GetTotalFocusTime();
+		float time = confirmAni.showTime;
 		confirmAni.confirm.enabled = true;
 		confirmAni.confirmRing.enabled = true;
 		confirmAni.confirm.DOFade( 1f , time );
 		confirmAni.confirm.transform.DOLocalMoveY( confirmAni.posY + confirmAni.moveY , 0 );
 		confirmAni.confirm.transform.DOLocalMoveY( confirmAni.posY , time );
-		}
+
 	}
 
-	public void HideConfirm()
+	/// <summary>
+	/// Hide the confirm button
+	/// </summary>
+	public void OnHideConfirm()
 	{
-		if ( confirmAni.confirm.color.a > 0.9f )
-		{
-			float time = tempSensor.GetTotalFocusTime() / 2f;
-			confirmAni.confirm.transform.DOLocalMoveY( confirmAni.posY + confirmAni.moveY , time );
-			confirmAni.confirm.DOFade( 0 , time  );
-			confirmAni.confirmRing.DOFillAmount( 0 , time ).OnComplete(ResetConfirm);
-		}
+		confirmAni.confirm.DOKill();
+		confirmAni.confirmRing.DOKill();
+		confirmAni.confirm.transform.DOKill();
+		float time = confirmAni.hideTime;
+		confirmAni.confirm.transform.DOLocalMoveY( confirmAni.posY + confirmAni.moveY , time );
+		confirmAni.confirm.DOFade( 0 , time  );
+		confirmAni.confirmRing.DOFillAmount( 0 , time ).OnComplete(ResetConfirm);
+	}
+
+	/// <summary>
+	/// hide the confirm ring
+	/// </summary>
+	public void OnHideConfirmRing()
+	{
+		confirmAni.confirm.transform.DOKill();
+		float time = confirmAni.hideTime;
+		confirmAni.confirmRing.DOFillAmount( 0 , time );
 	}
 	public void OnFucus( )
 	{
@@ -196,10 +169,6 @@ public class VideoInfoUnit : MonoBehaviour {
 			if ( e.hoverPhase == UIHoverEvent.HoverPhase.Begin )
 			{
 				videoPost.transform.DOScale( hoverAnimation.scale , hoverAnimation.duration );
-
-//				if ( videoName.GetComponent<Outline>() )
-//					videoName.GetComponent<Outline>().enabled = true;
-
 				m_state = VideoInfoUnitState.Hovered;
 			}
 		}
@@ -210,47 +179,14 @@ public class VideoInfoUnit : MonoBehaviour {
 			{
 				videoPost.transform.DOKill();
 				videoPost.transform.DOScale( Vector3.one , hoverAnimation.duration );
-
-//				if ( videoName.GetComponent<Outline>() )
-//					videoName.GetComponent<Outline>().enabled = false;
 				m_state = VideoInfoUnitState.Normal;
 			}
 		}
 	}
 
-	float confirmProcess = 0 ;
-	void UpdateConfirm( UIHoverEvent e )
+	public void UpdateConfirmRing( float process )
 	{
-		if ( e.hoverPhase == UIHoverEvent.HoverPhase.Middle )
-		{
-			if ( tempSensor.FocusTime > 0 )
-			{
-				confirmAni.confirmRing.fillAmount =
-					confirmAni.confirmCurve.Evaluate( tempSensor.FocusTime / ( tempSensor.GetTotalConfirmTime() + tempSensor.GetTotalFocusTime()));
-			}
-
-		}
-
-		if ( LogicManager.VRMode == VRMode.VR_2D )
-		{
-			if ( e.hoverPhase == UIHoverEvent.HoverPhase.Begin)
-			{
-				ShowConfirm();
-			}
-
-			if ( e.hoverPhase == UIHoverEvent.HoverPhase.End  )
-			{
-				HideConfirm();
-			}
-		}
-		if ( LogicManager.VRMode == VRMode.VR_3D )
-		{
-			if ( e.hoverPhase == UIHoverEvent.HoverPhase.End  )
-			{
-				float time = tempSensor.GetTotalFocusTime() / 2f;
-				confirmAni.confirmRing.DOFillAmount( 0 , time );
-			}
-		}
+		confirmAni.confirmRing.fillAmount = confirmAni.confirmCurve.Evaluate( process );
 	}
 
 	void ResetConfirm()
@@ -288,8 +224,10 @@ public struct VideoUnitConfirmAnimation
 	public Image confirm;
 	public Image confirmRing;
 	public AnimationCurve confirmCurve;
+	public float showTime;
+	public float hideTime;
 	public float posY;
-					public float moveY;
+	public float moveY;
 }
 
 public enum VideoInfoUnitState

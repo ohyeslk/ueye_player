@@ -102,6 +102,7 @@ public class VideoSelectWindow : UIWindow  {
 			unitObj.transform.SetParent( Panel.transform  );
 			unitObj.transform.localScale = Vector3.one;
 			unitObj.transform.localPosition = Vector3.zero;
+			unitObj.name = "InfoU" + info.title;
 
 			VideoInfoUnit unit = unitObj.GetComponentInChildren<VideoInfoUnit>();
 

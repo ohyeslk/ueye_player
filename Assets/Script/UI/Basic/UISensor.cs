@@ -5,6 +5,7 @@ public class UISensor : MonoBehaviour {
 
 	[SerializeField] protected float focusTime;
 	[SerializeField] protected float confirmTime;
+	[SerializeField] SensorType type = SensorType.Normal;
 
 	TimeBaseActionState inner_time_state = TimeBaseActionState.None;
 	TimeBaseActionState m_time_state {
@@ -27,14 +28,20 @@ public class UISensor : MonoBehaviour {
 	TimeBaseActionState TimeState{ get { return m_time_state;}}
 
 
-	float startHoverTime = Mathf.Infinity;
+//	float startHoverTime = Mathf.Infinity;
+//	public float HoveredTime
+//	{
+//		get {
+//			return (Time.time > startHoverTime)? Time.time - startHoverTime : 0;
+//		}
+//	}
+	float m_hoverTime = 0;
 	public float HoveredTime
 	{
 		get {
-			return (Time.time > startHoverTime)? Time.time - startHoverTime : 0;
+			return m_hoverTime;
 		}
 	}
-
 
 	public float FocusTime
 	{
@@ -75,6 +82,7 @@ public class UISensor : MonoBehaviour {
 	/// <param name="e">E.</param>
 	protected bool CheckStartTime(UIHoverEvent e)
 	{
+		m_hoverTime = e.duration;
 		if ( e.hoverPhase == UIHoverEvent.HoverPhase.Middle )
 			return true;
 		
@@ -88,12 +96,13 @@ public class UISensor : MonoBehaviour {
 
 	protected void StartHover()
 	{
-		startHoverTime = Time.time;
+//		startHoverTime = Time.time;
 	}
 
 	protected void EndHover()
 	{
-		startHoverTime = Mathf.Infinity;
+//		startHoverTime = Mathf.Infinity;
+		m_hoverTime = 0;
 		m_time_state = TimeBaseActionState.None;
 	}
 		
@@ -116,13 +125,14 @@ public class UISensor : MonoBehaviour {
 
 	public void Reset()
 	{
-		startHoverTime = Mathf.Infinity;
+//		startHoverTime = Mathf.Infinity;
+		m_hoverTime = 0;
 		m_time_state = TimeBaseActionState.None;
 	}
 
 	public float GetTotalFocusTime () { return focusTime ; }
 	public float GetTotalConfirmTime () { return confirmTime ; }
-		
+	public SensorType GetSensorType () { return type ; }
 }
 
 
@@ -132,4 +142,10 @@ public enum TimeBaseActionState
 	Hovered,
 	Focused,
 	Confirmed,
+}
+
+public enum SensorType
+{
+	Normal,
+	Sub,
 }

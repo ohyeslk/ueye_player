@@ -80,6 +80,8 @@ public class LogicManager : MonoBehaviour {
 
 public enum VRMode
 {
-	VR_2D,
-	VR_3D,
+	VR_None = 0,
+	VR_2D = 1,
+	VR_3D = 2,
+	VR_All = 3,
 }

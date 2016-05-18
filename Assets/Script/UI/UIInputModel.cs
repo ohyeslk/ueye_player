@@ -12,43 +12,109 @@ public class UIInputModel : GazeInputModule {
 	}
 
 	protected UISensor lastSensor = null;
+	protected UISensor lastSubSensor = null;
 	float hoverDuration = 0;
+	float subHoverDuration = 0;
 	public void ProcessUI()
 	{
 		// deal with the hover 
-			UIHoverEvent hoverEvent = new UIHoverEvent();
-			hoverEvent.point = GetIntersectionPosition();
-			UISensor hoverSensor = null ;
+		UIHoverEvent hoverEvent = new UIHoverEvent();
+		hoverEvent.point = GetIntersectionPosition();
+		UISensor hoverSensor = null ;
 
-			GameObject currentObj = GetCurrentGameObject();
-			if  ( currentObj != null )
-				hoverSensor = currentObj.GetComponent<UISensor>();
+		GameObject currentObj = GetCurrentGameObject();
+		if  ( currentObj != null )
+			hoverSensor = currentObj.GetComponent<UISensor>();
 
-
-			if ( hoverSensor != null ) {
-				if ( lastSensor != hoverSensor ) {
-					hoverEvent.hoverPhase = UIHoverEvent.HoverPhase.Begin;
-					hoverDuration = 0;
-				}
-				else
-				{
-					hoverEvent.hoverPhase = UIHoverEvent.HoverPhase.Middle;
-					hoverDuration += Time.deltaTime;
-				}
-				hoverEvent.duration = hoverDuration;
-				hoverSensor.OnHover(hoverEvent);
-			}
+		if ( hoverSensor == null )
+		{
 			if ( lastSensor != null )
 			{
-				if ( lastSensor != hoverSensor )
+				hoverEvent.hoverPhase = UIHoverEvent.HoverPhase.End;
+				hoverEvent.duration = hoverDuration;
+				lastSensor.OnHover(hoverEvent);
+				hoverDuration = 0;
+				lastSensor = null;
+			}
+			if ( lastSubSensor != null )
+			{
+				hoverEvent.hoverPhase = UIHoverEvent.HoverPhase.End;
+				hoverEvent.duration = subHoverDuration;
+				lastSubSensor.OnHover(hoverEvent);
+				subHoverDuration = 0;
+				lastSubSensor = null;
+			}
+		}
+		else if ( hoverSensor.GetSensorType() == SensorType.Normal )
+		{
+			if ( lastSensor != hoverSensor )
+			{
+				if ( lastSensor != null )
 				{
 					hoverEvent.hoverPhase = UIHoverEvent.HoverPhase.End;
-					hoverEvent.next = hoverSensor;
-					lastSensor.OnHover(hoverEvent);
+					hoverEvent.duration = hoverDuration;
+					lastSensor.OnHover( hoverEvent );
 				}
+
+				hoverDuration = 0;
+				hoverEvent.hoverPhase = UIHoverEvent.HoverPhase.Begin;
+				hoverEvent.duration = hoverDuration;
+				hoverSensor.OnHover( hoverEvent );
+				lastSensor = hoverSensor;
+			}
+			else
+			{
+				hoverDuration += Time.deltaTime;
+
+				hoverEvent.hoverPhase = UIHoverEvent.HoverPhase.Middle;
+				hoverEvent.duration = hoverDuration;
+				hoverSensor.OnHover( hoverEvent );
 			}
 
-			lastSensor = hoverSensor;
+			// sub exit 
+			if ( lastSubSensor != null )
+			{
+				hoverEvent.hoverPhase = UIHoverEvent.HoverPhase.End;
+				hoverEvent.duration = subHoverDuration;
+				lastSubSensor.OnHover(hoverEvent);
+				subHoverDuration = 0;
+				lastSubSensor = null;
+			}
+		}
+		else if ( hoverSensor.GetSensorType () == SensorType.Sub )
+		{
+			if ( lastSensor != null )
+			{
+				hoverDuration += Time.deltaTime;
+				hoverEvent.duration = hoverDuration;
+				hoverEvent.hoverPhase = UIHoverEvent.HoverPhase.Middle;
+				lastSensor.OnHover( hoverEvent );
+			}
+
+			if ( lastSubSensor != hoverSensor )
+			{
+				if ( lastSubSensor != null )
+				{
+					hoverEvent.hoverPhase = UIHoverEvent.HoverPhase.End;
+					hoverEvent.duration = subHoverDuration;
+					lastSensor.OnHover( hoverEvent );
+				}
+
+				subHoverDuration = 0;
+				hoverEvent.hoverPhase = UIHoverEvent.HoverPhase.Begin;
+				hoverEvent.duration = subHoverDuration;
+				hoverSensor.OnHover( hoverEvent );
+				lastSubSensor = hoverSensor;
+			}
+			else
+			{
+				subHoverDuration += Time.deltaTime;
+
+				hoverEvent.hoverPhase = UIHoverEvent.HoverPhase.Middle;
+				hoverEvent.duration = subHoverDuration;
+				hoverSensor.OnHover( hoverEvent );
+			}
+		}
 	}
 
 	protected override GameObject GetCurrentGameObject ()
@@ -164,5 +230,4 @@ public class UIHoverEvent : UIEvent
 
 	public float duration;
 
-	public UISensor next;
 }
