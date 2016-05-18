@@ -20,12 +20,19 @@ public class HoverSensor : UISensor {
 	void OnEnable()
 	{
 		VREvents.SwitchVRMode += OnSwitchVRMode;
+		SetToMode( LogicManager.VRMode );
 	}
 
 	void OnSwitchVRMode( Message msg )
 	{
 		Reset();
 		VRMode to = (VRMode) msg.GetMessage( Global.MSG_SWITCHVRMODE_MODE_KEY );
+		SetToMode( to );
+	}
+
+	void SetToMode( VRMode to )
+	{
+
 		Image img = GetComponent<Image>();
 		if ( ( to & mode ) > 0 )
 		{
