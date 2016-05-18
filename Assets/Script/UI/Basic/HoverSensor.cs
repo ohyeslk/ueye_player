@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class VRButton : UISensor {
+public class HoverSensor : UISensor {
 
 	[SerializeField] UnityEvent onConfirm;
 	[SerializeField] UnityEvent onEnterHover;

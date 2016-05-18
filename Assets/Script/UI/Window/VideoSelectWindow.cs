@@ -24,20 +24,31 @@ public class VideoSelectWindow : UIWindow  {
 	{
 		VREvents.ActiveWindow -= VREvents_ActiveWindow;
 		VREvents.PostVideoList -= RecieveVideoList;
+		VREvents.RequestCategoryVideoList -= ResetVideoList;
+		VREvents.RequestVideoList -= ResetVideoList;
 	}
 
 	void OnEnable()
 	{
 		VREvents.ActiveWindow += VREvents_ActiveWindow;
 		VREvents.PostVideoList += RecieveVideoList;
+		VREvents.RequestCategoryVideoList += ResetVideoList;
+		VREvents.RequestVideoList += ResetVideoList;
+	}
+
+	void ResetVideoList (URLRequestMessage msg)
+	{
+		ClearVideos();
 	}
 
 	void RecieveVideoList( URLRequestMessage msg )
 	{
-		if ( msg.postObj == this )
 		{
-//			Debug.Log("Recieve video list");
+			ClearVideos();
+
 			List<VideoInfo> videoList = (List<VideoInfo>)msg.GetMessage(Global.MSG_POSTVIDEO_VIDEO_KEY );
+
+			Debug.Log("Get Video List " + videoList.Count  );
 
 			foreach(VideoInfo info in videoList )
 			{
@@ -45,6 +56,7 @@ public class VideoSelectWindow : UIWindow  {
 				CreateVideoInfoUnit( info );
 			}
 		}
+
 	}
 
 	void VREvents_ActiveWindow (WindowArg arg)
@@ -65,9 +77,7 @@ public class VideoSelectWindow : UIWindow  {
 	}
 
 	void Start() {
-
 		RequestVideoList();
-			
 	}
 
 	public void RequestVideoList()
@@ -118,46 +128,18 @@ public class VideoSelectWindow : UIWindow  {
 			unitList.Add(unit);
 		}
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		// CheckSelection();
+
+	public void ClearVideos()
+	{
+		for( int i = unitList.Count - 1 ; i >= 0 ; --i )
+		{
+			unitList[i].Clear();
+		
+		}
+
+		unitList.Clear();
 	}
-	/// <summary>
-	/// the unit hovered in last frame(update every frame)
-	/// </summary>
-	VideoInfoUnit lastHoverUnit;
-	/// <summary>
-	/// check if the user see any unit
-	/// </summary>
-//	void CheckSelection()
-//	{
-//		CardboardHead head = Cardboard.Controller.Head;
-//		RaycastHit hit;
-//		VideoInfoUnit hoverUnit = null;
-//		UIHoverEvent hoverEvent = new UIHoverEvent();
-//
-//		if ( Physics.Raycast(head.Gaze, out hit, Mathf.Infinity) )
-//		{
-//			Debug.Log("Hit " + hoverUnit.name );
-//			hoverUnit = hit.collider.GetComponent<VideoInfoUnit>();
-//			hoverEvent.point = hit.point;
-//		}
-//			
-//		if ( hoverUnit != null ){
-//			if ( lastHoverUnit == null )
-//				hoverEvent.hoverPhase = UIHoverEvent.HoverPhase.Begin;
-//			else
-//				hoverEvent.hoverPhase = UIHoverEvent.HoverPhase.Middle;
-//			
-//			hoverUnit.OnHover(hoverEvent);
-//
-//		}
-//		else if ( lastHoverUnit != null ) {
-//			hoverEvent.hoverPhase = UIHoverEvent.HoverPhase.End;
-//			lastHoverUnit.OnHover(hoverEvent);
-//		}
-//
-//		lastHoverUnit = hoverUnit;
-//	}
+
+
+
 }

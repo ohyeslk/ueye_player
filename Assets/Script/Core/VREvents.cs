@@ -34,8 +34,17 @@ public class VREvents
 	/// </summary>
 	public delegate void URLEventHandler(URLRequestMessage msg); 
 
+	public static event URLEventHandler RequestCategory;
+	public static void FireRequestCategory(URLRequestMessage arg){if ( RequestCategory != null ) RequestCategory(arg) ; }
+
+	public static event URLEventHandler PostCategory;
+	public static void FirePostCategory(URLRequestMessage arg){if ( PostCategory != null ) PostCategory(arg) ; }
+
 	public static event URLEventHandler RequestVideoList;
 	public static void FireRequestVideoList(URLRequestMessage arg){if ( RequestVideoList != null ) RequestVideoList(arg) ; }
+
+	public static event URLEventHandler RequestCategoryVideoList;
+	public static void FireRequestCategoryVideoList(URLRequestMessage arg){if ( RequestCategoryVideoList != null ) RequestCategoryVideoList(arg) ; }
 
 	public static event URLEventHandler PostVideoList;
 	public static void FirePostVideoList(URLRequestMessage arg){if ( PostVideoList != null ) PostVideoList(arg) ; }
