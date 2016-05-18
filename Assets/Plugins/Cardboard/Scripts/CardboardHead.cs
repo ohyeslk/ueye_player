@@ -39,6 +39,8 @@ public class CardboardHead : MonoBehaviour {
   /// user's head rotation, and false means don't modify the gameobject's orientation.
   public bool trackRotation = true;
 
+  public bool isLockVertical = true;
+
   /// Determines whether to apply ther user's head offset to this gameobject's
   /// position.  True means to update the gameobject's position with the user's head offset,
   /// and false means don't modify the gameobject's position.
@@ -113,6 +115,13 @@ public class CardboardHead : MonoBehaviour {
       } else {
         transform.rotation = target.rotation * rot;
       }
+			if ( isLockVertical )
+			{
+				Vector3 eular = transform.rotation.eulerAngles;
+				eular.x = 0;
+				eular.z = 0;
+				transform.rotation = Quaternion.Euler( eular );
+			}
     }
 
     if (trackPosition) {
