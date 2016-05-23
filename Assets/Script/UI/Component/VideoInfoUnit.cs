@@ -106,7 +106,7 @@ public class VideoInfoUnit : VRBasicButton {
 
 		text.gameObject.SetActive( false );
 
-		ResetConfirm();
+		ResetSubButton();
 
 	}
 
@@ -161,7 +161,7 @@ public class VideoInfoUnit : VRBasicButton {
 		img.DOFade( 0 , clearAnimation.duration );
 		img.transform.DOLocalMoveY( clearAnimation.moveY , clearAnimation.duration );
 		text.DOFade( 0 , clearAnimation.duration ).OnComplete(CompleteClear);
-		OnHideConfirm();
+		OnHideSubButton();
 	}
 
 	void CompleteClear()

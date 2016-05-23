@@ -7,7 +7,7 @@ using DG.Tweening;
 public class VRBasicButton : MonoBehaviour {
 	[SerializeField] protected Image img;
 	[SerializeField] protected Text text;
-	[SerializeField] ConfirmAnimation confirmAni;
+	[SerializeField] SubAnimation subButtonAnimation;
 
 
 	virtual public void OnFucus( )
@@ -17,8 +17,8 @@ public class VRBasicButton : MonoBehaviour {
 
 	virtual public void OnConfirm ()
 	{
-		confirmAni.confirmRing.transform.DOScale( confirmAni.confirmRingScaleUp , confirmAni.confirmRingScaleUpTime );
-		confirmAni.confirmRing.DOFade( 0 , confirmAni.confirmRingScaleUpTime );
+		subButtonAnimation.subButtonRing.transform.DOScale( subButtonAnimation.subRingScaleUp , subButtonAnimation.subRingScaleUpTime );
+		subButtonAnimation.subButtonRing.DOFade( 0 , subButtonAnimation.subRingScaleUpTime );
 	}
 
 	virtual public void OnHover(UIHoverEvent e)
@@ -29,64 +29,64 @@ public class VRBasicButton : MonoBehaviour {
 	/// <summary>
 	/// Show the confirm button 
 	/// </summary>
-	public void OnShowConfirm()
+	public void OnShowSubButton()
 	{
-		confirmAni.confirm.DOKill();
-		confirmAni.confirmRing.DOKill();
-		confirmAni.confirm.transform.DOKill();
-		float time = confirmAni.showTime;
-		confirmAni.confirm.enabled = true;
-		confirmAni.confirmRing.enabled = true;
-		confirmAni.confirm.DOFade( 1f , time );
-		confirmAni.confirm.transform.DOLocalMoveY( confirmAni.posY + confirmAni.moveY , 0 );
-		confirmAni.confirm.transform.DOLocalMoveY( confirmAni.posY , time );
+		subButtonAnimation.subButton.DOKill();
+		subButtonAnimation.subButtonRing.DOKill();
+		subButtonAnimation.subButton.transform.DOKill();
+		float time = subButtonAnimation.showTime;
+		subButtonAnimation.subButton.enabled = true;
+		subButtonAnimation.subButtonRing.enabled = true;
+		subButtonAnimation.subButton.DOFade( 1f , time );
+		subButtonAnimation.subButton.transform.DOLocalMoveY( subButtonAnimation.posY + subButtonAnimation.moveY , 0 );
+		subButtonAnimation.subButton.transform.DOLocalMoveY( subButtonAnimation.posY , time );
 
 	}
 
 	/// <summary>
 	/// Hide the confirm button
 	/// </summary>
-	public void OnHideConfirm()
+	public void OnHideSubButton()
 	{
-		confirmAni.confirm.DOKill();
-		confirmAni.confirmRing.DOKill();
-		confirmAni.confirm.transform.DOKill();
-		float time = confirmAni.hideTime;
-		confirmAni.confirm.transform.DOLocalMoveY( confirmAni.posY + confirmAni.moveY , time );
-		confirmAni.confirm.DOFade( 0 , time  );
-		confirmAni.confirmRing.DOFillAmount( 0 , time ).OnComplete(ResetConfirm);
+		subButtonAnimation.subButton.DOKill();
+		subButtonAnimation.subButtonRing.DOKill();
+		subButtonAnimation.subButton.transform.DOKill();
+		float time = subButtonAnimation.hideTime;
+		subButtonAnimation.subButton.transform.DOLocalMoveY( subButtonAnimation.posY + subButtonAnimation.moveY , time );
+		subButtonAnimation.subButton.DOFade( 0 , time  );
+		subButtonAnimation.subButtonRing.DOFillAmount( 0 , time ).OnComplete(ResetSubButton);
 	}
 
 	/// <summary>
 	/// hide the confirm ring
 	/// </summary>
-	public void OnHideConfirmRing()
+	public void OnHideSubButtonRing()
 	{
-		confirmAni.confirm.transform.DOKill();
-		float time = confirmAni.hideTime;
-		confirmAni.confirmRing.DOFillAmount( 0 , time );
+		subButtonAnimation.subButton.transform.DOKill();
+		float time = subButtonAnimation.hideTime;
+		subButtonAnimation.subButtonRing.DOFillAmount( 0 , time );
 	}
 
-	public void OnResetConfirmRing()
+	public void OnResetSubButtonRing()
 	{
-		Color col = confirmAni.confirmRing.color ; 
+		Color col = subButtonAnimation.subButtonRing.color ; 
 		col.a = 1f ; 
-		confirmAni.confirmRing.color = col;
-		confirmAni.confirmRing.transform.localScale = Vector3.one;
+		subButtonAnimation.subButtonRing.color = col;
+		subButtonAnimation.subButtonRing.transform.localScale = Vector3.one;
 	}
 		
-	public void UpdateConfirmRing( float process )
+	public void UpdateSubButtonRing( float process )
 	{
-		confirmAni.confirmRing.fillAmount = confirmAni.confirmCurve.Evaluate( process );
+		subButtonAnimation.subButtonRing.fillAmount = subButtonAnimation.confirmCurve.Evaluate( process );
 	}
 
-	protected void ResetConfirm()
+	protected void ResetSubButton()
 	{
-		confirmAni.confirmRing.fillAmount = 0;
-		Color col = confirmAni.confirm.color ;
+		subButtonAnimation.subButtonRing.fillAmount = 0;
+		Color col = subButtonAnimation.subButton.color ;
 		col.a = 0.01f;
-		confirmAni.confirm.color = col;
-		confirmAni.confirmRing.enabled = false;
+		subButtonAnimation.subButton.color = col;
+		subButtonAnimation.subButtonRing.enabled = false;
 	}
 
 
@@ -97,15 +97,15 @@ public class VRBasicButton : MonoBehaviour {
 }
 
 [System.Serializable]
-public struct ConfirmAnimation
+public struct SubAnimation
 {
-	public Image confirm;
-	public Image confirmRing;
+	public Image subButton;
+	public Image subButtonRing;
 	public AnimationCurve confirmCurve;
 	public float showTime;
 	public float hideTime;
 	public float posY;
 	public float moveY;
-				public float confirmRingScaleUp;
-				public float confirmRingScaleUpTime;
+	public float subRingScaleUp;
+	public float subRingScaleUpTime;
 }

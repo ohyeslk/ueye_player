@@ -59,7 +59,7 @@ public class CategoryButton : VRBasicButton {
 		img.DOFade(0,0);
 		text.DOFade(0,0);
 
-		ResetConfirm();
+		ResetSubButton();
 	}
 
 	void PlayInitAnimation()
