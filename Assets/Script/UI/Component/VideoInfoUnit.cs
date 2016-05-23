@@ -16,13 +16,15 @@ public class VideoInfoUnit : VRBasicButton {
 	[SerializeField] HoverAnimation hoverAnimation;
 
 
-
 	[System.Serializable]
 	public struct ClearAnimation
 	{
 		public float duration;
 		public float moveY;
 	}
+	/// <summary>
+	/// defined the duration and movement in Y of the clear animation
+	/// </summary>
 	[SerializeField] ClearAnimation clearAnimation;
 
 	private VideoInfoUnitState inner_state = VideoInfoUnitState.Normal;
@@ -35,6 +37,10 @@ public class VideoInfoUnit : VRBasicButton {
 			inner_state = value;
 		}
 	}
+	/// <summary>
+	/// Return the state of the video info unit
+	/// </summary>
+	/// <value>The state.</value>
 	public VideoInfoUnitState State
 	{
 		get {
@@ -42,9 +48,20 @@ public class VideoInfoUnit : VRBasicButton {
 		}
 	}
 
+	[System.Serializable]
+	public struct VideoUnitInitAnimation
+	{
+		public float delay;
+		public float delayPerUnit;
+		public float duration;
+		public AnimationCurve initScaleCurve;
+	}
+	[SerializeField] VideoUnitInitAnimation m_initAnim;
 
 	VideoInfo m_info = new VideoInfo();
-	VideoUnitInitAnimation m_anim;
+
+	[SerializeField] Image blackCover;
+	[SerializeField] float blackCoverAlpha;
 
 	public VideoInfo Info{
 		get { return m_info; }
@@ -74,6 +91,14 @@ public class VideoInfoUnit : VRBasicButton {
 		VREvents.PostTexture += RecieveTexture;
 	}
 
+	void Awake()
+	{
+		if ( blackCover != null )
+			blackCover.gameObject.SetActive(false);
+		if ( text != null )
+			text.gameObject.SetActive( false );
+	}
+
 	void RecieveTexture( URLRequestMessage msg )
 	{
 		if ( msg.postObj == this )
@@ -81,15 +106,20 @@ public class VideoInfoUnit : VRBasicButton {
 			Texture2D tex = (Texture2D)msg.GetMessage(Global.MSG_REQUEST_TEXTURE_TEXTURE_KEY);
 			Rect rec = new Rect(0,0,tex.width ,tex.height );
 			img.sprite = Sprite.Create( tex , rec , new Vector2(0.5f,0.5f) , 100);
+			img.DOFade( 1f , 0 );
+			blackCover.sprite = img.sprite;
 
-			PlayInitAnimation();
+			Outline imgOutline = img.gameObject.GetComponent<Outline>();
+			imgOutline.enabled = true;
+
+			PlayRecieveImgAnimation();
 		}
 	}
 
 	/// <summary>
 	/// record the start time of hovering 
     /// </summary>
-	public void Init(VideoInfo info , VideoUnitInitAnimation anim , VideoSelectWindow _p )
+	public void Init(VideoInfo info , int index , VideoSelectWindow _p )
 	{
 		// initilize the sprite first
 		URLRequestMessage msg = new URLRequestMessage(this);
@@ -97,29 +127,126 @@ public class VideoInfoUnit : VRBasicButton {
 		VREvents.FireRequesTexture( msg );
 
 		m_state = VideoInfoUnitState.Init;
-		m_anim = anim;
 		parent = _p;
+
+		// update the delay time
+		m_initAnim.delay = index * m_initAnim.delayPerUnit;
 
 		m_info = info;
 		if ( text != null )
+		{
 			text.text = info.title;
-
-		text.gameObject.SetActive( false );
+			text.DOFade(0 , 0);
+			text.gameObject.SetActive( false );
+		}
 
 		ResetSubButton();
 
+		PlayInitAnimation();
+	}
+
+	public override void OnEnterHover ()
+	{
+		base.OnEnterHover ();
+		ShowBlackCover();
+		ShowText();
+	}
+
+	public override void OnExitHover ()
+	{
+		base.OnExitHover ();
+		HideBlackCover();
+		HideText();
+	}
+
+	public void ShowBlackCover()
+	{
+		if ( blackCover != null ){
+			Debug.Log("Show Black ");
+			blackCover.DOKill();
+			blackCover.gameObject.SetActive( true );
+			blackCover.DOFade( blackCoverAlpha , subButtonAnimation.showTime );
+		}
+	}
+
+	public void ShowText()
+	{
+		if ( text != null ) {
+			text.gameObject.SetActive( true );
+			text.DOFade( 1f , subButtonAnimation.showTime / 2f );
+		}
+	}
+
+	public void HideBlackCover()
+	{
+		if ( blackCover != null ) {
+			Debug.Log("Hide black ");
+			blackCover.DOKill();
+			blackCover.DOFade( 0 , subButtonAnimation.hideTime );
+		}
+		
+	}
+
+	public void HideText()
+	{
+		if ( text != null )
+			text.DOFade( 0 , subButtonAnimation.hideTime );
+		
+	}
+
+	bool shouldPlayRecieveAnimation = false;
+	void PlayRecieveImgAnimation()
+	{
+		if ( initAnimation != null )
+		{
+			shouldPlayRecieveAnimation = true;
+		}
+		else
+		{
+			StartCoroutine( DoRecieveAnimation () );
+		}
+	}
+
+	IEnumerator DoRecieveAnimation()
+	{
+		float timer = 0;
+		while( timer < 1f )
+		{
+			timer += Time.deltaTime;
+			yield return null;
+		}
 	}
 
 	void PlayInitAnimation()
 	{
-		VideoUnitInitAnimation anim = m_anim;
+		VideoUnitInitAnimation anim = m_initAnim;
+
+	
+		initAnimation = StartCoroutine( DoInitAnimation() );
+	}
+
+	Coroutine initAnimation;
+	IEnumerator DoInitAnimation()
+	{
+		yield return new WaitForSeconds( m_initAnim.delay );
+
 
 		img.gameObject.SetActive( true );
-		text.gameObject.SetActive( true );
-		img.transform.DOScale( Vector3.zero , anim.duration ).From().SetDelay(anim.delay);
-		img.transform.DORotate( new Vector3( 90, 90, 90 ) , anim.duration ).From().SetDelay(anim.delay );
-		img.DOFade( 0 , anim.duration ).From().SetDelay(anim.delay );
-		text.DOFade( 0 , anim.duration ).From().SetDelay(anim.delay ).OnComplete(CompleteInit);
+		img.DOFade( 0 , m_initAnim.duration ).From();
+
+		float timer = 0;
+		while( timer < m_initAnim.duration )
+		{
+			float curveTime = timer / m_initAnim.duration;
+			img.gameObject.transform.localScale = Vector3.one * m_initAnim.initScaleCurve.Evaluate( curveTime );
+			timer += Time.deltaTime;
+
+			yield return null;
+		}
+
+		initAnimation = null;
+		if ( shouldPlayRecieveAnimation  )
+			StartCoroutine( DoRecieveAnimation() );
 	}
 
 	void CompleteInit()
@@ -161,7 +288,7 @@ public class VideoInfoUnit : VRBasicButton {
 		img.DOFade( 0 , clearAnimation.duration );
 		img.transform.DOLocalMoveY( clearAnimation.moveY , clearAnimation.duration );
 		text.DOFade( 0 , clearAnimation.duration ).OnComplete(CompleteClear);
-		OnHideSubButton();
+		OnExitHover();
 	}
 
 	void CompleteClear()
@@ -172,12 +299,7 @@ public class VideoInfoUnit : VRBasicButton {
 	}
 
 }
-[System.Serializable]
-public struct VideoUnitInitAnimation
-{
-	public float delay;
-	public float duration;
-}
+
 
 public enum VideoInfoUnitState
 {
@@ -185,11 +307,4 @@ public enum VideoInfoUnitState
 	Init,
 	Normal,
 	Hovered,
-}
-
-[System.Serializable]
-public struct VideoUnitSelectParameter
-{
-	public float selectTime;
-	public float process;
 }

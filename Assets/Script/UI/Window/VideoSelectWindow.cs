@@ -19,6 +19,9 @@ public class VideoSelectWindow : UIWindow  {
 	List<VideoInfoUnit> unitList = new List<VideoInfoUnit>();
 	// Use this for initialization
 
+	public int row;
+	public int column;
+
 
 	void OnDisable()
 	{
@@ -83,7 +86,7 @@ public class VideoSelectWindow : UIWindow  {
 	public void RequestVideoList()
 	{
 		URLRequestMessage msg = new URLRequestMessage(this);
-		msg.AddMessage(Global.MSG_REQUESTVIDEO_NUMBER_KEY , "8");
+		msg.AddMessage(Global.MSG_REQUESTVIDEO_NUMBER_KEY , "6");
 		VREvents.FireRequestVideoList(msg);
 	}
 
@@ -116,13 +119,8 @@ public class VideoSelectWindow : UIWindow  {
 
 			VideoInfoUnit unit = unitObj.GetComponentInChildren<VideoInfoUnit>();
 
-			// set up the animation for the info unit
-			VideoUnitInitAnimation animation = new VideoUnitInitAnimation();
-			animation.delay = unitList.Count * 0.1f;
-			animation.duration = 0.5f;
-
 			// initilze the unit
-			unit.Init( info , animation , this );
+			unit.Init( info , unitList.Count , this );
 
 			// save the unit in the listx
 			unitList.Add(unit);

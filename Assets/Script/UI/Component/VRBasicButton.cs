@@ -7,7 +7,7 @@ using DG.Tweening;
 public class VRBasicButton : MonoBehaviour {
 	[SerializeField] protected Image img;
 	[SerializeField] protected Text text;
-	[SerializeField] SubAnimation subButtonAnimation;
+	[SerializeField] protected SubAnimation subButtonAnimation;
 
 
 	virtual public void OnFucus( )
@@ -29,8 +29,9 @@ public class VRBasicButton : MonoBehaviour {
 	/// <summary>
 	/// Show the confirm button 
 	/// </summary>
-	public void OnShowSubButton()
+	virtual public void OnEnterHover()
 	{
+		Debug.Log("Show Button ");
 		subButtonAnimation.subButton.DOKill();
 		subButtonAnimation.subButtonRing.DOKill();
 		subButtonAnimation.subButton.transform.DOKill();
@@ -46,8 +47,9 @@ public class VRBasicButton : MonoBehaviour {
 	/// <summary>
 	/// Hide the confirm button
 	/// </summary>
-	public void OnHideSubButton()
+	virtual public void OnExitHover()
 	{
+		Debug.Log("Hide Button ");
 		subButtonAnimation.subButton.DOKill();
 		subButtonAnimation.subButtonRing.DOKill();
 		subButtonAnimation.subButton.transform.DOKill();
@@ -60,14 +62,14 @@ public class VRBasicButton : MonoBehaviour {
 	/// <summary>
 	/// hide the confirm ring
 	/// </summary>
-	public void OnHideSubButtonRing()
+	virtual public void OnEnterSub()
 	{
 		subButtonAnimation.subButton.transform.DOKill();
 		float time = subButtonAnimation.hideTime;
 		subButtonAnimation.subButtonRing.DOFillAmount( 0 , time );
 	}
 
-	public void OnResetSubButtonRing()
+	virtual public void OnExitSub()
 	{
 		Color col = subButtonAnimation.subButtonRing.color ; 
 		col.a = 1f ; 
@@ -75,7 +77,7 @@ public class VRBasicButton : MonoBehaviour {
 		subButtonAnimation.subButtonRing.transform.localScale = Vector3.one;
 	}
 		
-	public void UpdateSubButtonRing( float process )
+	virtual public void UpdateHover( float process )
 	{
 		subButtonAnimation.subButtonRing.fillAmount = subButtonAnimation.confirmCurve.Evaluate( process );
 	}
