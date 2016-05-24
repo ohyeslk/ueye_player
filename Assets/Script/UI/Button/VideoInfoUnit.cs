@@ -129,7 +129,8 @@ public class VideoInfoUnit : VRBasicButton {
 
 
 			Outline imgOutline = img.gameObject.GetComponent<Outline>();
-			imgOutline.enabled = true;
+			if ( imgOutline != null )
+				imgOutline.enabled = true;
 
 			PlayRecieveImgAnimation();
 		}
@@ -199,6 +200,7 @@ public class VideoInfoUnit : VRBasicButton {
 	{
 		if ( text != null ) {
 			text.enabled = true;
+			text.DOKill();
 			text.DOFade( 1f , subButtonAnimation.showTime / 2f );
 		}
 	}
@@ -206,7 +208,7 @@ public class VideoInfoUnit : VRBasicButton {
 	public void HideBlackCover()
 	{
 		if ( blackCover != null ) {
-			Debug.Log("Hide black ");
+//			Debug.Log("Hide black ");
 			blackCover.DOKill();
 			blackCover.DOFade( 0 , subButtonAnimation.hideTime ).OnComplete(DisableBlackCover);
 		}
@@ -216,8 +218,10 @@ public class VideoInfoUnit : VRBasicButton {
 
 	public void HideText()
 	{
-		if ( text != null )
+		if ( text != null ) {
+			text.DOKill();
 			text.DOFade( 0 , subButtonAnimation.hideTime ).OnComplete(DisableText);
+		}
 		
 	}
 	void DisableText () { text.enabled = false; }

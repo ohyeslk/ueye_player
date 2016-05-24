@@ -32,7 +32,6 @@ public class VRBasicButton : MonoBehaviour {
 	/// </summary>
 	virtual public void OnEnterHover()
 	{
-		Debug.Log("Show Button ");
 		float time = subButtonAnimation.showTime;
 		if ( subButtonAnimation.subButton != null )
 		{
@@ -48,6 +47,8 @@ public class VRBasicButton : MonoBehaviour {
 		{
 			subButtonAnimation.subButtonRing.DOKill();
 			subButtonAnimation.subButtonRing.enabled = true;
+			subButtonAnimation.subButtonRing.DOFade( 1f , 0 );
+			subButtonAnimation.subButtonRing.transform.localScale = Vector3.one;
 		}
 
 	}
@@ -57,7 +58,6 @@ public class VRBasicButton : MonoBehaviour {
 	/// </summary>
 	virtual public void OnExitHover()
 	{
-		Debug.Log("Hide Button ");
 		float time = subButtonAnimation.hideTime;
 		if ( subButtonAnimation.subButton != null )
 		{
@@ -69,34 +69,28 @@ public class VRBasicButton : MonoBehaviour {
 		if ( subButtonAnimation.subButtonRing != null )
 		{
 			subButtonAnimation.subButtonRing.DOKill();
-			subButtonAnimation.subButtonRing.DOFillAmount( 0 , time ).OnComplete(ResetSubButton);
+			subButtonAnimation.subButtonRing.DOFillAmount( 0 , time  * subButtonAnimation.subButtonRing.fillAmount ).OnComplete(ResetSubButton);
 		}
 	}
 
-	/// <summary>
-	/// hide the confirm ring
-	/// </summary>
+
 	virtual public void OnEnterSub()
 	{
-		float time = subButtonAnimation.hideTime;
-		if ( subButtonAnimation.subButton != null )
-		{
-			subButtonAnimation.subButton.transform.DOKill();
-		}
-		if ( subButtonAnimation.subButtonRing != null)
-		{
-			subButtonAnimation.subButtonRing.DOFillAmount( 0 , time );
-		}
 	}
 
 	virtual public void OnExitSub()
 	{
-		if ( subButtonAnimation.subButton != null )
+
+		float time = subButtonAnimation.hideTime;
+		if ( subButtonAnimation.subButtonRing != null )
 		{
 			Color col = subButtonAnimation.subButtonRing.color ; 
 			col.a = 1f ; 
 			subButtonAnimation.subButtonRing.color = col;
 			subButtonAnimation.subButtonRing.transform.localScale = Vector3.one;
+
+			subButtonAnimation.subButtonRing.DOKill();
+			subButtonAnimation.subButtonRing.DOFillAmount( 0 , time );
 		}
 	}
 		

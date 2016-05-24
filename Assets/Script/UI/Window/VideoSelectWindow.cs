@@ -62,14 +62,15 @@ public class VideoSelectWindow : UIWindow  {
 
 	}
 
-	void VREvents_ActiveWindow (WindowArg arg)
+	protected override void OnBecomeVisible ()
 	{
-		if ( arg.type == WindowArg.Type.SELECT_WINDOW )
-		{
-			Panel.gameObject.SetActive(true);
-		}else{
-			Panel.gameObject.SetActive(false);
-		}
+		base.OnBecomeVisible ();
+		Panel.gameObject.SetActive( true );
+	}
+	protected override void OnBecomeInvsible ()
+	{
+		base.OnBecomeInvsible ();
+		Panel.gameObject.SetActive( false );
 	}
 
 	void Awake () {
@@ -92,7 +93,6 @@ public class VideoSelectWindow : UIWindow  {
 
 	public void ShowVideoDetail( VideoInfo info )
 	{
-		Debug.Log("PlayVideo " + info.title );
 		Message msg = new Message(this);
 		msg.AddMessage( Global.MSG_VIDEO_INFO_KEY , info );
 		VREvents.FireShowDetail( msg );

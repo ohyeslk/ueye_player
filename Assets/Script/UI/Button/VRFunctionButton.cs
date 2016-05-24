@@ -1,22 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Events;
 
 public class VRFunctionButton : VRBasicButton {
 
-	public enum FunctionType
-	{
-		Back,
-	}
-	[SerializeField] FunctionType function;
+	[SerializeField] UnityEvent confirmFunc;
 
 	public override void OnConfirm ()
 	{
-		switch ( function )
-		{
-		case FunctionType.Back:
-			break;
-		default:
-			break;
-		};
+		base.OnConfirm();
+		confirmFunc.Invoke();
 	}
 }

@@ -122,6 +122,8 @@ public class HTTPManager : MonoBehaviour {
 				VideoInfo info = new VideoInfo();
 				info.title = video.GetField("title").str;
 				info.description = video.GetField("description").str;
+				info.description = info.description.Replace( "\\r" , "\r");
+				info.description = info.description.Replace( "\\n" , "\n");
 				info.playUrl = video.GetField("playUrl").str;
 				info.coverUrl = video.GetField("coverForFeed").str;
 
