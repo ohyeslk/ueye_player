@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 
 public class VideoSelectWindow : UIWindow  {
 	/// <summary>
@@ -66,12 +67,29 @@ public class VideoSelectWindow : UIWindow  {
 	{
 		base.OnBecomeVisible ();
 		Panel.gameObject.SetActive( true );
+
+		foreach( VideoInfoUnit unit in unitList )
+		{
+			unit.PlayFadeInAnimation();
+		}
 	}
+
 	protected override void OnBecomeInvsible ()
 	{
 		base.OnBecomeInvsible ();
-		Panel.gameObject.SetActive( false );
+
+		foreach( VideoInfoUnit unit in unitList )
+		{
+			unit.PlayFadeOutAnimation();
+		}
+
+		/// set the panel to disable after 1.5 seconds
+		Sequence seq = DOTween.Sequence();
+		seq.AppendInterval( 1.5f );
+		seq.AppendCallback( DisablePanel );
 	}
+
+	public void DisablePanel() { Panel.gameObject.SetActive(false); }
 
 	void Awake () {
 		if ( VideoInfoUnitPrefab == null )

@@ -241,28 +241,34 @@ public class VideoInfoUnit : VRBasicButton {
 
 	IEnumerator DoRecieveAnimation()
 	{
+		// TODO : change the way to detect if the video info unit is visible
+		bool isVisible = img.color.a >= 1f ;
 		float timer = 0;
-		help.enabled = true;
-		{ 
-			Color col = help.color;
-			col.a = 1f;
-			help.color = col;
-			help.sprite = img.sprite;
-			help.DOFade( 0 , m_setting.recieveDuration );
-		}
+		img.sprite = m_info.Post;
 		frame.enabled = true;
-		{ 
-			Color col = frame.color;
-			col.a = 0f;
-			frame.color = col;
-			frame.DOFade( 1f , m_setting.recieveDuration );
-		}
+
+		if ( isVisible )
 		{
-			Color col = img.color;
-			col.a = 0;
-			img.color = col;
-			img.sprite = m_info.Post;
-			img.DOFade( 1f , m_setting.recieveDuration );
+			help.enabled = true;
+			{ 
+				Color col = help.color;
+				col.a = 1f;
+				help.color = col;
+				help.sprite = img.sprite;
+				help.DOFade( 0 , m_setting.recieveDuration );
+			}
+			{ 
+				Color col = frame.color;
+				col.a = 0f;
+				frame.color = col;
+				frame.DOFade( 1f , m_setting.recieveDuration );
+			}
+			{
+				Color col = img.color;
+				col.a = 0;
+				img.color = col;
+				img.DOFade( 1f , m_setting.recieveDuration );
+			}
 		}
 
 		while( timer < m_setting.recieveDuration )
@@ -281,7 +287,6 @@ public class VideoInfoUnit : VRBasicButton {
 	{
 		VideoUnitSetting anim = m_setting;
 
-	
 		initAnimCoroutine = StartCoroutine( DoInitAnimation() );
 	}
 
@@ -343,11 +348,19 @@ public class VideoInfoUnit : VRBasicButton {
 		PlayClearAnimation();
 	}
 
-	void PlayClearAnimation()
+	public void PlayClearAnimation()
 	{
-		img.DOFade( 0 , clearAnimation.duration );
-		img.transform.DOLocalMoveY( clearAnimation.moveY , clearAnimation.duration );
-		text.DOFade( 0 , clearAnimation.duration ).OnComplete(CompleteClear);
+		img.DOKill();
+		frame.DOKill();
+		img.transform.DOKill();
+
+		Sequence seq = DOTween.Sequence();
+		seq.Append( img.DOFade( 0 , clearAnimation.duration ));
+		seq.Join( frame.DOFade( 0 , clearAnimation.duration ));
+		seq.Join( img.transform.DOLocalMoveY( clearAnimation.moveY , clearAnimation.duration ));
+		seq.AppendCallback( CompleteClear );
+		HideBlackCover();
+		HideText();
 		OnExitHover();
 	}
 
@@ -356,6 +369,24 @@ public class VideoInfoUnit : VRBasicButton {
 		transform.SetParent( null );
 		gameObject.SetActive( false );
 		GameObject.Destroy( gameObject , 1f );
+	}
+
+	public void PlayFadeInAnimation()
+	{
+		img.DOFade( 1f , subButtonAnimation.showTime );
+		frame.DOFade( 1f , subButtonAnimation.showTime );
+	}
+
+	public void PlayFadeOutAnimation()
+	{
+		img.DOKill();
+		frame.DOKill();
+		img.DOFade( 0 , subButtonAnimation.hideTime );
+		frame.DOFade( 0 , subButtonAnimation.hideTime );
+		HideBlackCover();
+		HideText();
+		if ( subButtonAnimation.subButton != null )
+			subButtonAnimation.subButton.DOFade( 0 , subButtonAnimation.hideTime );
 	}
 
 }
