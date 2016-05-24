@@ -23,17 +23,17 @@ public class VideoSelectWindow : UIWindow  {
 	public int column;
 
 
-	void OnDisable()
+	override protected void OnDisable()
 	{
-		VREvents.ActiveWindow -= VREvents_ActiveWindow;
+		base.OnDisable();
 		VREvents.PostVideoList -= RecieveVideoList;
 		VREvents.RequestCategoryVideoList -= ResetVideoList;
 		VREvents.RequestVideoList -= ResetVideoList;
 	}
 
-	void OnEnable()
+	override protected void OnEnable()
 	{
-		VREvents.ActiveWindow += VREvents_ActiveWindow;
+		base.OnEnable();
 		VREvents.PostVideoList += RecieveVideoList;
 		VREvents.RequestCategoryVideoList += ResetVideoList;
 		VREvents.RequestVideoList += ResetVideoList;
@@ -90,16 +90,16 @@ public class VideoSelectWindow : UIWindow  {
 		VREvents.FireRequestVideoList(msg);
 	}
 
-	public void PlayVideo( VideoInfo info )
+	public void ShowVideoDetail( VideoInfo info )
 	{
 		Debug.Log("PlayVideo " + info.title );
 		Message msg = new Message(this);
-		msg.AddMessage( Global.MSG_PLAYVIDEO_INFO_KEY , info );
-		VREvents.FirePlayVideo( msg );
+		msg.AddMessage( Global.MSG_VIDEO_INFO_KEY , info );
+		VREvents.FireShowDetail( msg );
 
 
 		WindowArg arg = new WindowArg(this);
-		arg.type = WindowArg.Type.PLAY_WINDOW;
+		arg.type = WindowArg.Type.DETAIL_WINDOWS;
 		VREvents.FireActiveWindow( arg );
 	}
 

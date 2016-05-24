@@ -8,6 +8,9 @@ using DG.Tweening;
 public class VideoInfoUnit : VRBasicButton {
 	VideoSelectWindow parent;
 
+	[SerializeField] protected Image img;
+	[SerializeField] protected Text text;
+
 	[System.Serializable]
 	public struct HoverAnimation
 	{
@@ -69,7 +72,6 @@ public class VideoInfoUnit : VRBasicButton {
 	[SerializeField] Image help;
 	[SerializeField] Image blackCover;
 	[SerializeField] float blackCoverAlpha;
-	Sprite m_recieveSprite;
 
 	public VideoInfo Info{
 		get { return m_info; }
@@ -90,7 +92,7 @@ public class VideoInfoUnit : VRBasicButton {
 	{
 		Debug.Log("[On Confirm]" + name);
 		base.OnConfirm();
-		parent.PlayVideo( Info );
+		parent.ShowVideoDetail( Info );
 	}
 
 	override public void OnHover(UIHoverEvent e)
@@ -123,7 +125,8 @@ public class VideoInfoUnit : VRBasicButton {
 		{
 			Texture2D tex = (Texture2D)msg.GetMessage(Global.MSG_REQUEST_TEXTURE_TEXTURE_KEY);
 			Rect rec = new Rect(0,0,tex.width ,tex.height );
-			m_recieveSprite = Sprite.Create( tex , rec , new Vector2(0.5f,0.5f) , 100);
+			m_info.Post = Sprite.Create( tex , rec , new Vector2(0.5f,0.5f) , 100);
+
 
 			Outline imgOutline = img.gameObject.GetComponent<Outline>();
 			imgOutline.enabled = true;
@@ -254,7 +257,7 @@ public class VideoInfoUnit : VRBasicButton {
 			Color col = img.color;
 			col.a = 0;
 			img.color = col;
-			img.sprite = m_recieveSprite;
+			img.sprite = m_info.Post;
 			img.DOFade( 1f , m_setting.recieveDuration );
 		}
 

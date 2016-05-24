@@ -55,12 +55,14 @@
      <Compile Include="Assets\Script\UI\Basic\HoverSensor.cs" />
      <Compile Include="Assets\Script\UI\Basic\UIButton.cs" />
      <Compile Include="Assets\Script\UI\Basic\UISensor.cs" />
-     <Compile Include="Assets\Script\UI\Component\CategoryButton.cs" />
-     <Compile Include="Assets\Script\UI\Component\VRBasicButton.cs" />
-     <Compile Include="Assets\Script\UI\Component\VideoInfoUnit.cs" />
+     <Compile Include="Assets\Script\UI\Button\CategoryButton.cs" />
+     <Compile Include="Assets\Script\UI\Button\VRBasicButton.cs" />
+     <Compile Include="Assets\Script\UI\Button\VRFunctionButton.cs" />
+     <Compile Include="Assets\Script\UI\Button\VideoInfoUnit.cs" />
      <Compile Include="Assets\Script\UI\Reticle\UIReticle.cs" />
      <Compile Include="Assets\Script\UI\UIInputModel.cs" />
      <Compile Include="Assets\Script\UI\Window\CategoryWindow.cs" />
+     <Compile Include="Assets\Script\UI\Window\DetailWindow.cs" />
      <Compile Include="Assets\Script\UI\Window\ModeSwitchButton.cs" />
      <Compile Include="Assets\Script\UI\Window\UIWindow.cs" />
      <Compile Include="Assets\Script\UI\Window\VideoPlayWindow.cs" />
@@ -124,6 +126,7 @@
      <None Include="Assets\Plugins\EasyMovieTexture\readme_License.txt" />
      <None Include="Assets\Standard Assets\Effects\Projectors\Shaders\ProjectorLight.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\MultiPassHollywoodFlares.shader" />
+     <None Include="Assets\Shader\BackgroundShaderBlur.shader" />
      <None Include="Assets\Plugins\DOTween\DOTween43.xml" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\BlurEffectConeTaps.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\CameraMotionBlur.shader" />

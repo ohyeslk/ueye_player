@@ -8,13 +8,15 @@ public class CategoryWindow : UIWindow {
 	[SerializeField] GridLayoutGroup Panel;
 	List<CategoryButton> cateButtons = new List<CategoryButton>();
 
-	void OnDisable()
+	override protected void OnDisable()
 	{
+		base.OnDisable();
 		VREvents.PostCategory -= GetCategory;
 	}
 
-	void OnEnable()
+	override protected void OnEnable()
 	{
+		base.OnEnable();
 		VREvents.PostCategory += GetCategory;
 	}
 
@@ -66,5 +68,16 @@ public class CategoryWindow : UIWindow {
 		}
 	}
 
+	protected override void OnBecomeInvsible ()
+	{
+		base.OnBecomeInvsible ();
+		Panel.gameObject.SetActive(false);
+	}
+
+	protected override void OnBecomeVisible ()
+	{
+		base.OnBecomeVisible ();
+		Panel.gameObject.SetActive(true);
+	}
 
 }

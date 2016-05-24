@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Global {
 	
-	public static string MSG_PLAYVIDEO_INFO_KEY = "info";
+	public static string MSG_VIDEO_INFO_KEY = "info";
 
 	public static string MSG_REQUESTVIDEO_NUMBER_KEY = "number";
 

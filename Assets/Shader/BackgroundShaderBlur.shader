@@ -1,4 +1,4 @@
-﻿Shader "Custom/BackgroundShader"
+﻿Shader "Custom/BackgroundShaderBlur"
 {
 	Properties
 	{
@@ -7,9 +7,9 @@
 	}
 	SubShader
 	{
-		Tags { "RenderType"="Opaque" }
+		Tags { "RenderType"="Opaque-50" }
 		LOD 100
-		Cull off
+		Cull Front
 
 		Pass
 		{
@@ -57,7 +57,6 @@
 			}
 			ENDCG
 		}
-
 
 	}
 }

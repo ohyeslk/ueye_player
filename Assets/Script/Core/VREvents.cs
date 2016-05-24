@@ -111,6 +111,7 @@ public class WindowArg : BasicArg
 	{
 		SELECT_WINDOW,
 		PLAY_WINDOW,
+		DETAIL_WINDOWS
 	}
 	public Type type;
 

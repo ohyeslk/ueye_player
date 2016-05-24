@@ -7,6 +7,9 @@ public class CategoryButton : VRBasicButton {
 	CategoryInfo m_info;
 	CategoryWindow parent;
 
+	[SerializeField] protected Image img;
+	[SerializeField] protected Text text;
+
 	[System.Serializable]
 	public struct CategoryInitAnimation
 	{
