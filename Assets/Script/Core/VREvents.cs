@@ -20,14 +20,18 @@ public class VREvents
 	public delegate void MessageEventHandler(Message msg); 
 
 	public static event MessageEventHandler WindowReturn;
-	public static void FireWindowReturn(Message arg){if ( WindowReturn != null ) WindowReturn(arg) ; }
+	public static void FireWindowReturn(Message arg){if ( WindowReturn != null ) WindowReturn(arg); }
+
+	public static event MessageEventHandler ShowDetail;
+	public static void FireShowDetail(Message arg){if ( ShowDetail != null ) ShowDetail(arg); }
 
 	public static event MessageEventHandler SwitchVRMode;
 	public static void FireSwitchVRMode(Message arg) { if ( SwitchVRMode != null ) SwitchVRMode(arg); }
 
-
 	public static event MessageEventHandler PlayVideo;
-	public static void FirePlayVideo(Message arg){if ( PlayVideo != null ) PlayVideo(arg) ; }
+	public static void FirePlayVideo(Message arg){if ( PlayVideo != null ) PlayVideo(arg); }
+
+
 
 	/// <summary>
 	/// URL event handler. handle with the URL related events

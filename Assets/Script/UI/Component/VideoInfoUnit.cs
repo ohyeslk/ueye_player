@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using DG.Tweening;
 
+[ExecuteInEditMode]
 public class VideoInfoUnit : VRBasicButton {
 	VideoSelectWindow parent;
 
@@ -49,23 +50,40 @@ public class VideoInfoUnit : VRBasicButton {
 	}
 
 	[System.Serializable]
-	public struct VideoUnitInitAnimation
+	public struct VideoUnitSetting
 	{
-		public float delay;
-		public float delayPerUnit;
-		public float duration;
+		public float initDelay;
+		public float InitDelayPerUnit;
+		public float initDuration;
 		public AnimationCurve initScaleCurve;
+		public float anglePerUnit;
+		public float radius;
+		public float recieveDuration;
+		public AnimationCurve recieveScaleCurve;
 	}
-	[SerializeField] VideoUnitInitAnimation m_initAnim;
+	[SerializeField] VideoUnitSetting m_setting;
 
 	VideoInfo m_info = new VideoInfo();
 
+	[SerializeField] Image frame;
+	[SerializeField] Image help;
 	[SerializeField] Image blackCover;
 	[SerializeField] float blackCoverAlpha;
+	Sprite m_recieveSprite;
 
 	public VideoInfo Info{
 		get { return m_info; }
 	}
+
+//	public float angle;
+//	public float radius;
+//	void Update()
+//	{
+//		transform.rotation = Quaternion.Euler ( 0 , angle , 0 );
+//		Vector3 pos = transform.localPosition;
+//		pos.z = ( Mathf.Cos( angle * Mathf.Deg2Rad ) - 1 ) * radius;
+//		transform.localPosition = pos;
+//	}
 
 
 	override public void OnConfirm ()
@@ -94,9 +112,9 @@ public class VideoInfoUnit : VRBasicButton {
 	void Awake()
 	{
 		if ( blackCover != null )
-			blackCover.gameObject.SetActive(false);
+			blackCover.enabled = false;
 		if ( text != null )
-			text.gameObject.SetActive( false );
+			text.enabled = false;
 	}
 
 	void RecieveTexture( URLRequestMessage msg )
@@ -105,9 +123,7 @@ public class VideoInfoUnit : VRBasicButton {
 		{
 			Texture2D tex = (Texture2D)msg.GetMessage(Global.MSG_REQUEST_TEXTURE_TEXTURE_KEY);
 			Rect rec = new Rect(0,0,tex.width ,tex.height );
-			img.sprite = Sprite.Create( tex , rec , new Vector2(0.5f,0.5f) , 100);
-			img.DOFade( 1f , 0 );
-			blackCover.sprite = img.sprite;
+			m_recieveSprite = Sprite.Create( tex , rec , new Vector2(0.5f,0.5f) , 100);
 
 			Outline imgOutline = img.gameObject.GetComponent<Outline>();
 			imgOutline.enabled = true;
@@ -130,15 +146,22 @@ public class VideoInfoUnit : VRBasicButton {
 		parent = _p;
 
 		// update the delay time
-		m_initAnim.delay = index * m_initAnim.delayPerUnit;
+		m_setting.initDelay = index * m_setting.InitDelayPerUnit;
 
 		m_info = info;
 		if ( text != null )
 		{
 			text.text = info.title;
 			text.DOFade(0 , 0);
-			text.gameObject.SetActive( false );
+			text.enabled = false;
 		}
+
+		// set angle and position offset 
+		float angle = m_setting.anglePerUnit * ( ( index % parent.column ) - ( parent.column - 1f ) / 2f ) ;
+		transform.rotation = Quaternion.Euler ( 0 ,angle , 0 );
+		Vector3 pos = transform.localPosition;
+		pos.z = ( Mathf.Cos( angle * Mathf.Deg2Rad ) - 1 ) * m_setting.radius;
+		transform.localPosition = pos;
 
 		ResetSubButton();
 
@@ -164,7 +187,7 @@ public class VideoInfoUnit : VRBasicButton {
 		if ( blackCover != null ){
 			Debug.Log("Show Black ");
 			blackCover.DOKill();
-			blackCover.gameObject.SetActive( true );
+			blackCover.enabled = true;
 			blackCover.DOFade( blackCoverAlpha , subButtonAnimation.showTime );
 		}
 	}
@@ -172,7 +195,7 @@ public class VideoInfoUnit : VRBasicButton {
 	public void ShowText()
 	{
 		if ( text != null ) {
-			text.gameObject.SetActive( true );
+			text.enabled = true;
 			text.DOFade( 1f , subButtonAnimation.showTime / 2f );
 		}
 	}
@@ -182,71 +205,101 @@ public class VideoInfoUnit : VRBasicButton {
 		if ( blackCover != null ) {
 			Debug.Log("Hide black ");
 			blackCover.DOKill();
-			blackCover.DOFade( 0 , subButtonAnimation.hideTime );
+			blackCover.DOFade( 0 , subButtonAnimation.hideTime ).OnComplete(DisableBlackCover);
 		}
 		
 	}
+	void DisableBlackCover(){ blackCover.enabled = false; }
 
 	public void HideText()
 	{
 		if ( text != null )
-			text.DOFade( 0 , subButtonAnimation.hideTime );
+			text.DOFade( 0 , subButtonAnimation.hideTime ).OnComplete(DisableText);
 		
 	}
+	void DisableText () { text.enabled = false; }
 
 	bool shouldPlayRecieveAnimation = false;
-	void PlayRecieveImgAnimation()
+	void PlayRecieveImgAnimation( )
 	{
-		if ( initAnimation != null )
+		if ( initAnimCoroutine != null )
 		{
 			shouldPlayRecieveAnimation = true;
 		}
 		else
 		{
-			StartCoroutine( DoRecieveAnimation () );
+			StartCoroutine( DoRecieveAnimation ( ) );
 		}
 	}
 
 	IEnumerator DoRecieveAnimation()
 	{
 		float timer = 0;
-		while( timer < 1f )
+		help.enabled = true;
+		{ 
+			Color col = help.color;
+			col.a = 1f;
+			help.color = col;
+			help.sprite = img.sprite;
+			help.DOFade( 0 , m_setting.recieveDuration );
+		}
+		frame.enabled = true;
+		{ 
+			Color col = frame.color;
+			col.a = 0f;
+			frame.color = col;
+			frame.DOFade( 1f , m_setting.recieveDuration );
+		}
 		{
+			Color col = img.color;
+			col.a = 0;
+			img.color = col;
+			img.sprite = m_recieveSprite;
+			img.DOFade( 1f , m_setting.recieveDuration );
+		}
+
+		while( timer < m_setting.recieveDuration )
+		{
+			float curveTime = timer / m_setting.recieveDuration;
+			img.transform.localScale = Vector3.one * m_setting.recieveScaleCurve.Evaluate( curveTime );
 			timer += Time.deltaTime;
 			yield return null;
 		}
+
+		help.enabled = false;
+
 	}
 
 	void PlayInitAnimation()
 	{
-		VideoUnitInitAnimation anim = m_initAnim;
+		VideoUnitSetting anim = m_setting;
 
 	
-		initAnimation = StartCoroutine( DoInitAnimation() );
+		initAnimCoroutine = StartCoroutine( DoInitAnimation() );
 	}
 
-	Coroutine initAnimation;
+	Coroutine initAnimCoroutine;
 	IEnumerator DoInitAnimation()
 	{
-		yield return new WaitForSeconds( m_initAnim.delay );
+		yield return new WaitForSeconds( m_setting.initDelay );
 
 
-		img.gameObject.SetActive( true );
-		img.DOFade( 0 , m_initAnim.duration ).From();
+		img.enabled = true;
+		img.DOFade( 0 , m_setting.initDuration ).From();
 
 		float timer = 0;
-		while( timer < m_initAnim.duration )
+		while( timer < m_setting.initDuration )
 		{
-			float curveTime = timer / m_initAnim.duration;
-			img.gameObject.transform.localScale = Vector3.one * m_initAnim.initScaleCurve.Evaluate( curveTime );
+			float curveTime = timer / m_setting.initDuration;
+			img.gameObject.transform.localScale = Vector3.one * m_setting.initScaleCurve.Evaluate( curveTime );
 			timer += Time.deltaTime;
 
 			yield return null;
 		}
 
-		initAnimation = null;
+		initAnimCoroutine = null;
 		if ( shouldPlayRecieveAnimation  )
-			StartCoroutine( DoRecieveAnimation() );
+			StartCoroutine( DoRecieveAnimation( ) );
 	}
 
 	void CompleteInit()

@@ -34,7 +34,7 @@ public class CameraHolder : MonoBehaviour {
 		}
 	}
 		
-	void Awake()
+	void Start()
 	{
 		RotateTowardSelection();
 
@@ -44,8 +44,8 @@ public class CameraHolder : MonoBehaviour {
 	{
 		if ( selectionWindow == null )
 			selectionWindow = GameObject.FindGameObjectWithTag( "SelectionWindow" );
-		
-		transform.LookAt( selectionWindow.transform.position );
+		if ( selectionWindow != null )
+			transform.LookAt( selectionWindow.transform.position );
 	}
 
 	void OnFingerMove( FingerMotionEvent e ) {
