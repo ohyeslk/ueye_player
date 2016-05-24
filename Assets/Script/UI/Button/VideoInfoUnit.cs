@@ -63,6 +63,8 @@ public class VideoInfoUnit : VRBasicButton {
 		public float radius;
 		public float recieveDuration;
 		public AnimationCurve recieveScaleCurve;
+		public float FadeInTime;
+		public float fadeOutTime;
 	}
 	[SerializeField] VideoUnitSetting m_setting;
 
@@ -175,52 +177,52 @@ public class VideoInfoUnit : VRBasicButton {
 	public override void OnEnterHover ()
 	{
 		base.OnEnterHover ();
-		ShowBlackCover();
-		ShowText();
+		ShowBlackCover(subButtonAnimation.showTime);
+		ShowText(subButtonAnimation.showTime);
 	}
 
 	public override void OnExitHover ()
 	{
 		base.OnExitHover ();
-		HideBlackCover();
-		HideText();
+		HideBlackCover(subButtonAnimation.hideTime);
+		HideText(subButtonAnimation.hideTime);
 	}
 
-	public void ShowBlackCover()
+	public void ShowBlackCover( float duration )
 	{
 		if ( blackCover != null ){
 			Debug.Log("Show Black ");
 			blackCover.DOKill();
 			blackCover.enabled = true;
-			blackCover.DOFade( blackCoverAlpha , subButtonAnimation.showTime );
+			blackCover.DOFade( blackCoverAlpha , duration );
 		}
 	}
 
-	public void ShowText()
+	public void ShowText( float duration)
 	{
 		if ( text != null ) {
 			text.enabled = true;
 			text.DOKill();
-			text.DOFade( 1f , subButtonAnimation.showTime / 2f );
+			text.DOFade( 1f , duration / 2f );
 		}
 	}
 
-	public void HideBlackCover()
+	public void HideBlackCover( float duration )
 	{
 		if ( blackCover != null ) {
 //			Debug.Log("Hide black ");
 			blackCover.DOKill();
-			blackCover.DOFade( 0 , subButtonAnimation.hideTime ).OnComplete(DisableBlackCover);
+			blackCover.DOFade( 0 , duration ).OnComplete(DisableBlackCover);
 		}
 		
 	}
 	void DisableBlackCover(){ blackCover.enabled = false; }
 
-	public void HideText()
+	public void HideText( float duration )
 	{
 		if ( text != null ) {
 			text.DOKill();
-			text.DOFade( 0 , subButtonAnimation.hideTime ).OnComplete(DisableText);
+			text.DOFade( 0 , duration ).OnComplete(DisableText);
 		}
 		
 	}
@@ -359,8 +361,8 @@ public class VideoInfoUnit : VRBasicButton {
 		seq.Join( frame.DOFade( 0 , clearAnimation.duration ));
 		seq.Join( img.transform.DOLocalMoveY( clearAnimation.moveY , clearAnimation.duration ));
 		seq.AppendCallback( CompleteClear );
-		HideBlackCover();
-		HideText();
+		HideBlackCover( clearAnimation.duration);
+		HideText(clearAnimation.duration);
 		OnExitHover();
 	}
 
@@ -373,20 +375,21 @@ public class VideoInfoUnit : VRBasicButton {
 
 	public void PlayFadeInAnimation()
 	{
-		img.DOFade( 1f , subButtonAnimation.showTime );
-		frame.DOFade( 1f , subButtonAnimation.showTime );
+		img.DOFade( 1f , m_setting.FadeInTime );
+		frame.DOFade( 1f , m_setting.FadeInTime);
 	}
 
 	public void PlayFadeOutAnimation()
 	{
 		img.DOKill();
 		frame.DOKill();
-		img.DOFade( 0 , subButtonAnimation.hideTime );
-		frame.DOFade( 0 , subButtonAnimation.hideTime );
-		HideBlackCover();
-		HideText();
+
+		img.DOFade( 0 , m_setting.fadeOutTime );
+		frame.DOFade( 0 , m_setting.fadeOutTime );
+		HideBlackCover(m_setting.fadeOutTime);
+		HideText(m_setting.fadeOutTime);
 		if ( subButtonAnimation.subButton != null )
-			subButtonAnimation.subButton.DOFade( 0 , subButtonAnimation.hideTime );
+			subButtonAnimation.subButton.DOFade( 0 , m_setting.fadeOutTime );
 	}
 
 }

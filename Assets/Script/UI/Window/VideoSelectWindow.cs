@@ -56,7 +56,6 @@ public class VideoSelectWindow : UIWindow  {
 
 			foreach(VideoInfo info in videoList )
 			{
-				// Debug.Log("Video " + info.title + " URL " + info.playUrl );
 				CreateVideoInfoUnit( info );
 			}
 		}
@@ -83,9 +82,9 @@ public class VideoSelectWindow : UIWindow  {
 			unit.PlayFadeOutAnimation();
 		}
 
-		/// set the panel to disable after 1.5 seconds
+		/// set the panel to disable after 1 seconds
 		Sequence seq = DOTween.Sequence();
-		seq.AppendInterval( 1.5f );
+		seq.AppendInterval( 1f );
 		seq.AppendCallback( DisablePanel );
 	}
 
