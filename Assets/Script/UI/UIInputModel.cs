@@ -181,7 +181,7 @@ public class UIInputModel : GazeInputModule {
 		}
 	}
 
-	public void OnFingerStationary( FingerMotionEvent e )
+	public void OnFingerMove( FingerMotionEvent e )
 	{
 		{
 			if ( FingerPointData == null ) {

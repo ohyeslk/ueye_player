@@ -40,6 +40,7 @@ public class CardboardHead : MonoBehaviour {
   public bool trackRotation = true;
 
   public bool isLockVertical = true;
+	[SerializeField] float verticalYThreshod = 0.7f;
 
   /// Determines whether to apply ther user's head offset to this gameobject's
   /// position.  True means to update the gameobject's position with the user's head offset,
@@ -109,18 +110,24 @@ public class CardboardHead : MonoBehaviour {
     Cardboard.SDK.UpdateState();
 
     if (trackRotation) {
-      var rot = Cardboard.SDK.HeadPose.Orientation;
-      if (target == null) {
-        transform.localRotation = rot;
-      } else {
-        transform.rotation = target.rotation * rot;
-      }
+      		var rot = Cardboard.SDK.HeadPose.Orientation;
 			if ( isLockVertical )
 			{
-				Vector3 eular = transform.rotation.eulerAngles;
-				eular.x = 0;
-				eular.z = 0;
-				transform.rotation = Quaternion.Euler( eular );
+				float temY =  transform.localRotation.eulerAngles.y;
+				float toY =  rot.eulerAngles.y;
+				if ( Mathf.Abs( temY - toY ) > verticalYThreshod )
+				{
+					Vector3 toEular = Quaternion.Lerp( transform.localRotation , rot  , 0.2f ).eulerAngles;
+					toEular.x = toEular.z = 0;
+					transform.localRotation = Quaternion.Euler( toEular );
+				}
+			}
+			else {
+		      if (target == null) {
+		        transform.localRotation = rot;
+		      } else {
+		        transform.rotation = target.rotation * rot;
+		      }
 			}
     }
 

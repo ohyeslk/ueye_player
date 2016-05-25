@@ -75,6 +75,12 @@ public class VideoInfoUnit : VRBasicButton {
 	[SerializeField] Image blackCover;
 	[SerializeField] float blackCoverAlpha;
 
+	/// <summary>
+	/// set to true when initilize and fade in; 
+	/// set to false when enter the detail/play window ( fade out ) or remove from selecet window (clear)
+	/// </summary>
+	bool isVisible = false;
+
 	public VideoInfo Info{
 		get { return m_info; }
 	}
@@ -169,6 +175,9 @@ public class VideoInfoUnit : VRBasicButton {
 		pos.z = ( Mathf.Cos( angle * Mathf.Deg2Rad ) - 1 ) * m_setting.radius;
 		transform.localPosition = pos;
 
+		// set visible to true
+		isVisible = true;
+
 		ResetSubButton();
 
 		PlayInitAnimation();
@@ -243,8 +252,6 @@ public class VideoInfoUnit : VRBasicButton {
 
 	IEnumerator DoRecieveAnimation()
 	{
-		// TODO : change the way to detect if the video info unit is visible
-		bool isVisible = img.color.a >= 1f ;
 		float timer = 0;
 		img.sprite = m_info.Post;
 		frame.enabled = true;
@@ -352,6 +359,8 @@ public class VideoInfoUnit : VRBasicButton {
 
 	public void PlayClearAnimation()
 	{
+		isVisible = false;
+
 		img.DOKill();
 		frame.DOKill();
 		img.transform.DOKill();
@@ -375,12 +384,14 @@ public class VideoInfoUnit : VRBasicButton {
 
 	public void PlayFadeInAnimation()
 	{
+		isVisible = true;
 		img.DOFade( 1f , m_setting.FadeInTime );
 		frame.DOFade( 1f , m_setting.FadeInTime);
 	}
 
 	public void PlayFadeOutAnimation()
 	{
+		isVisible = false;
 		img.DOKill();
 		frame.DOKill();
 
