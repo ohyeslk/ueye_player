@@ -141,6 +141,7 @@ public class DetailWindow : UIWindow {
 	/// </summary>
 	public void OnPlayVideo()
 	{
+		Debug.Log("Play video " + m_info.playUrl );
 		Message msg = new Message(this);
 		msg.AddMessage( Global.MSG_VIDEO_INFO_KEY , m_info );
 		VREvents.FirePlayVideo( msg );
