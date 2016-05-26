@@ -147,7 +147,7 @@ public class VRBasicButton : MonoBehaviour {
 		}
 	}
 
-	public void OnBecomeVisible( float time )
+	virtual public void OnBecomeVisible( float time )
 	{
 		if ( subButtonAnimation.subButton != null )
 		{
@@ -157,7 +157,7 @@ public class VRBasicButton : MonoBehaviour {
 		}
 	}
 
-	public void OnBecomeInvisible( float time )
+	virtual public void OnBecomeInvisible( float time )
 	{
 		if ( subButtonAnimation.subButton != null )
 		{
@@ -165,10 +165,6 @@ public class VRBasicButton : MonoBehaviour {
 			subButtonAnimation.subButton.DOKill();
 			subButtonAnimation.subButton.DOFade( 0 , t );
 		}
-	}
-
-	virtual public void Clear()
-	{
 	}
 
 }

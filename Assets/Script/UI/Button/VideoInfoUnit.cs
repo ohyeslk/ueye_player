@@ -253,7 +253,6 @@ public class VideoInfoUnit : VRBasicButton {
 	{
 		float timer = 0;
 		img.sprite = m_info.Post;
-		frame.enabled = true;
 
 		if ( isVisible )
 		{
@@ -264,12 +263,6 @@ public class VideoInfoUnit : VRBasicButton {
 				help.color = col;
 				help.sprite = img.sprite;
 				help.DOFade( 0 , m_setting.recieveDuration );
-			}
-			{ 
-				Color col = frame.color;
-				col.a = 0f;
-				frame.color = col;
-				frame.DOFade( 1f , m_setting.recieveDuration );
 			}
 			{
 				Color col = img.color;
@@ -317,6 +310,15 @@ public class VideoInfoUnit : VRBasicButton {
 			yield return null;
 		}
 
+		frame.enabled = true;
+		if ( isVisible )
+		{
+			Color col = frame.color;
+			col.a = 0f;
+			frame.color = col;
+			frame.DOFade( 1f , m_setting.recieveDuration );
+		}
+
 		initAnimCoroutine = null;
 		if ( shouldPlayRecieveAnimation  )
 			StartCoroutine( DoRecieveAnimation( ) );
@@ -350,14 +352,12 @@ public class VideoInfoUnit : VRBasicButton {
 	}
 		
 
-	override public void Clear()
+	public void Clear( VideoSelectWindow.ClearType type )
 	{
-		base.Clear();
-		transform.SetParent( null );
-		PlayClearAnimation();
+		PlayClearAnimation( type );
 	}
 
-	public void PlayClearAnimation()
+	public void PlayClearAnimation(VideoSelectWindow.ClearType type)
 	{
 		isVisible = false;
 
@@ -365,10 +365,28 @@ public class VideoInfoUnit : VRBasicButton {
 		frame.DOKill();
 		img.transform.DOKill();
 
+		float y = 0;
+
+		switch( type )
+		{
+		case VideoSelectWindow.ClearType.Up:
+			y = clearAnimation.moveY;
+			break;
+		case VideoSelectWindow.ClearType.Down:
+			y = - clearAnimation.moveY;
+			break;
+		case VideoSelectWindow.ClearType.Disapper:
+			y = 0;
+			break;
+		default:
+			y = 0;
+			break;
+		};
+
 		Sequence seq = DOTween.Sequence();
 		seq.Append( img.DOFade( 0 , clearAnimation.duration ));
 		seq.Join( frame.DOFade( 0 , clearAnimation.duration ));
-		seq.Join( img.transform.DOLocalMoveY( clearAnimation.moveY , clearAnimation.duration ));
+		seq.Join( img.transform.DOLocalMoveY( y, clearAnimation.duration ).SetEase(Ease.InBack) );
 		seq.AppendCallback( CompleteClear );
 		HideBlackCover( clearAnimation.duration);
 		HideText(clearAnimation.duration);
@@ -377,6 +395,7 @@ public class VideoInfoUnit : VRBasicButton {
 
 	void CompleteClear()
 	{
+		transform.SetParent( null , true );
 		gameObject.SetActive( false );
 		GameObject.Destroy( gameObject , 1f );
 	}

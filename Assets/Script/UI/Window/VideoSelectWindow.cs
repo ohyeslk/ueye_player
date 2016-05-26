@@ -9,15 +9,23 @@ public class VideoSelectWindow : UIWindow  {
 	/// The prefabe of the unit in the window
 	/// </summary>
 	[SerializeField] GameObject VideoInfoUnitPrefab;
+	[SerializeField] GameObject SidePatternPrefab;
 	/// <summary>
 	/// The grid panel to save the units
 	/// </summary>
 	[SerializeField] GridLayoutGroup Panel;
+	[SerializeField] GridLayoutGroup helpPanel;
+	[SerializeField] GridLayoutGroup sidePanel;
+	const int sidePatternNumber = 10;
 
 	/// <summary>
 	/// the list to save the unit 
 	/// </summary>
 	List<VideoInfoUnit> unitList = new List<VideoInfoUnit>();
+	/// <summary>
+	/// save the side pattern
+	/// </summary>
+	List<SidePattern> sidePatternList = new List<SidePattern>();
 	// Use this for initialization
 
 	public int row;
@@ -70,25 +78,29 @@ public class VideoSelectWindow : UIWindow  {
 
 	void ResetVideoList (URLRequestMessage msg)
 	{
-		ClearVideos();
+		ClearVideos( ClearType.Disapper );
 	}
 
 	void RecieveVideoList( URLRequestMessage msg )
 	{
 		m_videoList = (List<VideoInfo>)msg.GetMessage(Global.MSG_POSTVIDEO_VIDEO_KEY );
+		temPage = 0;
+
 		ShowVideoOnTempPage();
 	}
 
 	void ShowVideoOnTempPage()
 	{
-		ClearVideos();
-
+		if ( unitList.Count > 0 ) 
+			ClearVideos( ClearType.Disapper );
+		
 		for ( int i = temPage * VideoPerPage ; i < ( temPage + 1 ) *  VideoPerPage && i < m_videoList.Count ; ++ i ) 
 		{
 			CreateVideoInfoUnit( m_videoList[i] );
 		}
 
 		UpdatePageChangeButtons();
+		UpdateSidePattern();
 	}
 
 	void UpdatePageChangeButtons()
@@ -97,7 +109,7 @@ public class VideoSelectWindow : UIWindow  {
 		DownButton.m_Enable = true;
 
 		if ( temPage <= 0 ) UpButton.m_Enable = false;
-		if ( temPage * VideoPerPage >= m_videoList.Count ) DownButton.m_Enable = false;
+		if ( ( temPage + 1 ) * VideoPerPage >= m_videoList.Count ) DownButton.m_Enable = false;
 	}
 
 	protected override void OnBecomeVisible ( float time )
@@ -112,6 +124,7 @@ public class VideoSelectWindow : UIWindow  {
 
 		UpButton.OnBecomeVisible( time );
 		DownButton.OnBecomeVisible( time );
+		foreach( SidePattern p in sidePatternList ) p.OnBecomeVisible( time );
 	}
 
 	protected override void OnBecomeInvsible ( float time )
@@ -130,6 +143,7 @@ public class VideoSelectWindow : UIWindow  {
 
 		UpButton.OnBecomeInvisible( time );
 		DownButton.OnBecomeInvisible( time );
+		foreach( SidePattern p in sidePatternList ) p.OnBecomeInvisible( time );
 	}
 
 	public void DisablePanel() { Panel.gameObject.SetActive(false); }
@@ -139,16 +153,18 @@ public class VideoSelectWindow : UIWindow  {
 			VideoInfoUnitPrefab = (GameObject)Resources.Load("Prefab/UI/VideoInfoUnit");
 		if ( Panel == null )
 			Debug.LogError("Cannot find Panel");
+		
 	}
 
 	void Start() {
+		CreateSidePattern();
 		RequestVideoList();
 	}
 
 	public void RequestVideoList()
 	{
 		URLRequestMessage msg = new URLRequestMessage(this);
-		msg.AddMessage(Global.MSG_REQUESTVIDEO_NUMBER_KEY , "12");
+		msg.AddMessage(Global.MSG_REQUESTVIDEO_NUMBER_KEY , "13");
 		VREvents.FireRequestVideoList(msg);
 	}
 
@@ -188,11 +204,64 @@ public class VideoSelectWindow : UIWindow  {
 		}
 	}
 
-	public void ClearVideos()
+	/// <summary>
+	/// create 10 side patterns and set to disabled, for save
+	/// </summary>
+	void CreateSidePattern()
 	{
-		for( int i = unitList.Count - 1 ; i >= 0 ; --i )
+		for( int i = 0 ;i < sidePatternNumber ; ++i )
 		{
-			unitList[i].Clear();
+			GameObject sideObj = Instantiate( SidePatternPrefab ) as GameObject;
+			sideObj.transform.SetParent( sidePanel.transform );
+			sideObj.transform.localScale = Vector3.one;
+			sideObj.transform.localPosition = Vector3.zero;
+			sideObj.transform.localRotation = Quaternion.identity;
+			sideObj.name = "side" + i.ToString();
+			sideObj.SetActive( false );
+
+			SidePattern pattern = sideObj.GetComponent<SidePattern>();
+
+			sidePatternList.Add( pattern );
+		}
+	}
+
+	void UpdateSidePattern()
+	{
+		int totalPage = ( m_videoList.Count - 1 ) / VideoPerPage + 1;
+
+		// set the the pattern
+		for( int i = sidePatternNumber -1; i >= 0 ; -- i )
+		{
+			if ( i < totalPage )
+			{
+				sidePatternList[i].gameObject.SetActive( true );
+			}else
+			{
+				sidePatternList[i].gameObject.SetActive( false );
+			}
+			if ( i == temPage )
+			{
+				sidePatternList[i].PatternEnable = true;
+			}else
+			{
+				sidePatternList[i].PatternEnable = false;
+			}
+		}
+	}
+
+	public enum ClearType
+	{
+		Up,
+		Down,
+		Disapper
+	}
+	public void ClearVideos( ClearType type )
+	{
+		
+		for( int i = 0; i < unitList.Count ; ++i )
+		{
+			unitList[i].transform.SetParent( helpPanel.transform , true );
+			unitList[i].Clear(type);
 		}
 
 		unitList.Clear();
@@ -203,6 +272,7 @@ public class VideoSelectWindow : UIWindow  {
 		if ( temPage > 0 ) 
 		{
 			temPage --;
+			ClearVideos( ClearType.Down);
 			ShowVideoOnTempPage();
 		}
 	}
@@ -212,6 +282,7 @@ public class VideoSelectWindow : UIWindow  {
 		if ( temPage * VideoPerPage < m_videoList.Count )
 		{
 			temPage ++ ;
+			ClearVideos( ClearType.Up);
 			ShowVideoOnTempPage();
 		}
 	}

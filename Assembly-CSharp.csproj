@@ -60,6 +60,7 @@
      <Compile Include="Assets\Script\UI\Button\VRBasicButton.cs" />
      <Compile Include="Assets\Script\UI\Button\VRFunctionButton.cs" />
      <Compile Include="Assets\Script\UI\Button\VideoInfoUnit.cs" />
+     <Compile Include="Assets\Script\UI\Other\SidePattern.cs" />
      <Compile Include="Assets\Script\UI\Reticle\UIReticle.cs" />
      <Compile Include="Assets\Script\UI\UIInputModel.cs" />
      <Compile Include="Assets\Script\UI\Window\CategoryWindow.cs" />

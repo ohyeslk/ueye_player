@@ -10,6 +10,11 @@ public class HTTPManager : MonoBehaviour {
 
 	public delegate void RequestHandler(WWW www, URLRequestMessage postMsg );
 
+	/// <summary>
+	/// Save the texture in in the dictionary
+	/// </summary>
+	Dictionary<string,Texture2D> textureCache = new Dictionary<string, Texture2D>();
+
 	public void OnEnable()
 	{
 		VREvents.RequestVideoList += RequestVideoInfo;
@@ -73,6 +78,15 @@ public class HTTPManager : MonoBehaviour {
 	void RequestTexture( URLRequestMessage msg )
 	{
 		string url = msg.url;
+		{
+			Texture2D texture;
+			if ( textureCache.TryGetValue( url , out texture) )
+			{
+				msg.AddMessage( Global.MSG_REQUEST_TEXTURE_TEXTURE_KEY , texture );
+				VREvents.FirePostTexture( msg );
+				return;
+			}
+		}
 		StartCoroutine( WaitForRequest( url , TextureHandler , msg));
 	}
 
@@ -165,7 +179,8 @@ public class HTTPManager : MonoBehaviour {
 	void TextureHandler( WWW www , URLRequestMessage postMsg )
 	{
 		Texture2D texture = www.texture;
-
+		if ( !textureCache.ContainsKey( postMsg.url ))
+			textureCache.Add( postMsg.url , texture );
 		postMsg.AddMessage( Global.MSG_REQUEST_TEXTURE_TEXTURE_KEY , texture );
 		VREvents.FirePostTexture( postMsg );
 	}
