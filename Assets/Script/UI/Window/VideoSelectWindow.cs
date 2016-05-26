@@ -23,6 +23,34 @@ public class VideoSelectWindow : UIWindow  {
 	public int row;
 	public int column;
 
+	/// <summary>
+	/// the number of the video info shown in per page
+	/// </summary>
+	/// <value>The video per page.</value>
+	public int VideoPerPage { get { return row * column ; } }
+
+	/// <summary>
+	///  the number of the video pero row in temperary page
+	/// </summary>
+	/// <value>The video per row.</value>
+	public int VideoPerRow {
+		get{
+			return ( m_videoList.Count - VideoPerPage * temPage ) < column ? ( m_videoList.Count - VideoPerPage * temPage ) : column;
+		}
+	}
+
+	/// <summary>
+	/// record the temperary page number
+	/// </summary>
+	int temPage = 0;
+
+	/// <summary>
+	/// cache the video list
+	/// </summary>
+	List<VideoInfo> m_videoList = new List<VideoInfo>();
+
+	[SerializeField] VRFunctionButton UpButton;
+	[SerializeField] VRFunctionButton DownButton;
 
 	override protected void OnDisable()
 	{
@@ -47,45 +75,61 @@ public class VideoSelectWindow : UIWindow  {
 
 	void RecieveVideoList( URLRequestMessage msg )
 	{
-		{
-			ClearVideos();
-
-			List<VideoInfo> videoList = (List<VideoInfo>)msg.GetMessage(Global.MSG_POSTVIDEO_VIDEO_KEY );
-
-			Debug.Log("Get Video List " + videoList.Count  );
-
-			foreach(VideoInfo info in videoList )
-			{
-				CreateVideoInfoUnit( info );
-			}
-		}
-
+		m_videoList = (List<VideoInfo>)msg.GetMessage(Global.MSG_POSTVIDEO_VIDEO_KEY );
+		ShowVideoOnTempPage();
 	}
 
-	protected override void OnBecomeVisible ()
+	void ShowVideoOnTempPage()
 	{
-		base.OnBecomeVisible ();
+		ClearVideos();
+
+		for ( int i = temPage * VideoPerPage ; i < ( temPage + 1 ) *  VideoPerPage && i < m_videoList.Count ; ++ i ) 
+		{
+			CreateVideoInfoUnit( m_videoList[i] );
+		}
+
+		UpdatePageChangeButtons();
+	}
+
+	void UpdatePageChangeButtons()
+	{
+		UpButton.m_Enable = true;
+		DownButton.m_Enable = true;
+
+		if ( temPage <= 0 ) UpButton.m_Enable = false;
+		if ( temPage * VideoPerPage >= m_videoList.Count ) DownButton.m_Enable = false;
+	}
+
+	protected override void OnBecomeVisible ( float time )
+	{
+		base.OnBecomeVisible ( time );
 		Panel.gameObject.SetActive( true );
 
 		foreach( VideoInfoUnit unit in unitList )
 		{
-			unit.PlayFadeInAnimation();
+			unit.PlayFadeInAnimation( time );
 		}
+
+		UpButton.OnBecomeVisible( time );
+		DownButton.OnBecomeVisible( time );
 	}
 
-	protected override void OnBecomeInvsible ()
+	protected override void OnBecomeInvsible ( float time )
 	{
-		base.OnBecomeInvsible ();
+		base.OnBecomeInvsible ( time );
 
 		foreach( VideoInfoUnit unit in unitList )
 		{
-			unit.PlayFadeOutAnimation();
+			unit.PlayFadeOutAnimation( time );
 		}
 
-		/// set the panel to disable after 1 seconds
 		Sequence seq = DOTween.Sequence();
-		seq.AppendInterval( 1f );
+		seq.AppendInterval( time  );
 		seq.AppendCallback( DisablePanel );
+
+
+		UpButton.OnBecomeInvisible( time );
+		DownButton.OnBecomeInvisible( time );
 	}
 
 	public void DisablePanel() { Panel.gameObject.SetActive(false); }
@@ -104,7 +148,7 @@ public class VideoSelectWindow : UIWindow  {
 	public void RequestVideoList()
 	{
 		URLRequestMessage msg = new URLRequestMessage(this);
-		msg.AddMessage(Global.MSG_REQUESTVIDEO_NUMBER_KEY , "6");
+		msg.AddMessage(Global.MSG_REQUESTVIDEO_NUMBER_KEY , "12");
 		VREvents.FireRequestVideoList(msg);
 	}
 
@@ -149,12 +193,27 @@ public class VideoSelectWindow : UIWindow  {
 		for( int i = unitList.Count - 1 ; i >= 0 ; --i )
 		{
 			unitList[i].Clear();
-		
 		}
 
 		unitList.Clear();
 	}
 
+	public void OnLastPage()
+	{
+		if ( temPage > 0 ) 
+		{
+			temPage --;
+			ShowVideoOnTempPage();
+		}
+	}
 
+	public void OnNextPage()
+	{
+		if ( temPage * VideoPerPage < m_videoList.Count )
+		{
+			temPage ++ ;
+			ShowVideoOnTempPage();
+		}
+	}
 
 }

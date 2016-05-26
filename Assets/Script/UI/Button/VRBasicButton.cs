@@ -6,19 +6,32 @@ using DG.Tweening;
 
 public class VRBasicButton : MonoBehaviour {
 	[SerializeField] protected SubAnimation subButtonAnimation;
-
+	public bool m_Enable = true;
 
 	virtual public void OnFucus( )
 	{
-
+		if ( m_Enable )
+		{
+		}
 	}
 
 	virtual public void OnConfirm ()
 	{
+		if ( m_Enable)
+		{
 		if ( subButtonAnimation.subButtonRing != null )
 		{
 			subButtonAnimation.subButtonRing.transform.DOScale( subButtonAnimation.subRingScaleUp , subButtonAnimation.subRingScaleUpTime );
 			subButtonAnimation.subButtonRing.DOFade( 0 , subButtonAnimation.subRingScaleUpTime );
+		}
+		if ( subButtonAnimation.subButton != null )
+		{
+			if ( subButtonAnimation.subButtonFade )
+			{
+					subButtonAnimation.subButton.DOKill();	
+				subButtonAnimation.subButton.DOFade( 0 , subButtonAnimation.subRingScaleUpTime );
+			}
+		}
 		}
 	}
 
@@ -35,12 +48,18 @@ public class VRBasicButton : MonoBehaviour {
 		float time = subButtonAnimation.showTime;
 		if ( subButtonAnimation.subButton != null )
 		{
-			subButtonAnimation.subButton.DOKill();
-			subButtonAnimation.subButton.transform.DOKill();
-			subButtonAnimation.subButton.enabled = true;
-			subButtonAnimation.subButton.DOFade( 1f , time );
-			subButtonAnimation.subButton.transform.DOLocalMoveY( subButtonAnimation.posY + subButtonAnimation.moveY , 0 );
-			subButtonAnimation.subButton.transform.DOLocalMoveY( subButtonAnimation.posY , time );
+			if ( subButtonAnimation.subButtonFade )
+			{
+				subButtonAnimation.subButton.DOKill();
+				subButtonAnimation.subButton.enabled = true;
+				subButtonAnimation.subButton.DOFade( 1f , time );
+			}
+			if ( subButtonAnimation.subButtonMove )
+			{
+				subButtonAnimation.subButton.transform.DOKill();
+				subButtonAnimation.subButton.transform.DOLocalMoveY( subButtonAnimation.posY + subButtonAnimation.moveY , 0 );
+				subButtonAnimation.subButton.transform.DOLocalMoveY( subButtonAnimation.posY , time );
+			}
 		}
 
 		if ( subButtonAnimation.subButtonRing != null )
@@ -61,10 +80,16 @@ public class VRBasicButton : MonoBehaviour {
 		float time = subButtonAnimation.hideTime;
 		if ( subButtonAnimation.subButton != null )
 		{
-			subButtonAnimation.subButton.DOKill();
-			subButtonAnimation.subButton.transform.DOKill();
-			subButtonAnimation.subButton.transform.DOLocalMoveY( subButtonAnimation.posY + subButtonAnimation.moveY , time );
-			subButtonAnimation.subButton.DOFade( 0 , time  );
+			if ( subButtonAnimation.subButtonFade)
+			{
+				subButtonAnimation.subButton.DOKill();
+				subButtonAnimation.subButton.DOFade( 0 , time  );
+			}
+			if ( subButtonAnimation.subButtonMove )
+			{
+				subButtonAnimation.subButton.transform.DOKill();
+				subButtonAnimation.subButton.transform.DOLocalMoveY( subButtonAnimation.posY + subButtonAnimation.moveY , time );
+			}
 		}
 		if ( subButtonAnimation.subButtonRing != null )
 		{
@@ -80,7 +105,6 @@ public class VRBasicButton : MonoBehaviour {
 
 	virtual public void OnExitSub()
 	{
-
 		float time = subButtonAnimation.hideTime;
 		if ( subButtonAnimation.subButtonRing != null )
 		{
@@ -96,9 +120,12 @@ public class VRBasicButton : MonoBehaviour {
 		
 	virtual public void UpdateHover( float process )
 	{
+		if ( m_Enable )
+		{
 		if ( subButtonAnimation.subButtonRing != null )
 		{
 			subButtonAnimation.subButtonRing.fillAmount = subButtonAnimation.confirmCurve.Evaluate( process );
+		}
 		}
 	}
 
@@ -106,9 +133,12 @@ public class VRBasicButton : MonoBehaviour {
 	{
 		if ( subButtonAnimation.subButton != null )
 		{
-			Color col = subButtonAnimation.subButton.color ;
-			col.a = 0.01f;
-			subButtonAnimation.subButton.color = col;
+			if ( subButtonAnimation.subButtonFade )
+			{
+				Color col = subButtonAnimation.subButton.color;
+				col.a = 0.01f;
+				subButtonAnimation.subButton.color = col;
+			}
 		}
 		if ( subButtonAnimation.subButtonRing )
 		{
@@ -117,6 +147,25 @@ public class VRBasicButton : MonoBehaviour {
 		}
 	}
 
+	public void OnBecomeVisible( float time )
+	{
+		if ( subButtonAnimation.subButton != null )
+		{
+			float t = ( time <= 0 ) ? subButtonAnimation.showTime : time ;
+			subButtonAnimation.subButton.DOKill();
+			subButtonAnimation.subButton.DOFade( 1f , t );
+		}
+	}
+
+	public void OnBecomeInvisible( float time )
+	{
+		if ( subButtonAnimation.subButton != null )
+		{
+			float t = ( time <= 0 ) ? subButtonAnimation.hideTime : time;
+			subButtonAnimation.subButton.DOKill();
+			subButtonAnimation.subButton.DOFade( 0 , t );
+		}
+	}
 
 	virtual public void Clear()
 	{
@@ -136,4 +185,6 @@ public struct SubAnimation
 	public float moveY;
 	public float subRingScaleUp;
 	public float subRingScaleUpTime;
+	public bool subButtonFade;
+	public bool subButtonMove;
 }

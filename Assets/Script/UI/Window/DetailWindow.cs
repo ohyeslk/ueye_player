@@ -9,7 +9,7 @@ public class DetailWindow : UIWindow {
 	[SerializeField] Text title;
 	[SerializeField] Text description;
 	[SerializeField] GameObject panel;
-	[SerializeField] Image backImage;
+	[SerializeField] VRBasicButton backBtn;
 	[SerializeField] Image playImage;
 	[SerializeField] Sprite defaulSprite;
 
@@ -37,17 +37,17 @@ public class DetailWindow : UIWindow {
 		VREvents.PostTexture += RecieveTexture;
 	}
 
-	protected override void OnBecomeVisible ()
+	protected override void OnBecomeVisible ( float time )
 	{
 		Debug.Log(" Detail Becom visible");
-		base.OnBecomeVisible ();
-		PlayInitAnimation();
+		base.OnBecomeVisible ( time );
+		PlayInitAnimation ( time );
 	}
 
-	protected override void OnBecomeInvsible ()
+	protected override void OnBecomeInvsible ( float time )
 	{
-		base.OnBecomeInvsible ();
-		PlayExitAnimation();
+		base.OnBecomeInvsible ( time );
+		PlayExitAnimation ( time );
 	}
 
 	void RecieveTexture( URLRequestMessage msg )
@@ -91,38 +91,39 @@ public class DetailWindow : UIWindow {
 	/// <summary>
 	/// Play the initilzation animation
 	/// </summary>
-	void PlayInitAnimation()
+	void PlayInitAnimation( float time )
 	{
 		// enable the components
 		panel.gameObject.SetActive ( true );
 		description.text = "";
 
+		float t = ( time <= 0 ) ? m_setting.showDuration : time;
+		backBtn.OnBecomeVisible( t );
+
 		Sequence seq = DOTween.Sequence();
 		seq.Append( img.DOFade( 0 , 0 ) );
 		seq.Join( description.DOFade( 0 , 0 ));
 		seq.Join( title.DOFade( 0 , 0 ));
-		seq.Join( backImage.DOFade( 0 , 0 ));
-		seq.Join( playImage.DOFade( 0 , 0 ));
-		seq.Append( img.DOFade( 1f , m_setting.showDuration ) );
-		seq.Join( description.DOFade( 1f , m_setting.showDuration ) );
-		seq.Join( description.DOText( m_info.description , m_setting.showDuration ));
-		seq.Join( backImage.DOFade( 1f , m_setting.hideDuration ));
-		seq.Join( playImage.DOFade( 1f , m_setting.hideDuration ));
-		seq.Join( title.DOFade( 1f , m_setting.showDuration ));
+		seq.Append( img.DOFade( 1f , t ) );
+		seq.Join( description.DOFade( 1f , t ) );
+		seq.Join( description.DOText( m_info.description , t ));
+		seq.Join( title.DOFade( 1f , t ));
 	}
 
 	/// <summary>
 	/// Play the exit animation
 	/// </summary>
-	void PlayExitAnimation()
+	void PlayExitAnimation( float time )
 	{
+		float t = ( time <= 0 ) ? m_setting.hideDuration : time;
+		backBtn.OnBecomeInvisible( t );
+
 		Sequence seq = DOTween.Sequence();
-		seq.Append( img.DOFade( 0f , m_setting.hideDuration ) );
-		seq.Join( description.DOFade( 0f , m_setting.hideDuration ) );
-		seq.Join( description.DOText( "" , m_setting.hideDuration ));
-		seq.Join( title.DOFade( 0f , m_setting.hideDuration ));
-		seq.Join( backImage.DOFade( 0 , m_setting.hideDuration ));
-		seq.Join( playImage.DOFade( 0 , m_setting.hideDuration ));
+		seq.Append( img.DOFade( 0f , t ) );
+		seq.Join( description.DOFade( 0f , t ) );
+		seq.Join( description.DOText( "" , t ));
+		seq.Join( title.DOFade( 0f , t ));
+		seq.Join( playImage.DOFade( 0 , t ));
 		seq.AppendCallback( ExitComplete );
 
 	}

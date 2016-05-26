@@ -24,6 +24,7 @@ public class EffectManager : MonoBehaviour {
 	void OnActiveWindow (WindowArg arg)
 	{
 //		if ( arg.type == WindowArg.Type.DETAIL_WINDOWS || arg.type == WindowArg.Type.SELECT_WINDOW )
+		if ( LogicManager.VRMode == VRMode.VR_2D )
 		{
 			rippleEffect.enabled = true;
 			rippleEffect.EmitAll();

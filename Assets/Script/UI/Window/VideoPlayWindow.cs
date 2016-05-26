@@ -37,15 +37,15 @@ public class VideoPlayWindow : UIWindow {
 		OnPlayVideo();
 	}
 
-	protected override void OnBecomeInvsible ()
+	protected override void OnBecomeInvsible ( float time )
 	{
-		base.OnBecomeInvsible ();
+		base.OnBecomeInvsible ( time );
 		BecomeVisible ( false );
 	}
 
-	protected override void OnBecomeVisible ()
+	protected override void OnBecomeVisible ( float time )
 	{
-		base.OnBecomeVisible ();
+		base.OnBecomeVisible ( time );
 		BecomeVisible ( true );
 	}
 

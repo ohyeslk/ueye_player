@@ -135,7 +135,6 @@ public class VideoInfoUnit : VRBasicButton {
 			Rect rec = new Rect(0,0,tex.width ,tex.height );
 			m_info.Post = Sprite.Create( tex , rec , new Vector2(0.5f,0.5f) , 100);
 
-
 			Outline imgOutline = img.gameObject.GetComponent<Outline>();
 			if ( imgOutline != null )
 				imgOutline.enabled = true;
@@ -169,8 +168,8 @@ public class VideoInfoUnit : VRBasicButton {
 		}
 
 		// set angle and position offset 
-		float angle = m_setting.anglePerUnit * ( ( index % parent.column ) - ( parent.column - 1f ) / 2f ) ;
-		transform.rotation = Quaternion.Euler ( 0 ,angle , 0 );
+		float angle = m_setting.anglePerUnit * ( ( index % parent.VideoPerRow ) - ( parent.VideoPerRow - 1f ) / 2f ) ;
+		transform.localRotation = Quaternion.Euler ( 0 ,angle , 0 );
 		Vector3 pos = transform.localPosition;
 		pos.z = ( Mathf.Cos( angle * Mathf.Deg2Rad ) - 1 ) * m_setting.radius;
 		transform.localPosition = pos;
@@ -354,6 +353,7 @@ public class VideoInfoUnit : VRBasicButton {
 	override public void Clear()
 	{
 		base.Clear();
+		transform.SetParent( null );
 		PlayClearAnimation();
 	}
 
@@ -377,30 +377,31 @@ public class VideoInfoUnit : VRBasicButton {
 
 	void CompleteClear()
 	{
-		transform.SetParent( null );
 		gameObject.SetActive( false );
 		GameObject.Destroy( gameObject , 1f );
 	}
 
-	public void PlayFadeInAnimation()
+	public void PlayFadeInAnimation( float time )
 	{
 		isVisible = true;
-		img.DOFade( 1f , m_setting.FadeInTime );
-		frame.DOFade( 1f , m_setting.FadeInTime);
+		float t = ( time <= 0 ) ? m_setting.FadeInTime : time;
+		img.DOFade( 1f , t );
+		frame.DOFade( 1f , t );
 	}
 
-	public void PlayFadeOutAnimation()
+	public void PlayFadeOutAnimation( float time )
 	{
 		isVisible = false;
+		float t = ( time <= 0 ) ? m_setting.FadeInTime : time;
 		img.DOKill();
 		frame.DOKill();
 
-		img.DOFade( 0 , m_setting.fadeOutTime );
-		frame.DOFade( 0 , m_setting.fadeOutTime );
-		HideBlackCover(m_setting.fadeOutTime);
-		HideText(m_setting.fadeOutTime);
+		img.DOFade( 0 , t );
+		frame.DOFade( 0 , t );
+		HideBlackCover(t);
+		HideText(t);
 		if ( subButtonAnimation.subButton != null )
-			subButtonAnimation.subButton.DOFade( 0 , m_setting.fadeOutTime );
+			subButtonAnimation.subButton.DOFade( 0 , t );
 	}
 
 }

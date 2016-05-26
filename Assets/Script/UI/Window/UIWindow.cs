@@ -3,6 +3,8 @@ using System.Collections;
 
 public class UIWindow : MonoBehaviour {
 	[SerializeField] WindowArg.Type myType;
+	[SerializeField] float becomeVisibleTime = 1f;
+	[SerializeField] float becomeInvisbleTime = 0.5f;
 
 	virtual protected void OnDisable()
 	{
@@ -18,15 +20,15 @@ public class UIWindow : MonoBehaviour {
 	{
 		if ( arg.type == myType )
 		{
-			OnBecomeVisible();
+			OnBecomeVisible( becomeVisibleTime );
 		}else
 		{
-			OnBecomeInvsible();
+			OnBecomeInvsible( becomeInvisbleTime );
 		}
 
 	}
 
-	virtual protected void OnBecomeVisible(){}
-	virtual protected void OnBecomeInvsible(){}
+	virtual protected void OnBecomeVisible( float time ){}
+	virtual protected void OnBecomeInvsible( float time ){}
 
 }
