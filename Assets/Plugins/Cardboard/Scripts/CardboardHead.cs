@@ -40,7 +40,7 @@ public class CardboardHead : MonoBehaviour {
   public bool trackRotation = true;
 
   public bool isLockVertical = true;
-	[SerializeField] float verticalYThreshod = 0.7f;
+  [SerializeField] float verticalYThreshod = 0.7f;
 
   /// Determines whether to apply ther user's head offset to this gameobject's
   /// position.  True means to update the gameobject's position with the user's head offset,
