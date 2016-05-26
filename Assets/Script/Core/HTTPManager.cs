@@ -14,12 +14,39 @@ public class HTTPManager : MonoBehaviour {
 	{
 		VREvents.RequestVideoList += RequestVideoInfo;
 		VREvents.RequesTexture += RequestTexture;
+		VREvents.RequestCategory += RequestCategory;
+		VREvents.RequestCategoryVideoList += RequestCategoryVideoList;
 	}
 
 	public void OnDisable()
 	{
 		VREvents.RequestVideoList -= RequestVideoInfo;
-		VREvents.RequesTexture += RequestTexture;
+		VREvents.RequesTexture -= RequestTexture;
+		VREvents.RequestCategory -= RequestCategory;
+		VREvents.RequestCategoryVideoList -= RequestCategoryVideoList;
+	}
+
+	void RequestCategory( URLRequestMessage msg )
+	{
+		string url = msg.url;
+		if ( url == null || url == "" )
+		{
+			url = Global.CategoryRequstURL;
+		}
+		StartCoroutine( WaitForRequest ( url , CategoryHandler , msg ));
+
+	}
+
+	void RequestCategoryVideoList( URLRequestMessage msg )
+	{
+		string url = msg.url;
+		if ( url == null || url == "" )
+		{
+			string category = msg.GetMessage(Global.MSG_REQUEST_CATEGORYVIDEO_CATEGORY_KEY ).ToString();
+			url = Global.CategoryVideoRequestURL.Replace("CATEGORY" , category );
+			Debug.Log("Request c v l " + url );
+		}
+		StartCoroutine( WaitForRequest( url , CategoryVideoHandeler , msg ));
 	}
 
 	/// <summary>
@@ -30,13 +57,13 @@ public class HTTPManager : MonoBehaviour {
 	{
 		Debug.Log(" Request Video Info ");
 		string url = msg.url;
-		if ( url == null )
+		if ( url == null || url == "")
 		{
 			string number = msg.GetMessage(Global.MSG_REQUESTVIDEO_NUMBER_KEY ).ToString();
 			url = Global.VideoRequestURL.Replace( "NUMBER" , number );
 		}
 
-		StartCoroutine( WaitForRequest( url , VideoInfoHandler , msg));
+		StartCoroutine( WaitForRequest( url , DayVideoInfoHandler , msg));
 	}
 
 	/// <summary>
@@ -56,38 +83,76 @@ public class HTTPManager : MonoBehaviour {
 	/// </summary>
 	/// <param name="www">Www.</param>
 	/// <param name="postMsg">Post message.</param>
-	void  VideoInfoHandler( WWW www , URLRequestMessage postMsg)
+	void  DayVideoInfoHandler( WWW www , URLRequestMessage postMsg)
 	{
 		List<VideoInfo> list = new List<VideoInfo>();
 
-		JSONObject jason = new JSONObject( www.text );
+		JSONObject json = new JSONObject( www.text );
 
-
-		JSONObject dailyList = jason.GetField( "dailyList");
+		JSONObject dailyList = json.GetField( "dailyList");
 		if ( dailyList.IsArray )
 		{
 			foreach( JSONObject day in dailyList.list )
 			{
-//				long total  = day.GetField("total").IsNumber ? day.GetField("total").i : 0;
 				JSONObject videoList = day.GetField("videoList");
-				if ( videoList.IsArray )
-				{
-					foreach( JSONObject video in videoList.list )
-					{
-						VideoInfo info = new VideoInfo();
-						info.title = video.GetField("title").str;
-						info.description = video.GetField("description").str;
-						info.playUrl = video.GetField("playUrl").str;
-						info.coverUrl = video.GetField("coverForFeed").str;
-
-						list.Add( info );
-					}
-				}
+				list.AddRange( Json2VideoList( videoList ) );
 			}
 		}
 
 		postMsg.AddMessage(Global.MSG_POSTVIDEO_VIDEO_KEY , list );
 		VREvents.FirePostVideoList( postMsg );
+	}
+
+	void CategoryVideoHandeler( WWW www , URLRequestMessage postMsg )
+	{
+		JSONObject json = new JSONObject( www.text );
+		List<VideoInfo> list = Json2VideoList( json.GetField("videoList") );
+
+		postMsg.AddMessage( Global.MSG_POSTVIDEO_VIDEO_KEY , list );
+		VREvents.FirePostVideoList( postMsg );
+	}
+	
+	List<VideoInfo> Json2VideoList( JSONObject obj )
+	{
+		List<VideoInfo> res = new List<VideoInfo>();
+		if ( obj.IsArray )
+		{
+			foreach( JSONObject video in obj.list )
+			{
+				VideoInfo info = new VideoInfo();
+				info.title = video.GetField("title").str;
+				info.description = video.GetField("description").str;
+				info.description = info.description.Replace( "\\r" , "\r");
+				info.description = info.description.Replace( "\\n" , "\n");
+				info.playUrl = video.GetField("playUrl").str;
+				info.coverUrl = video.GetField("coverForFeed").str;
+
+				res.Add( info );
+			}
+		}
+		return res;
+	}
+
+
+	void CategoryHandler( WWW www , URLRequestMessage msg )
+	{
+		List<CategoryInfo> list = new List<CategoryInfo>();
+
+		JSONObject categorys = new JSONObject( www.text );
+		if ( categorys.IsArray )
+		{
+			foreach( JSONObject category in categorys.list )
+			{
+				CategoryInfo info = new CategoryInfo();
+				info.name = category.GetField("name").str;
+				info.bgUrl = category.GetField("bgPicture").str;
+
+				list.Add( info );
+			}
+		}
+
+		msg.AddMessage(Global.MSG_POSTCATEGORY_CATEGORYLIST_KEY , list );
+		VREvents.FirePostCategory( msg );
 	}
 
 	/// <summary>

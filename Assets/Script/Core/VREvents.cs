@@ -20,19 +20,35 @@ public class VREvents
 	public delegate void MessageEventHandler(Message msg); 
 
 	public static event MessageEventHandler WindowReturn;
-	public static void FireWindowReturn(Message arg){if ( WindowReturn != null ) WindowReturn(arg) ; }
+	public static void FireWindowReturn(Message arg){if ( WindowReturn != null ) WindowReturn(arg); }
 
+	public static event MessageEventHandler ShowDetail;
+	public static void FireShowDetail(Message arg){if ( ShowDetail != null ) ShowDetail(arg); }
+
+	public static event MessageEventHandler SwitchVRMode;
+	public static void FireSwitchVRMode(Message arg) { if ( SwitchVRMode != null ) SwitchVRMode(arg); }
 
 	public static event MessageEventHandler PlayVideo;
-	public static void FirePlayVideo(Message arg){if ( PlayVideo != null ) PlayVideo(arg) ; }
+	public static void FirePlayVideo(Message arg){if ( PlayVideo != null ) PlayVideo(arg); }
+
+
 
 	/// <summary>
 	/// URL event handler. handle with the URL related events
 	/// </summary>
 	public delegate void URLEventHandler(URLRequestMessage msg); 
 
+	public static event URLEventHandler RequestCategory;
+	public static void FireRequestCategory(URLRequestMessage arg){if ( RequestCategory != null ) RequestCategory(arg) ; }
+
+	public static event URLEventHandler PostCategory;
+	public static void FirePostCategory(URLRequestMessage arg){if ( PostCategory != null ) PostCategory(arg) ; }
+
 	public static event URLEventHandler RequestVideoList;
 	public static void FireRequestVideoList(URLRequestMessage arg){if ( RequestVideoList != null ) RequestVideoList(arg) ; }
+
+	public static event URLEventHandler RequestCategoryVideoList;
+	public static void FireRequestCategoryVideoList(URLRequestMessage arg){if ( RequestCategoryVideoList != null ) RequestCategoryVideoList(arg) ; }
 
 	public static event URLEventHandler PostVideoList;
 	public static void FirePostVideoList(URLRequestMessage arg){if ( PostVideoList != null ) PostVideoList(arg) ; }
@@ -95,6 +111,7 @@ public class WindowArg : BasicArg
 	{
 		SELECT_WINDOW,
 		PLAY_WINDOW,
+		DETAIL_WINDOWS
 	}
 	public Type type;
 

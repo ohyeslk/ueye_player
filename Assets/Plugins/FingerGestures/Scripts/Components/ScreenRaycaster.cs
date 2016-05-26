@@ -48,8 +48,6 @@ public class ScreenRaycaster : MonoBehaviour
         return false;
     }
 
-	float minDis = 0.1f;
-
 	public bool Raycast( Vector2 screenPos, Vector2 deltaPos , out RaycastHit hit )
 	{
 

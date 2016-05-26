@@ -6,8 +6,8 @@ public class VideoPlayWindow : UIWindow {
 	[SerializeField] GameObject panel;
 	[SerializeField] MediaPlayerCtrl video;
 
-	[SerializeField] UIButton playButton;
-	[SerializeField] UIButton pauseButton;
+	[SerializeField] GameObject playButton;
+	[SerializeField] GameObject pauseButton;
 
 	void Start()
 	{
@@ -16,38 +16,37 @@ public class VideoPlayWindow : UIWindow {
 		video.Pause();
 	}
 
-	void OnDisable()
+	override protected void OnDisable()
 	{
-		VREvents.ActiveWindow -= VREvents_ActiveWindow;
+		base.OnDisable();
 		VREvents.PlayVideo -= OnPlayVideoEvent;
 	}
 
-	void OnEnable()
+	override protected void OnEnable()
 	{
-		VREvents.ActiveWindow += VREvents_ActiveWindow;
+		base.OnEnable();
 		VREvents.PlayVideo += OnPlayVideoEvent;
 	}
 
 	void OnPlayVideoEvent (Message msg)
 	{
-		VideoInfo info = (VideoInfo)msg.GetMessage(Global.MSG_PLAYVIDEO_INFO_KEY);
+		VideoInfo info = (VideoInfo)msg.GetMessage(Global.MSG_VIDEO_INFO_KEY);
 		Debug.Log("Play Video " + info.title + " " + info.playUrl );
 		video.Load( info.playUrl );
 //		Debug.Log("Play Video" + info.playUrl );
-		BecomeVisible(true);
 		OnPlayVideo();
 	}
 
-	void VREvents_ActiveWindow (WindowArg arg)
+	protected override void OnBecomeInvsible ( float time )
 	{
-		if ( arg.type == WindowArg.Type.PLAY_WINDOW )
-		{
-			BecomeVisible( true );
-			OnPlayVideo();
-		}else{
-			BecomeVisible( false );
-			OnPauseVideo();
-		}
+		base.OnBecomeInvsible ( time );
+		BecomeVisible ( false );
+	}
+
+	protected override void OnBecomeVisible ( float time )
+	{
+		base.OnBecomeVisible ( time );
+		BecomeVisible ( true );
 	}
 
 	void BecomeVisible( bool to )
@@ -59,14 +58,14 @@ public class VideoPlayWindow : UIWindow {
 	public void OnPlayVideo()
 	{
 		video.Play();
-		playButton.gameObject.SetActive(false);
-		pauseButton.gameObject.SetActive(true);
+		playButton.SetActive(false);
+		pauseButton.SetActive(true);
 	}
 	public void OnPauseVideo()
 	{
 		video.Pause();
-		playButton.gameObject.SetActive(true);
-		pauseButton.gameObject.SetActive(false);
+		playButton.SetActive(true);
+		pauseButton.SetActive(false);
 	}
 
 	public void OnReturn()

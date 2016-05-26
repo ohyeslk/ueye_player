@@ -5,6 +5,7 @@ public class UISensor : MonoBehaviour {
 
 	[SerializeField] protected float focusTime;
 	[SerializeField] protected float confirmTime;
+	[SerializeField] SensorType type = SensorType.Normal;
 
 	TimeBaseActionState inner_time_state = TimeBaseActionState.None;
 	TimeBaseActionState m_time_state {
@@ -27,11 +28,25 @@ public class UISensor : MonoBehaviour {
 	TimeBaseActionState TimeState{ get { return m_time_state;}}
 
 
-	float startHoverTime = Mathf.Infinity;
+//	float startHoverTime = Mathf.Infinity;
+//	public float HoveredTime
+//	{
+//		get {
+//			return (Time.time > startHoverTime)? Time.time - startHoverTime : 0;
+//		}
+//	}
+	float m_hoverTime = 0;
 	public float HoveredTime
 	{
 		get {
-			return (Time.time > startHoverTime)? Time.time - startHoverTime : 0;
+			return m_hoverTime;
+		}
+	}
+
+	public float FocusTime
+	{
+		get {
+			return ( HoveredTime > focusTime )? HoveredTime - focusTime : 0;
 		}
 	}
 
@@ -52,41 +67,72 @@ public class UISensor : MonoBehaviour {
 	}
 
 	virtual public void OnHover( UIHoverEvent e ) {
-		UpdateStartTime(e);
-		UpdateTimeRelatedAction(e);
+		if ( CheckStartTime(e) )
+			UpdateState();
 	}
 
-	protected void UpdateStartTime(UIHoverEvent e)
-	{
-		if ( e.hoverPhase == UIHoverEvent.HoverPhase.Begin )
-			startHoverTime = Time.time;
-		else if ( e.hoverPhase == UIHoverEvent.HoverPhase.End )
-			startHoverTime = Mathf.Infinity;
+	virtual public void OnMotion( FingerMotionEvent e ) {
+		
 	}
 
-	protected void UpdateTimeRelatedAction(UIHoverEvent e)
+	/// <summary>
+	/// Checks the start time.
+	/// </summary>
+	/// <returns><c>true</c>, if in the middle of the hover, <c>false</c> otherwise.</returns>
+	/// <param name="e">E.</param>
+	protected bool CheckStartTime(UIHoverEvent e)
 	{
+		m_hoverTime = e.duration;
 		if ( e.hoverPhase == UIHoverEvent.HoverPhase.Middle )
-		{
-			if ( HoveredTime < focusTime )
-			{
-				m_time_state = TimeBaseActionState.Hovered;
-			}
-			else if ( HoveredTime < focusTime + confirmTime )
-			{
-				m_time_state = TimeBaseActionState.Focused;
-			}
-			else
-			{
-				m_time_state = TimeBaseActionState.Confirmed;
-			}
-		}
+			return true;
+		
+		if ( e.hoverPhase == UIHoverEvent.HoverPhase.Begin )
+			StartHover();
 		else if ( e.hoverPhase == UIHoverEvent.HoverPhase.End )
-		{
-			m_time_state = TimeBaseActionState.None;
-		}
+			EndHover();
+		
+		return false;
 	}
 
+	protected void StartHover()
+	{
+//		startHoverTime = Time.time;
+	}
+
+	protected void EndHover()
+	{
+//		startHoverTime = Mathf.Infinity;
+		m_hoverTime = 0;
+		m_time_state = TimeBaseActionState.None;
+	}
+		
+	protected void UpdateState()
+	{
+		if ( FocusTime <= 0 )
+		{
+			m_time_state = TimeBaseActionState.Hovered;
+		}
+		else if ( HoveredTime < focusTime + confirmTime )
+		{
+			m_time_state = TimeBaseActionState.Focused;
+		}
+		else
+		{
+			m_time_state = TimeBaseActionState.Confirmed;
+		}
+		
+	}
+
+	public void Reset()
+	{
+//		startHoverTime = Mathf.Infinity;
+		m_hoverTime = 0;
+		m_time_state = TimeBaseActionState.None;
+	}
+
+	public float GetTotalFocusTime () { return focusTime ; }
+	public float GetTotalConfirmTime () { return confirmTime ; }
+	public SensorType GetSensorType () { return type ; }
 }
 
 
@@ -96,4 +142,10 @@ public enum TimeBaseActionState
 	Hovered,
 	Focused,
 	Confirmed,
+}
+
+public enum SensorType
+{
+	Normal,
+	Sub,
 }
