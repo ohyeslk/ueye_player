@@ -9,9 +9,13 @@ public class VRFunctionButton : VRBasicButton {
 	public override void OnConfirm ()
 	{
 		base.OnConfirm();
+<<<<<<< HEAD
 		if ( m_Enable )
 		{
 			confirmFunc.Invoke();
 		}
+=======
+		confirmFunc.Invoke();
+>>>>>>> 223bc20077c7b09e94d589709d9b76fe007d3996
 	}
 }

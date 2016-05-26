@@ -11,6 +11,7 @@ public class CategoryButton : VRBasicButton {
 	[SerializeField] protected Text text;
 
 	[System.Serializable]
+<<<<<<< HEAD
 	public struct CategorySetting
 	{
 		public float duration;
@@ -19,6 +20,13 @@ public class CategoryButton : VRBasicButton {
 	}
 	[SerializeField] CategorySetting m_setting;
 
+=======
+	public struct CategoryInitAnimation
+	{
+		public float duration;
+	}
+	[SerializeField] CategoryInitAnimation initAnim;
+>>>>>>> 223bc20077c7b09e94d589709d9b76fe007d3996
 
 	override public void OnConfirm ()
 	{
@@ -51,7 +59,11 @@ public class CategoryButton : VRBasicButton {
 		PlayInitAnimation();
 	}
 
+<<<<<<< HEAD
 	public void Init( CategoryInfo info , int index , CategoryWindow p )
+=======
+	public void Init( CategoryInfo info , CategoryWindow p )
+>>>>>>> 223bc20077c7b09e94d589709d9b76fe007d3996
 	{
 		// initilize the sprite first
 		URLRequestMessage msg = new URLRequestMessage(this);
@@ -65,6 +77,7 @@ public class CategoryButton : VRBasicButton {
 		img.DOFade(0,0);
 		text.DOFade(0,0);
 
+<<<<<<< HEAD
 		//set the angle and position offset
 		float angle = m_setting.anglePerUnit * ( ( index % parent.column ) - ( parent.column - 1f ) / 2f ) ;
 		transform.localRotation = Quaternion.Euler ( 0 ,angle , 0 );
@@ -72,13 +85,20 @@ public class CategoryButton : VRBasicButton {
 		pos.z = ( Mathf.Cos( angle * Mathf.Deg2Rad ) - 1 ) * m_setting.radius;
 		transform.localPosition = pos;
 
+=======
+>>>>>>> 223bc20077c7b09e94d589709d9b76fe007d3996
 		ResetSubButton();
 	}
 
 	void PlayInitAnimation()
 	{
+<<<<<<< HEAD
 		img.DOFade( 1f , m_setting.duration );
 		text.DOFade( 1f , m_setting.duration );
+=======
+		img.DOFade( 1f , initAnim.duration );
+		text.DOFade( 1f , initAnim.duration );
+>>>>>>> 223bc20077c7b09e94d589709d9b76fe007d3996
 	}
 }
 

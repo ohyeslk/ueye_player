@@ -7,8 +7,11 @@ public class CategoryWindow : UIWindow {
 	[SerializeField] GameObject CategoryButtonPrefab;
 	[SerializeField] GridLayoutGroup Panel;
 	List<CategoryButton> cateButtons = new List<CategoryButton>();
+<<<<<<< HEAD
 	public int column;
 	public int row;
+=======
+>>>>>>> 223bc20077c7b09e94d589709d9b76fe007d3996
 
 	override protected void OnDisable()
 	{
@@ -58,18 +61,27 @@ public class CategoryWindow : UIWindow {
 			unitObj.transform.localScale = Vector3.one;
 			unitObj.transform.localPosition = Vector3.zero;
 			unitObj.transform.localRotation = Quaternion.identity;
+<<<<<<< HEAD
 			unitObj.name = "CategoryBtn" + info.name;
+=======
+			unitObj.name = "CateB" + info.name;
+>>>>>>> 223bc20077c7b09e94d589709d9b76fe007d3996
 
 			CategoryButton btn = unitObj.GetComponentInChildren<CategoryButton>();
 
 			// initilze the unit
+<<<<<<< HEAD
 			btn.Init( info  , cateButtons.Count , this );
+=======
+			btn.Init( info  , this );
+>>>>>>> 223bc20077c7b09e94d589709d9b76fe007d3996
 
 			// save the unit in the listx
 			cateButtons.Add(btn);
 		}
 	}
 
+<<<<<<< HEAD
 	protected override void OnBecomeInvsible ( float time )
 	{
 		base.OnBecomeInvsible ( time );
@@ -80,6 +92,17 @@ public class CategoryWindow : UIWindow {
 	{
 		base.OnBecomeVisible ( time 
 		);
+=======
+	protected override void OnBecomeInvsible ()
+	{
+		base.OnBecomeInvsible ();
+		Panel.gameObject.SetActive(false);
+	}
+
+	protected override void OnBecomeVisible ()
+	{
+		base.OnBecomeVisible ();
+>>>>>>> 223bc20077c7b09e94d589709d9b76fe007d3996
 		Panel.gameObject.SetActive(true);
 	}
 
