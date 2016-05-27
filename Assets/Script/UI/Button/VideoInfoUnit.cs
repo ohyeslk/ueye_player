@@ -14,8 +14,8 @@ public class VideoInfoUnit : VRBasicButton {
 	[System.Serializable]
 	public struct HoverAnimation
 	{
-		public Vector3 scale;
-		public float duration;
+		public float hoverSensity;
+		public float remainNormalDuration;
 	}
 	[SerializeField] HoverAnimation hoverAnimation;
 
@@ -80,6 +80,7 @@ public class VideoInfoUnit : VRBasicButton {
 	/// set to false when enter the detail/play window ( fade out ) or remove from selecet window (clear)
 	/// </summary>
 	bool isVisible = false;
+	Quaternion initRotation;
 
 	public VideoInfo Info{
 		get { return m_info; }
@@ -103,11 +104,13 @@ public class VideoInfoUnit : VRBasicButton {
 		parent.ShowVideoDetail( Info );
 	}
 
-	override public void OnHover(UIHoverEvent e)
-	{
-		base.OnHover(e);
-		UpdateState(e);
-	}
+//	override public void OnHover(UIHoverEvent e)
+//	{
+//		Debug.Log("On Hover");
+//		base.OnHover(e);
+//		UpdateState(e);
+//		UpdateRotation(e);
+//	}
 
 	void OnDisable()
 	{
@@ -170,6 +173,7 @@ public class VideoInfoUnit : VRBasicButton {
 		// set angle and position offset 
 		float angle = m_setting.anglePerUnit * ( ( index % parent.VideoPerRow ) - ( parent.VideoPerRow - 1f ) / 2f ) ;
 		transform.localRotation = Quaternion.Euler ( 0 ,angle , 0 );
+		initRotation = transform.localRotation;
 		Vector3 pos = transform.localPosition;
 		pos.z = ( Mathf.Cos( angle * Mathf.Deg2Rad ) - 1 ) * m_setting.radius;
 		transform.localPosition = pos;
@@ -185,21 +189,26 @@ public class VideoInfoUnit : VRBasicButton {
 	public override void OnEnterHover ()
 	{
 		base.OnEnterHover ();
+		if ( m_Enable )
+		{
 		ShowBlackCover(subButtonAnimation.showTime);
 		ShowText(subButtonAnimation.showTime);
+		}
 	}
 
 	public override void OnExitHover ()
 	{
 		base.OnExitHover ();
+		if ( m_Enable  )
+		{
 		HideBlackCover(subButtonAnimation.hideTime);
 		HideText(subButtonAnimation.hideTime);
+		}
 	}
 
 	public void ShowBlackCover( float duration )
 	{
 		if ( blackCover != null ){
-			Debug.Log("Show Black ");
 			blackCover.DOKill();
 			blackCover.enabled = true;
 			blackCover.DOFade( blackCoverAlpha , duration );
@@ -218,7 +227,6 @@ public class VideoInfoUnit : VRBasicButton {
 	public void HideBlackCover( float duration )
 	{
 		if ( blackCover != null ) {
-//			Debug.Log("Hide black ");
 			blackCover.DOKill();
 			blackCover.DOFade( 0 , duration ).OnComplete(DisableBlackCover);
 		}
@@ -286,8 +294,6 @@ public class VideoInfoUnit : VRBasicButton {
 
 	void PlayInitAnimation()
 	{
-		VideoUnitSetting anim = m_setting;
-
 		initAnimCoroutine = StartCoroutine( DoInitAnimation() );
 	}
 
@@ -295,7 +301,6 @@ public class VideoInfoUnit : VRBasicButton {
 	IEnumerator DoInitAnimation()
 	{
 		yield return new WaitForSeconds( m_setting.initDelay );
-
 
 		img.enabled = true;
 		img.DOFade( 0 , m_setting.initDuration ).From();
@@ -330,24 +335,41 @@ public class VideoInfoUnit : VRBasicButton {
 	}
 
 
-	void UpdateState(UIHoverEvent e)
-	{
-		if ( State == VideoInfoUnitState.Normal ) {
-			if ( e.hoverPhase == UIHoverEvent.HoverPhase.Begin )
-			{
-				img.transform.DOScale( hoverAnimation.scale , hoverAnimation.duration );
-				m_state = VideoInfoUnitState.Hovered;
-			}
-		}
-		if ( State == VideoInfoUnitState.Hovered )
-		{
+//	void UpdateState(UIHoverEvent e)
+//	{
+//		if ( State == VideoInfoUnitState.Normal ) {
+//			if ( e.hoverPhase == UIHoverEvent.HoverPhase.Begin )
+//			{
+//				img.transform.DOScale( hoverAnimation.scale , hoverAnimation.duration );
+//				m_state = VideoInfoUnitState.Hovered;
+//			}
+//		}
+//		if ( State == VideoInfoUnitState.Hovered )
+//		{
+//
+//			if ( e.hoverPhase == UIHoverEvent.HoverPhase.End )
+//			{
+//				img.transform.DOKill();
+//				img.transform.DOScale( Vector3.one , hoverAnimation.duration );
+//				m_state = VideoInfoUnitState.Normal;
+//			}
+//		}
+//	}
 
-			if ( e.hoverPhase == UIHoverEvent.HoverPhase.End )
-			{
-				img.transform.DOKill();
-				img.transform.DOScale( Vector3.one , hoverAnimation.duration );
-				m_state = VideoInfoUnitState.Normal;
-			}
+	public void OnHoverV3( Vector3 p )
+	{
+		//if ( LogicManager.VRMode == VRMode.VR_3D )
+		if ( m_Enable )
+		{
+		if ( p == Global.ONHOVERV3_PHASE_EXIT )
+		{
+			transform.DOLocalRotate( initRotation.eulerAngles , hoverAnimation.remainNormalDuration );
+		}else
+		{
+			Vector3 offset =  img.transform.InverseTransformPoint( p );
+			Quaternion rotationOffset = Quaternion.Euler( new Vector3( offset.y , - offset.x , 0 ) * hoverAnimation.hoverSensity );
+			transform.localRotation = Quaternion.Lerp( transform.localRotation ,  initRotation * rotationOffset , 0.1f );
+		}
 		}
 	}
 		
@@ -400,16 +422,18 @@ public class VideoInfoUnit : VRBasicButton {
 		GameObject.Destroy( gameObject , 1f );
 	}
 
-	public void PlayFadeInAnimation( float time )
+	override public void OnBecomeVisible( float time )
 	{
+		m_Enable = true;
 		isVisible = true;
 		float t = ( time <= 0 ) ? m_setting.FadeInTime : time;
 		img.DOFade( 1f , t );
 		frame.DOFade( 1f , t );
 	}
 
-	public void PlayFadeOutAnimation( float time )
+	override public void OnBecomeInvisible( float time )
 	{
+		m_Enable = false;
 		isVisible = false;
 		float t = ( time <= 0 ) ? m_setting.FadeInTime : time;
 		img.DOKill();
@@ -419,8 +443,6 @@ public class VideoInfoUnit : VRBasicButton {
 		frame.DOFade( 0 , t );
 		HideBlackCover(t);
 		HideText(t);
-		if ( subButtonAnimation.subButton != null )
-			subButtonAnimation.subButton.DOFade( 0 , t );
 	}
 
 }

@@ -25,6 +25,7 @@ public class Global {
 
 	public static VRMode initMode = VRMode.VR_2D;
 
+	public static Vector3 ONHOVERV3_PHASE_EXIT = Vector3.zero;
 }
 
 

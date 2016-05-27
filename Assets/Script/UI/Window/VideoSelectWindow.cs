@@ -59,6 +59,7 @@ public class VideoSelectWindow : UIWindow  {
 
 	[SerializeField] VRFunctionButton UpButton;
 	[SerializeField] VRFunctionButton DownButton;
+	[SerializeField] VRFunctionButton homeButton;
 
 	override protected void OnDisable()
 	{
@@ -119,11 +120,12 @@ public class VideoSelectWindow : UIWindow  {
 
 		foreach( VideoInfoUnit unit in unitList )
 		{
-			unit.PlayFadeInAnimation( time );
+			unit.OnBecomeVisible( time );
 		}
 
 		UpButton.OnBecomeVisible( time );
 		DownButton.OnBecomeVisible( time );
+		homeButton.OnBecomeVisible( time );
 		foreach( SidePattern p in sidePatternList ) p.OnBecomeVisible( time );
 	}
 
@@ -133,7 +135,7 @@ public class VideoSelectWindow : UIWindow  {
 
 		foreach( VideoInfoUnit unit in unitList )
 		{
-			unit.PlayFadeOutAnimation( time );
+			unit.OnBecomeInvisible( time );
 		}
 
 		Sequence seq = DOTween.Sequence();
@@ -143,6 +145,7 @@ public class VideoSelectWindow : UIWindow  {
 
 		UpButton.OnBecomeInvisible( time );
 		DownButton.OnBecomeInvisible( time );
+		homeButton.OnBecomeInvisible( time );
 		foreach( SidePattern p in sidePatternList ) p.OnBecomeInvisible( time );
 	}
 
@@ -163,8 +166,12 @@ public class VideoSelectWindow : UIWindow  {
 
 	public void RequestVideoList()
 	{
+		RequestVideoList( 50 );
+	}
+	public void RequestVideoList ( int number )
+	{
 		URLRequestMessage msg = new URLRequestMessage(this);
-		msg.AddMessage(Global.MSG_REQUESTVIDEO_NUMBER_KEY , "13");
+		msg.AddMessage(Global.MSG_REQUESTVIDEO_NUMBER_KEY , number.ToString());
 		VREvents.FireRequestVideoList(msg);
 	}
 

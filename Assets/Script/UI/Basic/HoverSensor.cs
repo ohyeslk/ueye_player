@@ -9,6 +9,7 @@ public class HoverSensor : UISensor {
 	[SerializeField] UnityEvent onEnterHover;
 	[SerializeField] UnityEvent onExitHover;
 	[SerializeField] VRFloatEvent onUpdateHover;
+	[SerializeField] VRVec3Event onUpdateHoverV3;
 	[SerializeField] UnityEvent onFocus;
 	[SerializeField] VRMode mode;
 
@@ -68,9 +69,15 @@ public class HoverSensor : UISensor {
 					float process = FocusTime / GetTotalConfirmTime();
 					onUpdateHover.Invoke(process);
 				}
+				if ( onUpdateHoverV3 != null )
+				{
+					
+					onUpdateHoverV3.Invoke(e.point);
+				}
 			}else if ( e.hoverPhase == UIHoverEvent.HoverPhase.End )
 			{
 				if ( onExitHover != null ) onExitHover.Invoke();
+				if ( onUpdateHoverV3 != null ) onUpdateHoverV3.Invoke( Global.ONHOVERV3_PHASE_EXIT );
 			}
 		}
 	}
@@ -90,3 +97,6 @@ public class HoverSensor : UISensor {
 
 [System.Serializable]
 public class VRFloatEvent : UnityEvent<float>{}
+
+[System.Serializable]
+public class VRVec3Event : UnityEvent<Vector3>{}

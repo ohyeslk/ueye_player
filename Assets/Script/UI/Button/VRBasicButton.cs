@@ -35,39 +35,38 @@ public class VRBasicButton : MonoBehaviour {
 		}
 	}
 
-	virtual public void OnHover(UIHoverEvent e)
-	{
-		
-	}
 
 	/// <summary>
 	/// Show the confirm button 
 	/// </summary>
 	virtual public void OnEnterHover()
 	{
-		float time = subButtonAnimation.showTime;
-		if ( subButtonAnimation.subButton != null )
+		if ( m_Enable )
 		{
-			if ( subButtonAnimation.subButtonFade )
+			float time = subButtonAnimation.showTime;
+			if ( subButtonAnimation.subButton != null )
 			{
-				subButtonAnimation.subButton.DOKill();
-				subButtonAnimation.subButton.enabled = true;
-				subButtonAnimation.subButton.DOFade( 1f , time );
+				if ( subButtonAnimation.subButtonFade )
+				{
+					subButtonAnimation.subButton.DOKill();
+					subButtonAnimation.subButton.enabled = true;
+					subButtonAnimation.subButton.DOFade( 1f , time );
+				}
+				if ( subButtonAnimation.subButtonMove )
+				{
+					subButtonAnimation.subButton.transform.DOKill();
+					subButtonAnimation.subButton.transform.DOLocalMoveY( subButtonAnimation.posY + subButtonAnimation.moveY , 0 );
+					subButtonAnimation.subButton.transform.DOLocalMoveY( subButtonAnimation.posY , time );
+				}
 			}
-			if ( subButtonAnimation.subButtonMove )
-			{
-				subButtonAnimation.subButton.transform.DOKill();
-				subButtonAnimation.subButton.transform.DOLocalMoveY( subButtonAnimation.posY + subButtonAnimation.moveY , 0 );
-				subButtonAnimation.subButton.transform.DOLocalMoveY( subButtonAnimation.posY , time );
-			}
-		}
 
-		if ( subButtonAnimation.subButtonRing != null )
-		{
-			subButtonAnimation.subButtonRing.DOKill();
-			subButtonAnimation.subButtonRing.enabled = true;
-			subButtonAnimation.subButtonRing.DOFade( 1f , 0 );
-			subButtonAnimation.subButtonRing.transform.localScale = Vector3.one;
+			if ( subButtonAnimation.subButtonRing != null )
+			{
+				subButtonAnimation.subButtonRing.DOKill();
+				subButtonAnimation.subButtonRing.enabled = true;
+				subButtonAnimation.subButtonRing.DOFade( 1f , 0 );
+				subButtonAnimation.subButtonRing.transform.localScale = Vector3.one;
+			}
 		}
 
 	}
@@ -77,6 +76,8 @@ public class VRBasicButton : MonoBehaviour {
 	/// </summary>
 	virtual public void OnExitHover()
 	{
+		if ( m_Enable )
+		{
 		float time = subButtonAnimation.hideTime;
 		if ( subButtonAnimation.subButton != null )
 		{
@@ -96,11 +97,26 @@ public class VRBasicButton : MonoBehaviour {
 			subButtonAnimation.subButtonRing.DOKill();
 			subButtonAnimation.subButtonRing.DOFillAmount( 0 , time  * subButtonAnimation.subButtonRing.fillAmount ).OnComplete(ResetSubButton);
 		}
+		}
 	}
 
 
 	virtual public void OnEnterSub()
 	{
+		if ( m_Enable )
+		{
+			float time = subButtonAnimation.showTime;
+			if ( subButtonAnimation.subButton != null )
+			{
+				if ( subButtonAnimation.subButtonFade )
+				{
+					subButtonAnimation.subButton.DOKill();
+					subButtonAnimation.subButton.enabled = true;
+					subButtonAnimation.subButton.DOFade( 1f , time );
+				}
+			}
+			
+		}
 	}
 
 	virtual public void OnExitSub()
