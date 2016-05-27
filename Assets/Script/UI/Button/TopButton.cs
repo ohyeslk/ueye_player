@@ -17,15 +17,6 @@ public class TopButton : VRFunctionButton {
 		SetHighlighted( isHighedOnAwake );
 	}
 
-	void OnEnable()
-	{
-		
-	}
-
-	void OnDiable()
-	{
-	}
-
 	public override void OnConfirm ()
 	{
 		base.OnConfirm ();

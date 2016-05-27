@@ -10,6 +10,21 @@ public class LogicManager : MonoBehaviour {
 			return m_vr_mode ;
 		}
 	}
+
+	static public WindowArg.Type m_window_type;
+	static public WindowArg.Type ActiveWindow
+	{
+		get {
+			return m_window_type;
+		}
+	}
+
+	static public bool isLockVerticle
+	{
+		get {
+			return ( VRMode == VRMode.VR_2D ) && ( ActiveWindow != WindowArg.Type.PLAY_WINDOW );
+		}
+	}
 		
 	private static LogicManager instance;
 	public static LogicManager Instance
@@ -73,6 +88,21 @@ public class LogicManager : MonoBehaviour {
 	void Start()
 	{
 		SetVRMode(Global.initMode);
+	}
+
+	void OnEnable()
+	{
+		VREvents.ActiveWindow +=  OnActiveWindow;
+	}
+
+	void OnDisable()
+	{
+		VREvents.ActiveWindow -=  OnActiveWindow;
+	}
+
+	void OnActiveWindow (WindowArg arg)
+	{
+		m_window_type = arg.type;
 	}
 
 }
