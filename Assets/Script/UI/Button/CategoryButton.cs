@@ -43,9 +43,7 @@ public class CategoryButton : VRBasicButton {
 	{
 		if ( msg.postObj == this )
 		{
-			Texture2D tex = (Texture2D)msg.GetMessage(Global.MSG_REQUEST_TEXTURE_TEXTURE_KEY);
-			Rect rec = new Rect(0,0,tex.width ,tex.height );
-			img.sprite = Sprite.Create( tex , rec , new Vector2(0.5f,0.5f) , 100);
+			img.sprite = (Sprite)msg.GetMessage(Global.MSG_REQUEST_TEXTURE_SPRITE_KEY);
 		}
 
 		PlayInitAnimation();

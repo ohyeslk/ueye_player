@@ -17,6 +17,7 @@ public class VideoSelectWindow : UIWindow  {
 	[SerializeField] GridLayoutGroup helpPanel;
 	[SerializeField] GridLayoutGroup sidePanel;
 	const int sidePatternNumber = 10;
+	const float videoCreateDelay = 0.15f;
 
 	/// <summary>
 	/// the list to save the unit 
@@ -190,14 +191,13 @@ public class VideoSelectWindow : UIWindow  {
 	{
 		if ( unitList.Count > 0 ) 
 			ClearVideos( ClearType.Disapper );
-		
+		UpdatePageChangeButtons();
+		UpdateSidePattern();
+
 		for ( int i = temPage * VideoPerPage ; i < ( temPage + 1 ) *  VideoPerPage && i < m_videoManager.GetVideoCount() ; ++ i ) 
 		{
 			CreateVideoInfoUnit( m_videoManager.GetVideoList()[i] );
 		}
-
-		UpdatePageChangeButtons();
-		UpdateSidePattern();
 	}
 
 	/// <summary>

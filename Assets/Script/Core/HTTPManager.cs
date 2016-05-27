@@ -13,7 +13,7 @@ public class HTTPManager : MonoBehaviour {
 	/// <summary>
 	/// Save the texture in in the dictionary
 	/// </summary>
-	Dictionary<string,Texture2D> textureCache = new Dictionary<string, Texture2D>();
+	Dictionary<string,Sprite> textureCache = new Dictionary<string, Sprite>();
 
 	public void OnEnable()
 	{
@@ -96,10 +96,10 @@ public class HTTPManager : MonoBehaviour {
 	{
 		string url = msg.url;
 		{
-			Texture2D texture;
-			if ( textureCache.TryGetValue( url , out texture) )
+			Sprite sprite;
+			if ( textureCache.TryGetValue( url , out sprite) )
 			{
-				msg.AddMessage( Global.MSG_REQUEST_TEXTURE_TEXTURE_KEY , texture );
+				msg.AddMessage( Global.MSG_REQUEST_TEXTURE_SPRITE_KEY , sprite );
 				VREvents.FirePostTexture( msg );
 				return;
 			}
@@ -195,10 +195,14 @@ public class HTTPManager : MonoBehaviour {
 	/// <param name="postMsg">Post message.</param>
 	void TextureHandler( WWW www , URLRequestMessage postMsg )
 	{
-		Texture2D texture = www.texture;
+		Texture2D tex = www.texture;
+		Rect rec = new Rect(0,0,tex.width ,tex.height );
+		Sprite sprite = Sprite.Create( tex , rec , new Vector2(0.5f,0.5f) , 100);
+
 		if ( !textureCache.ContainsKey( postMsg.url ))
-			textureCache.Add( postMsg.url , texture );
-		postMsg.AddMessage( Global.MSG_REQUEST_TEXTURE_TEXTURE_KEY , texture );
+			textureCache.Add( postMsg.url , sprite );
+		
+		postMsg.AddMessage( Global.MSG_REQUEST_TEXTURE_SPRITE_KEY , sprite );
 		VREvents.FirePostTexture( postMsg );
 	}
 

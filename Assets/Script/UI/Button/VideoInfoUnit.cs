@@ -135,14 +135,7 @@ public class VideoInfoUnit : VRBasicButton {
 	{
 		if ( msg.postObj == this )
 		{
-			Texture2D tex = (Texture2D)msg.GetMessage(Global.MSG_REQUEST_TEXTURE_TEXTURE_KEY);
-			Rect rec = new Rect(0,0,tex.width ,tex.height );
-			m_info.Post = Sprite.Create( tex , rec , new Vector2(0.5f,0.5f) , 100);
-
-			Outline imgOutline = img.gameObject.GetComponent<Outline>();
-			if ( imgOutline != null )
-				imgOutline.enabled = true;
-
+			m_info.Post = (Sprite)msg.GetMessage(Global.MSG_REQUEST_TEXTURE_SPRITE_KEY);
 			PlayRecieveImgAnimation();
 		}
 	}
@@ -192,8 +185,8 @@ public class VideoInfoUnit : VRBasicButton {
 		base.OnEnterHover ();
 		if ( m_Enable )
 		{
-		ShowBlackCover(subButtonAnimation.showTime);
-		ShowText(subButtonAnimation.showTime);
+			ShowBlackCover(subButtonAnimation.showTime);
+			ShowText(subButtonAnimation.showTime);
 		}
 	}
 
@@ -202,8 +195,8 @@ public class VideoInfoUnit : VRBasicButton {
 		base.OnExitHover ();
 		if ( m_Enable  )
 		{
-		HideBlackCover(subButtonAnimation.hideTime);
-		HideText(subButtonAnimation.hideTime);
+			HideBlackCover(subButtonAnimation.hideTime);
+			HideText(subButtonAnimation.hideTime);
 		}
 	}
 
@@ -261,7 +254,6 @@ public class VideoInfoUnit : VRBasicButton {
 	IEnumerator DoRecieveAnimation()
 	{
 		float timer = 0;
-		img.sprite = m_info.Post;
 
 		if ( isVisible )
 		{
@@ -271,15 +263,11 @@ public class VideoInfoUnit : VRBasicButton {
 				col.a = 1f;
 				help.color = col;
 				help.sprite = img.sprite;
-				help.DOFade( 0 , m_setting.recieveDuration );
-			}
-			{
-				Color col = img.color;
-				col.a = 0;
-				img.color = col;
-				img.DOFade( 1f , m_setting.recieveDuration );
+				help.DOFade( 0 , m_setting.recieveDuration ).SetEase(Ease.OutQuad);
 			}
 		}
+
+		img.sprite = m_info.Post;
 
 		while( timer < m_setting.recieveDuration )
 		{

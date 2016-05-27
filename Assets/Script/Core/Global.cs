@@ -10,7 +10,8 @@ public class Global {
 	public static string MSG_POSTVIDEO_VIDEO_KEY = "videolist";
 	public static string MSG_POSTVIDEO_NAME_KEY = "name";
 
-	public static string MSG_REQUEST_TEXTURE_TEXTURE_KEY = "sprite";
+	public static string MSG_REQUEST_TEXTURE_SPRITE_KEY = "sprite";
+
 
 	public static string MSG_SWITCHVRMODE_MODE_KEY = "VRMode";
 
