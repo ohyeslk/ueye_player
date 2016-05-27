@@ -6,7 +6,18 @@ using DG.Tweening;
 
 public class VRBasicButton : MonoBehaviour {
 	[SerializeField] protected SubAnimation subButtonAnimation;
-	public bool m_Enable = true;
+
+	bool inner_enable = true;
+	public bool m_Enable{
+		get {
+			return inner_enable;
+		}
+		set {
+			inner_enable = value;
+			if ( subButtonAnimation.subButton != null )
+				subButtonAnimation.subButton.raycastTarget = inner_enable;
+		}
+	}
 
 	virtual public void OnFucus( )
 	{
@@ -163,6 +174,13 @@ public class VRBasicButton : MonoBehaviour {
 		}
 	}
 
+	public void OnBecomeVisible( float time , bool setEnableTo)
+	{
+		gameObject.SetActive( true );
+		m_Enable = setEnableTo;
+		OnBecomeVisible( time );
+	}
+
 	virtual public void OnBecomeVisible( float time )
 	{
 		if ( subButtonAnimation.subButton != null )
@@ -170,6 +188,17 @@ public class VRBasicButton : MonoBehaviour {
 			float t = ( time <= 0 ) ? subButtonAnimation.showTime : time ;
 			subButtonAnimation.subButton.DOKill();
 			subButtonAnimation.subButton.DOFade( 1f , t );
+		}
+	}
+
+	public void OnBecomeInvisible( float time , bool setEnableTo )
+	{
+		m_Enable = setEnableTo ;
+		if ( subButtonAnimation.subButton != null )
+		{
+			float t = ( time <= 0 ) ? subButtonAnimation.hideTime : time;
+			subButtonAnimation.subButton.DOKill();
+			subButtonAnimation.subButton.DOFade( 0 , t ).OnComplete( SelfDisable );
 		}
 	}
 
@@ -181,6 +210,11 @@ public class VRBasicButton : MonoBehaviour {
 			subButtonAnimation.subButton.DOKill();
 			subButtonAnimation.subButton.DOFade( 0 , t );
 		}
+	}
+
+	void SelfDisable()
+	{
+		gameObject.SetActive( false );
 	}
 
 }

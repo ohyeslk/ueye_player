@@ -16,6 +16,7 @@ public class VideoInfoUnit : VRBasicButton {
 	{
 		public float hoverSensity;
 		public float remainNormalDuration;
+		public Ease remainNormalEaseType;
 	}
 	[SerializeField] HoverAnimation hoverAnimation;
 
@@ -294,7 +295,8 @@ public class VideoInfoUnit : VRBasicButton {
 
 	void PlayInitAnimation()
 	{
-		initAnimCoroutine = StartCoroutine( DoInitAnimation() );
+		if ( gameObject.activeSelf )
+			initAnimCoroutine = StartCoroutine( DoInitAnimation() );
 	}
 
 	Coroutine initAnimCoroutine;
@@ -363,7 +365,15 @@ public class VideoInfoUnit : VRBasicButton {
 		{
 		if ( p == Global.ONHOVERV3_PHASE_EXIT )
 		{
-			transform.DOLocalRotate( initRotation.eulerAngles , hoverAnimation.remainNormalDuration );
+
+				Vector3 offset =  img.transform.InverseTransformPoint( p );
+				Vector3 to = new Vector3( offset.y , - offset.x , 0 ) * hoverAnimation.hoverSensity ;
+				Sequence seq = DOTween.Sequence();
+				seq.Append( transform.DOLocalRotate( initRotation.eulerAngles - to * 0.5f , hoverAnimation.remainNormalDuration * 0.25f ));
+				seq.Append( transform.DOLocalRotate( initRotation.eulerAngles + to * 0.25f , hoverAnimation.remainNormalDuration * 0.25f ));
+				seq.Append( transform.DOLocalRotate( initRotation.eulerAngles - to * 0.1f , hoverAnimation.remainNormalDuration * 0.25f ));
+				seq.Append( transform.DOLocalRotate( initRotation.eulerAngles , hoverAnimation.remainNormalDuration * 0.25f ));
+			
 		}else
 		{
 			Vector3 offset =  img.transform.InverseTransformPoint( p );

@@ -123,9 +123,9 @@ public class VideoSelectWindow : UIWindow  {
 			unit.OnBecomeVisible( time );
 		}
 
-		UpButton.OnBecomeVisible( time );
-		DownButton.OnBecomeVisible( time );
-		homeButton.OnBecomeVisible( time );
+		UpButton.OnBecomeVisible( time , true);
+		DownButton.OnBecomeVisible( time , true );
+		homeButton.OnBecomeVisible( time , true );
 		foreach( SidePattern p in sidePatternList ) p.OnBecomeVisible( time );
 	}
 
@@ -143,9 +143,9 @@ public class VideoSelectWindow : UIWindow  {
 		seq.AppendCallback( DisablePanel );
 
 
-		UpButton.OnBecomeInvisible( time );
-		DownButton.OnBecomeInvisible( time );
-		homeButton.OnBecomeInvisible( time );
+		UpButton.OnBecomeInvisible( time , false );
+		DownButton.OnBecomeInvisible( time , false );
+		homeButton.OnBecomeInvisible( time , false );
 		foreach( SidePattern p in sidePatternList ) p.OnBecomeInvisible( time );
 	}
 
