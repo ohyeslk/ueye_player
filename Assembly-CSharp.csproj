@@ -57,6 +57,7 @@
      <Compile Include="Assets\Script\UI\Basic\UIButton.cs" />
      <Compile Include="Assets\Script\UI\Basic\UISensor.cs" />
      <Compile Include="Assets\Script\UI\Button\CategoryButton.cs" />
+     <Compile Include="Assets\Script\UI\Button\TopButton.cs" />
      <Compile Include="Assets\Script\UI\Button\VRBasicButton.cs" />
      <Compile Include="Assets\Script\UI\Button\VRFunctionButton.cs" />
      <Compile Include="Assets\Script\UI\Button\VideoInfoUnit.cs" />

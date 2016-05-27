@@ -18,6 +18,7 @@ public class HTTPManager : MonoBehaviour {
 	public void OnEnable()
 	{
 		VREvents.RequestVideoList += RequestVideoInfo;
+		VREvents.RequestLiveVideoList += RequestLiveVideoInfo;
 		VREvents.RequesTexture += RequestTexture;
 		VREvents.RequestCategory += RequestCategory;
 		VREvents.RequestCategoryVideoList += RequestCategoryVideoList;
@@ -26,6 +27,7 @@ public class HTTPManager : MonoBehaviour {
 	public void OnDisable()
 	{
 		VREvents.RequestVideoList -= RequestVideoInfo;
+		VREvents.RequestLiveVideoList -= RequestLiveVideoInfo;
 		VREvents.RequesTexture -= RequestTexture;
 		VREvents.RequestCategory -= RequestCategory;
 		VREvents.RequestCategoryVideoList -= RequestCategoryVideoList;
@@ -49,7 +51,7 @@ public class HTTPManager : MonoBehaviour {
 		{
 			string category = msg.GetMessage(Global.MSG_REQUEST_CATEGORYVIDEO_CATEGORY_KEY ).ToString();
 			url = Global.CategoryVideoRequestURL.Replace("CATEGORY" , category );
-			Debug.Log("Request c v l " + url );
+			msg.AddMessage( Global.MSG_POSTVIDEO_NAME_KEY , category );
 		}
 		StartCoroutine( WaitForRequest( url , CategoryVideoHandeler , msg ));
 	}
@@ -67,6 +69,21 @@ public class HTTPManager : MonoBehaviour {
 			string number = msg.GetMessage(Global.MSG_REQUESTVIDEO_NUMBER_KEY ).ToString();
 			url = Global.VideoRequestURL.Replace( "NUMBER" , number );
 		}
+		msg.AddMessage( Global.MSG_POSTVIDEO_NAME_KEY , "Latest" );
+
+		StartCoroutine( WaitForRequest( url , DayVideoInfoHandler , msg));
+	}
+
+	void RequestLiveVideoInfo( URLRequestMessage msg )
+	{
+		Debug.Log(" Request Video Info ");
+		string url = msg.url;
+		if ( url == null || url == "")
+		{
+			string number = msg.GetMessage(Global.MSG_REQUESTVIDEO_NUMBER_KEY ).ToString();
+			url = Global.LiveVideoRequestURL.Replace( "NUMBER" , number );
+		}
+		msg.AddMessage( Global.MSG_POSTVIDEO_NAME_KEY , "Live" );
 
 		StartCoroutine( WaitForRequest( url , DayVideoInfoHandler , msg));
 	}
@@ -121,7 +138,7 @@ public class HTTPManager : MonoBehaviour {
 	{
 		JSONObject json = new JSONObject( www.text );
 		List<VideoInfo> list = Json2VideoList( json.GetField("videoList") );
-
+		string name = postMsg.GetMessage( Global.MSG_REQUEST_CATEGORYVIDEO_CATEGORY_KEY ).ToString();
 		postMsg.AddMessage( Global.MSG_POSTVIDEO_VIDEO_KEY , list );
 		VREvents.FirePostVideoList( postMsg );
 	}

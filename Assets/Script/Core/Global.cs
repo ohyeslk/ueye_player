@@ -8,6 +8,7 @@ public class Global {
 	public static string MSG_REQUESTVIDEO_NUMBER_KEY = "number";
 
 	public static string MSG_POSTVIDEO_VIDEO_KEY = "videolist";
+	public static string MSG_POSTVIDEO_NAME_KEY = "name";
 
 	public static string MSG_REQUEST_TEXTURE_TEXTURE_KEY = "sprite";
 
@@ -18,14 +19,15 @@ public class Global {
 
 
 	public static string VideoRequestURL = "http://balala-dev-beta.us-west-1.elasticbeanstalk.com/api/v1/channels/recordedstreams?days=NUMBER";
-
 	public static string CategoryRequstURL = "http://balala-dev-beta.us-west-1.elasticbeanstalk.com/api/v1/channels/category/";
-
 	public static string CategoryVideoRequestURL = "http://balala-dev-beta.us-west-1.elasticbeanstalk.com/api/v1/channels/category/CATEGORY";
+	public static string LiveVideoRequestURL = "http://balala-dev-beta.us-west-1.elasticbeanstalk.com/api/v1/channels/livestreams?index=0&days=NUMBER";
 
 	public static VRMode initMode = VRMode.VR_2D;
 
 	public static Vector3 ONHOVERV3_PHASE_EXIT = Vector3.zero;
+
+	public static string LIVE_VIDEOLIST_NAME = "Live";
 }
 
 

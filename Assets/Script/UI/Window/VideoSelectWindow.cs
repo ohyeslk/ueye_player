@@ -43,7 +43,7 @@ public class VideoSelectWindow : UIWindow  {
 	/// <value>The video per row.</value>
 	public int VideoPerRow {
 		get{
-			return ( m_videoList.Count - VideoPerPage * temPage ) < column ? ( m_videoList.Count - VideoPerPage * temPage ) : column;
+			return ( m_videoManager.GetVideoCount() - VideoPerPage * temPage ) < column ? ( m_videoManager.GetVideoCount() - VideoPerPage * temPage ) : column;
 		}
 	}
 
@@ -52,14 +52,90 @@ public class VideoSelectWindow : UIWindow  {
 	/// </summary>
 	int temPage = 0;
 
-	/// <summary>
-	/// cache the video list
-	/// </summary>
-	List<VideoInfo> m_videoList = new List<VideoInfo>();
 
 	[SerializeField] VRFunctionButton UpButton;
 	[SerializeField] VRFunctionButton DownButton;
 	[SerializeField] VRFunctionButton homeButton;
+	[SerializeField] TopButton videoTopButton;
+	[SerializeField] TopButton liveTopButton;
+	VRBasicButton[] buttonList;
+
+	public class VideoListManager
+	{
+		public string videoListName;
+
+		/// <summary>
+		/// temperary type of the video list
+		/// </summary>
+		enum Type
+		{
+			Video,
+			Live,
+		}
+		Type type;
+
+		public string name;
+
+		List<VideoInfo> m_videoList = new List<VideoInfo>();
+
+		/// <summary>
+		/// save the live video list
+		/// </summary>
+		List<VideoInfo> m_liveVideoList = new List<VideoInfo>();
+		/// <summary>
+		/// save the normal video list
+		/// </summary>
+		List<VideoInfo> m_normalVideoList = new List<VideoInfo>();
+
+		public List<VideoInfo> GetVideoList () 
+		{
+			if ( type == Type.Video )
+				return m_normalVideoList;
+			if ( type == Type.Live )
+				return m_liveVideoList;
+	
+			return new  List<VideoInfo>();
+		}
+
+		public int GetVideoCount()
+		{
+			return GetVideoList().Count;
+		}
+
+		/// <summary>
+		/// save the video list
+		/// </summary>
+		/// <returns><c>true</c>,if need refresh <c>false</c> otherwise.</returns>
+		/// <param name="list"> the list of vide info.</param>
+		/// <param name="_name"> the name of the video list.</param>
+		public bool SetVideoList(List<VideoInfo> list , string _name )
+		{
+			name = _name;
+			if ( name == Global.LIVE_VIDEOLIST_NAME ) 
+				m_liveVideoList = list;
+			else
+				m_normalVideoList = list;
+			
+			if ( name == Global.LIVE_VIDEOLIST_NAME ) 
+				return type == Type.Live;
+			else
+				return type == Type.Video;
+			
+		}
+
+		public void ToVideo()
+		{
+			type = Type.Video;
+		}
+
+		public void ToLive()
+		{
+			type = Type.Live;
+		}
+
+
+	}
+	VideoListManager m_videoManager = new VideoListManager();
 
 	override protected void OnDisable()
 	{
@@ -84,33 +160,57 @@ public class VideoSelectWindow : UIWindow  {
 
 	void RecieveVideoList( URLRequestMessage msg )
 	{
-		m_videoList = (List<VideoInfo>)msg.GetMessage(Global.MSG_POSTVIDEO_VIDEO_KEY );
-		temPage = 0;
+		if ( m_videoManager.SetVideoList( (List<VideoInfo>)msg.GetMessage(Global.MSG_POSTVIDEO_VIDEO_KEY ) 
+			, msg.GetMessage( Global.MSG_POSTVIDEO_NAME_KEY).ToString() ) )
+		{
+			RefreshAndShowVideo();
+		}
+		if ( msg.GetMessage( Global.MSG_POSTVIDEO_NAME_KEY ).ToString() != Global.LIVE_VIDEOLIST_NAME )
+		{
+			videoTopButton.SetName( msg.GetMessage( Global.MSG_POSTVIDEO_NAME_KEY ).ToString() );
+		}
+	}
 
+	/// <summary>
+	/// set the tem page to 0 and show the video on this page
+	/// </summary>
+	void RefreshAndShowVideo()
+	{
+		temPage = 0;
 		ShowVideoOnTempPage();
 	}
 
+	/// <summary>
+	/// Clear the videos if there is any,
+	/// Create the new video info units,
+	/// update the page change buttons,
+	/// update the side pattern,
+	/// </summary>
 	void ShowVideoOnTempPage()
 	{
 		if ( unitList.Count > 0 ) 
 			ClearVideos( ClearType.Disapper );
 		
-		for ( int i = temPage * VideoPerPage ; i < ( temPage + 1 ) *  VideoPerPage && i < m_videoList.Count ; ++ i ) 
+		for ( int i = temPage * VideoPerPage ; i < ( temPage + 1 ) *  VideoPerPage && i < m_videoManager.GetVideoCount() ; ++ i ) 
 		{
-			CreateVideoInfoUnit( m_videoList[i] );
+			CreateVideoInfoUnit( m_videoManager.GetVideoList()[i] );
 		}
 
 		UpdatePageChangeButtons();
 		UpdateSidePattern();
 	}
 
+	/// <summary>
+	/// reset the m_Enable of the page change buttons,
+	/// according to whether the page can be turned up/down,
+	/// </summary>
 	void UpdatePageChangeButtons()
 	{
 		UpButton.m_Enable = true;
 		DownButton.m_Enable = true;
 
 		if ( temPage <= 0 ) UpButton.m_Enable = false;
-		if ( ( temPage + 1 ) * VideoPerPage >= m_videoList.Count ) DownButton.m_Enable = false;
+		if ( ( temPage + 1 ) * VideoPerPage >= m_videoManager.GetVideoCount() ) DownButton.m_Enable = false;
 	}
 
 	protected override void OnBecomeVisible ( float time )
@@ -122,10 +222,10 @@ public class VideoSelectWindow : UIWindow  {
 		{
 			unit.OnBecomeVisible( time );
 		}
-
-		UpButton.OnBecomeVisible( time , true);
-		DownButton.OnBecomeVisible( time , true );
-		homeButton.OnBecomeVisible( time , true );
+			
+		foreach( VRBasicButton btn in buttonList )
+			btn.OnBecomeVisible( time , true );
+		
 		foreach( SidePattern p in sidePatternList ) p.OnBecomeVisible( time );
 	}
 
@@ -142,10 +242,9 @@ public class VideoSelectWindow : UIWindow  {
 		seq.AppendInterval( time  );
 		seq.AppendCallback( DisablePanel );
 
-
-		UpButton.OnBecomeInvisible( time , false );
-		DownButton.OnBecomeInvisible( time , false );
-		homeButton.OnBecomeInvisible( time , false );
+		foreach( VRBasicButton btn in buttonList )
+			btn.OnBecomeInvisible( time , false );
+		
 		foreach( SidePattern p in sidePatternList ) p.OnBecomeInvisible( time );
 	}
 
@@ -156,7 +255,7 @@ public class VideoSelectWindow : UIWindow  {
 			VideoInfoUnitPrefab = (GameObject)Resources.Load("Prefab/UI/VideoInfoUnit");
 		if ( Panel == null )
 			Debug.LogError("Cannot find Panel");
-		
+		buttonList = GetComponentsInChildren<VRBasicButton>();
 	}
 
 	void Start() {
@@ -166,13 +265,20 @@ public class VideoSelectWindow : UIWindow  {
 
 	public void RequestVideoList()
 	{
-		RequestVideoList( 50 );
+		RequestLatestVideoList( 50 );
+		RequestLiveVideoList( 3 );
 	}
-	public void RequestVideoList ( int number )
+	public void RequestLatestVideoList ( int number )
 	{
 		URLRequestMessage msg = new URLRequestMessage(this);
 		msg.AddMessage(Global.MSG_REQUESTVIDEO_NUMBER_KEY , number.ToString());
 		VREvents.FireRequestVideoList(msg);
+	}
+	public void RequestLiveVideoList ( int number )
+	{
+		URLRequestMessage msg = new URLRequestMessage(this);
+		msg.AddMessage(Global.MSG_REQUESTVIDEO_NUMBER_KEY , number.ToString());
+		VREvents.FireRequestLiveVideoList(msg);
 	}
 
 	public void ShowVideoDetail( VideoInfo info )
@@ -212,7 +318,7 @@ public class VideoSelectWindow : UIWindow  {
 	}
 
 	/// <summary>
-	/// create 10 side patterns and set to disabled, for save
+	/// create <sidePatternNumer>(=10) side patterns and set to disabled, for save
 	/// </summary>
 	void CreateSidePattern()
 	{
@@ -234,7 +340,7 @@ public class VideoSelectWindow : UIWindow  {
 
 	void UpdateSidePattern()
 	{
-		int totalPage = ( m_videoList.Count - 1 ) / VideoPerPage + 1;
+		int totalPage = ( m_videoManager.GetVideoCount() - 1 ) / VideoPerPage + 1;
 
 		// set the the pattern
 		for( int i = sidePatternNumber -1; i >= 0 ; -- i )
@@ -274,6 +380,11 @@ public class VideoSelectWindow : UIWindow  {
 		unitList.Clear();
 	}
 
+
+/***************
+ * called by button
+ * *************/
+
 	public void OnLastPage()
 	{
 		if ( temPage > 0 ) 
@@ -286,12 +397,28 @@ public class VideoSelectWindow : UIWindow  {
 
 	public void OnNextPage()
 	{
-		if ( temPage * VideoPerPage < m_videoList.Count )
+		if ( temPage * VideoPerPage < m_videoManager.GetVideoCount() )
 		{
 			temPage ++ ;
-			ClearVideos( ClearType.Up);
+			ClearVideos( ClearType.Up );
 			ShowVideoOnTempPage();
 		}
+	}
+
+	public void OnTopVideo()
+	{
+		m_videoManager.ToVideo();
+		RefreshAndShowVideo();
+		videoTopButton.SetHighlighted( true );
+		liveTopButton.SetHighlighted( false );
+	}
+
+	public void OnTopLive()
+	{
+		m_videoManager.ToLive();
+		RefreshAndShowVideo();
+		videoTopButton.SetHighlighted( false );
+		liveTopButton.SetHighlighted( true );
 	}
 
 }

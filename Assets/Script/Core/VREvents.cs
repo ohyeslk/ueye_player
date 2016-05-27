@@ -33,6 +33,7 @@ public class VREvents
 
 
 
+
 	/// <summary>
 	/// URL event handler. handle with the URL related events
 	/// </summary>
@@ -46,6 +47,9 @@ public class VREvents
 
 	public static event URLEventHandler RequestVideoList;
 	public static void FireRequestVideoList(URLRequestMessage arg){if ( RequestVideoList != null ) RequestVideoList(arg) ; }
+
+	public static event URLEventHandler RequestLiveVideoList;
+	public static void FireRequestLiveVideoList(URLRequestMessage arg){if ( RequestLiveVideoList != null ) RequestLiveVideoList(arg) ; }
 
 	public static event URLEventHandler RequestCategoryVideoList;
 	public static void FireRequestCategoryVideoList(URLRequestMessage arg){if ( RequestCategoryVideoList != null ) RequestCategoryVideoList(arg) ; }
