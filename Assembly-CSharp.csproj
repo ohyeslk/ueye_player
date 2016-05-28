@@ -52,6 +52,7 @@
      <Compile Include="Assets\Script\Core\VREvents.cs" />
      <Compile Include="Assets\Script\Core\WindowManager.cs" />
      <Compile Include="Assets\Script\UI\Basic\CameraHolder.cs" />
+     <Compile Include="Assets\Script\UI\Basic\FollowView.cs" />
      <Compile Include="Assets\Script\UI\Basic\Grid.cs" />
      <Compile Include="Assets\Script\UI\Basic\HoverSensor.cs" />
      <Compile Include="Assets\Script\UI\Basic\UIButton.cs" />
