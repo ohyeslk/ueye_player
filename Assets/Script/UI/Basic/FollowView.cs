@@ -20,7 +20,7 @@ public class FollowView : MonoBehaviour {
 		toPos.y = transform.position.y;
 		transform.position = toPos;
 
-		transform.rotation = Quaternion.LookRotation( - cameraForward );
+		transform.rotation = Quaternion.LookRotation( cameraForward );
 
 	}
 

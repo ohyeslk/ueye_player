@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 using DG.Tweening;
 
 public class VRBasicButton : MonoBehaviour {
-	[SerializeField] protected SubAnimation subButtonAnimation;
+	[SerializeField] public SubAnimation subButtonAnimation;
 
 	bool inner_enable = true;
 	public bool m_Enable{

@@ -1743,7 +1743,7 @@ public class MediaPlayerCtrl : MonoBehaviour
 		}
 	}
 	
-	private unsafe bool Call_Load(string strFileName, int iSeek)
+private unsafe bool Call_Load(string strFileName, int iSeek)
 	{
 		fCurrentSeekTime = 0.0f;
 		fLastFrameTime = 0.0f;
