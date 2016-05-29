@@ -47,7 +47,6 @@ public class VideoPlayWindow : UIWindow {
 		Debug.Log("Buttons " + buttons.Length );
 		HidePlayPanelButtons(0);
 		HideLoadAnimation();
-
 	}
 
 	override protected void OnDisable()
@@ -86,7 +85,6 @@ public class VideoPlayWindow : UIWindow {
 	void BecomeVisible( bool to , float time )
 	{
 		video.gameObject.SetActive(to);
-		Debug.Log("Become Visible " + to );
 		ShouldUpdate = to;
 
 		FollowView.enabled = to;
@@ -119,8 +117,15 @@ public class VideoPlayWindow : UIWindow {
 	IEnumerator PlayVideoFake( VideoInfo info , float delay )
 	{
 
-		video.Load( info.playUrl );
 		ShowLoadAnimation();
+
+		video.enabled = false;
+
+		yield return new WaitForSeconds( 1f );
+
+		video.enabled = true;
+
+		video.Load( info.playUrl );
 
 		while( video.GetCurrentState() == MediaPlayerCtrl.MEDIAPLAYER_STATE.NOT_READY )
 		{
