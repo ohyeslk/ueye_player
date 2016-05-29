@@ -128,7 +128,9 @@ public class CardboardHead : MonoBehaviour {
 		      } else {
 		        transform.rotation = target.rotation * rot;
 		      }
+
 			}
+
     }
 
     if (trackPosition) {

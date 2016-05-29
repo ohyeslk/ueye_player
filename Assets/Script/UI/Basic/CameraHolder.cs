@@ -4,6 +4,7 @@ using System.Collections;
 public class CameraHolder : MonoBehaviour {
 
 	[SerializeField] GameObject selectionWindow;
+	[SerializeField] Cardboard cardboard;
 	[SerializeField] CardboardHead head;
 
 	void OnDisable()
@@ -52,7 +53,7 @@ public class CameraHolder : MonoBehaviour {
 		RotateTowardSelection();
 
 	}
-
+		
 	void RotateTowardSelection( )
 	{
 		if ( selectionWindow == null )
@@ -66,7 +67,7 @@ public class CameraHolder : MonoBehaviour {
 		Vector3 to = Camera.main.ScreenPointToRay( e.Position - e.Finger.DeltaPosition ).direction;
 		Vector3 from = Camera.main.ScreenPointToRay( e.Position ).direction;
 
-		if ( LogicManager.isLockVerticle )
+//		if ( LogicManager.isLockVerticle )
 		{
 			from.y = to.y = 0;
 		}
