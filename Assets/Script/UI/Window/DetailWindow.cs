@@ -54,11 +54,7 @@ public class DetailWindow : UIWindow {
 	{
 		if ( msg.postObj == this )
 		{
-			Texture2D tex = (Texture2D)msg.GetMessage(Global.MSG_REQUEST_TEXTURE_SPRITE_KEY);
-			Rect rec = new Rect(0,0,tex.width ,tex.height );
-			m_info.Post = Sprite.Create( tex , rec , new Vector2(0.5f,0.5f) , 100);
-
-			img.sprite = m_info.Post;
+			img.sprite = (Sprite)msg.GetMessage(Global.MSG_REQUEST_TEXTURE_SPRITE_KEY);
 		}
 	}
 	/// <summary>

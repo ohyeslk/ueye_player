@@ -318,18 +318,14 @@ public class MediaPlayerCtrl : MonoBehaviour
         if (m_bFirst == false)
         {
 
-
-
-
-
             string strName = m_strFileName.Trim();
 
 #if UNITY_IPHONE
-			/*if (strName.StartsWith("http",StringComparison.OrdinalIgnoreCase))
-			{
-				StartCoroutine( DownloadStreamingVideoAndLoad(strName) );
-			}
-			else*/
+//			if (strName.StartsWith("http",StringComparison.OrdinalIgnoreCase))
+//			{
+//				StartCoroutine( DownloadStreamingVideoAndLoad(strName) );
+//			}
+//			else
 			{
 				Call_Load(strName,0);
 			}
@@ -431,8 +427,6 @@ public class MediaPlayerCtrl : MonoBehaviour
 
 
             m_iCurrentSeekPosition = Call_GetSeekPosition();
-
-
 
 
         }
@@ -1937,8 +1931,6 @@ private unsafe bool Call_Load(string strFileName, int iSeek)
                 OnReady();
 			m_CurrentState = MEDIAPLAYER_STATE.READY;
 		}
-
-
 
 		return true;
 	}

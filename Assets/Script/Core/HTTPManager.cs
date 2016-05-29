@@ -212,10 +212,12 @@ public class HTTPManager : MonoBehaviour {
 		WWW www = new WWW(url);
 		yield return www;
 
-		handler(www, postMsg);
-
-		if ( www.error != null )
+		if ( string.IsNullOrEmpty(www.error) ){
+			handler(www, postMsg);
+		}else{
+			
 			Debug.Log("WWW Error" + www.error );
+		}
 	}
 
 

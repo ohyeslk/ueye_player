@@ -126,7 +126,6 @@ public class VRBasicButton : MonoBehaviour {
 					subButtonAnimation.subButton.DOFade( 1f , time );
 				}
 			}
-			
 		}
 	}
 

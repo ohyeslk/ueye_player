@@ -8,34 +8,46 @@ public class VideoPlayWindow : UIWindow {
 
 	[SerializeField] MediaPlayerCtrl video;
 
-	[SerializeField] GameObject playButton;
-	[SerializeField] GameObject pauseButton;
+	[SerializeField] VRBasicButton playButton;
+	[SerializeField] VRBasicButton pauseButton;
+	[SerializeField] VRBasicButton ExpandButton;
 
-	[SerializeField] GameObject PlayPanel;
+	[SerializeField] FollowView FollowView;
 	[SerializeField] Image PlayPanelBack;
+
 	/// <summary>
 	/// when the camera degree ( from V3.down ) equals ShowButtonDegree,
 	/// show the buttons on the play panel
 	/// </summary>
-	[SerializeField] float ShowButtonDegree = 30f;
+	[SerializeField] float ShowButtonDegree = 70f;
 	/// <summary>
 	/// When the camera degree ( from V3.down ) is smaller than ShowPanelDegree,
 	/// begin to show the play panel
 	/// </summary>
-	[SerializeField] float ShowPanelDegree = 45f;
+	[SerializeField] float ShowPanelDegree = 80f;
 	[SerializeField] float ButtonShowTime = 1f;
 	[SerializeField] float ButtonHideTime = 0.5f;
-	[SerializeField] VRBasicButton ExpandButton;
 
+	[System.Serializable]
+	public struct LoadAnimation
+	{
+		public Image IconFrame;
+		public Image EyeIcon;
+		public float fadeDuration;
+	}
+	[SerializeField] LoadAnimation m_loadAnimation;
 	VRBasicButton[] buttons;
+
 	void Start()
 	{
-		PlayPanel.gameObject.SetActive ( false );
+		FollowView.gameObject.SetActive ( false );
 		video.gameObject.SetActive(false);
 		video.Pause();
-		buttons = PlayPanel.GetComponentsInChildren<VRBasicButton>();
+		buttons = FollowView.gameObject.GetComponentsInChildren<VRBasicButton>();
 		Debug.Log("Buttons " + buttons.Length );
 		HidePlayPanelButtons(0);
+		HideLoadAnimation();
+
 	}
 
 	override protected void OnDisable()
@@ -54,8 +66,9 @@ public class VideoPlayWindow : UIWindow {
 	{
 		VideoInfo info = (VideoInfo)msg.GetMessage(Global.MSG_VIDEO_INFO_KEY);
 		Debug.Log("Play Video " + info.title + " " + info.playUrl );
-		video.Load( info.playUrl );
-		OnPlayVideo();
+
+		StartCoroutine( PlayVideoFake( info , 3f ));
+//		OnPlayVideo();
 	}
 
 	protected override void OnBecomeInvsible ( float time )
@@ -72,36 +85,57 @@ public class VideoPlayWindow : UIWindow {
 
 	void BecomeVisible( bool to , float time )
 	{
-//		video.gameObject.SetActive(to);
+		video.gameObject.SetActive(to);
 		Debug.Log("Become Visible " + to );
 		ShouldUpdate = to;
+
+		FollowView.enabled = to;
+
 		if ( to )
 		{
-			PlayPanel.SetActive( true );
+			FollowView.gameObject.SetActive( true );
 			lastDegree = 90f;
+			
 		}else
 		{
 			PlayPanelBack.DOFade( 0 , time ).OnComplete( DisablePlayPanel );
 			HidePlayPanelButtons( time );
+			ExpandButton.OnBecomeInvisible( time );
 		}
 	}
 
 	public void DisablePlayPanel()
 	{
-		PlayPanel.gameObject.SetActive( false );
+		FollowView.gameObject.SetActive( false );
 	}
 
 	public void OnPlayVideo()
 	{
 		video.Play();
-		playButton.SetActive(false);
-		pauseButton.SetActive(true);
+		playButton.gameObject.SetActive(false);
+		pauseButton.gameObject.SetActive(true);
 	}
+
+	IEnumerator PlayVideoFake( VideoInfo info , float delay )
+	{
+
+		video.Load( info.playUrl );
+		ShowLoadAnimation();
+
+		while( video.GetCurrentState() == MediaPlayerCtrl.MEDIAPLAYER_STATE.NOT_READY )
+		{
+			yield return null;
+		}
+
+		HideLoadAnimation();
+		OnPlayVideo();
+	}
+
 	public void OnPauseVideo()
 	{
 		video.Pause();
-		playButton.SetActive(true);
-		pauseButton.SetActive(false);
+		playButton.gameObject.SetActive(true);
+		pauseButton.gameObject.SetActive(false);
 	}
 
 	public void OnReturn()
@@ -112,6 +146,9 @@ public class VideoPlayWindow : UIWindow {
 	}
 
 	float lastDegree = 90f;
+	/// <summary>
+	/// Should Update if become visible
+	/// </summary>
 	bool ShouldUpdate = false;
 	public void LateUpdate()
 	{
@@ -135,18 +172,6 @@ public class VideoPlayWindow : UIWindow {
 				}
 			}
 
-			// Call show buttons as soon as the degree is lower than the show button degree
-//			if ( lastDegree > ShowButtonDegree && degree < ShowButtonDegree )
-//			{
-//				ShowPlayPanelButtons( ButtonShowTime );
-//			}
-
-			// call hide buttons as soon as the degree is higher than the show panel degree
-//			if ( lastDegree < ShowPanelDegree && degree > ShowPanelDegree )
-//			{
-//				HidePlayPanelButtons( ButtonHideTime );
-//			}
-
 			lastDegree = degree;
 		}
 	}
@@ -156,39 +181,57 @@ public class VideoPlayWindow : UIWindow {
 		if( PlayPanelExpanded )
 		{
 			HidePlayPanelButtons( ButtonHideTime );
+			FollowView.enabled = true;
 		}else
 		{
 			ShowPlayPanelButtons( ButtonShowTime );
+			FollowView.enabled = false;
 		}
 	}
 
+	public void ShowLoadAnimation() {
+
+		m_loadAnimation.EyeIcon.DOFade( 1f , m_loadAnimation.fadeDuration );
+		m_loadAnimation.IconFrame.DOFade( 1f , m_loadAnimation.fadeDuration );
+	}
+
+	public void HideLoadAnimation() {
+
+		m_loadAnimation.EyeIcon.DOFade( 0 , m_loadAnimation.fadeDuration );
+		m_loadAnimation.IconFrame.DOFade( 0 , m_loadAnimation.fadeDuration );
+	}
+
 	bool PlayPanelExpanded = false;
-	public void ShowPlayPanelButtons( float time )
+	/// <summary>
+	/// Play the Show Planel Buttons Animation and set PlayPanelExpanded to true
+	/// </summary>
+	/// <param name="time">Show duration.</param>
+	public void ShowPlayPanelButtons( float duration )
 	{
 		{
-			StartCoroutine( ShowPlayPanelButtonsDo(time) );
+			StartCoroutine( ShowPlayPanelButtonsDo(duration) );
 			PlayPanelExpanded = true;
 		}
 	}
 
-	IEnumerator ShowPlayPanelButtonsDo(float time)
+	IEnumerator ShowPlayPanelButtonsDo(float duration)
 	{
 		{
 			RectTransform recTrans = (RectTransform) transform;
 			Sequence seq = DOTween.Sequence();
 			PlayPanelBack.transform.DOKill();
 			ExpandButton.transform.DOKill();
-			seq.Append( PlayPanelBack.transform.DOScaleX( 1f , time * 0.5f ));
-			seq.Join( ExpandButton.transform.DOLocalMoveY( -250f , time * 0.5f ));
-			seq.Join( ExpandButton.transform.DOLocalRotate( new Vector3( 0 , 0 , 90f ) , time * 0.5f ));
+			seq.Append( PlayPanelBack.transform.DOScaleX( 1f , duration * 0.5f ));
+			seq.Join( ExpandButton.transform.DOLocalMoveY( -300f , duration * 0.5f ));
+			seq.Join( ExpandButton.transform.DOLocalRotate( new Vector3( 0 , 0 , 90f ) , duration * 0.5f ));
 	
-			yield return new WaitForSeconds( time * 0.5f );
+			yield return new WaitForSeconds( duration * 0.5f );
 
 			foreach( VRBasicButton btn in buttons )
 			{
 				if ( btn != ExpandButton )
 				{
-					btn.OnBecomeVisible(time * 0.5f);
+					btn.OnBecomeVisible(duration * 0.5f);
 //					btn.transform.rotation = Quaternion.LookRotation( Camera.main.transform.position - btn.transform.position );
 				}
 			}
@@ -196,36 +239,40 @@ public class VideoPlayWindow : UIWindow {
 		yield break;
 	}
 
-	public void HidePlayPanelButtons( float time )
+	/// <summary>
+	/// Play the Hide Planel Buttons Animation and set PlayPanelExpanded to false
+	/// </summary>
+	/// <param name="time">Show duration.</param>
+	public void HidePlayPanelButtons( float duration )
 	{
 		{
-			StartCoroutine( HidePlayPanelButtonsDo(time) );
+			StartCoroutine( HidePlayPanelButtonsDo(duration) );
 			PlayPanelExpanded = false;
 		}
 	}
 
-	IEnumerator HidePlayPanelButtonsDo(float time)
+	IEnumerator HidePlayPanelButtonsDo(float duration)
 	{
 		{
 			foreach( VRBasicButton btn in buttons )
 			{
 				if ( btn != ExpandButton )
 				{
-					btn.OnBecomeInvisible(time * 0.5f );
+					btn.OnBecomeInvisible(duration * 0.5f );
 //					btn.transform.rotation = Quaternion.LookRotation( Camera.main.transform.position - btn.transform.position );
 				}
 			}
 
-			yield return new WaitForSeconds( time * 0.5f );
+			yield return new WaitForSeconds( duration * 0.5f );
 
 			RectTransform recTrans = (RectTransform) transform;
 			Sequence seq = DOTween.Sequence();
 			PlayPanelBack.transform.DOKill();
 			PlayPanelBack.transform.DOKill();
 			ExpandButton.transform.DOKill();
-			seq.Append( PlayPanelBack.transform.DOScaleX( 0 , time * 0.5f ));
-			seq.Join( ExpandButton.transform.DOLocalMoveY( 0 , time * 0.5f ));
-			seq.Join( ExpandButton.transform.DOLocalRotate( new Vector3( 0 , 0 , -90f ) , time * 0.5f ));
+			seq.Append( PlayPanelBack.transform.DOScaleX( 0 , duration * 0.5f ));
+			seq.Join( ExpandButton.transform.DOLocalMoveY( 0 , duration * 0.5f ));
+			seq.Join( ExpandButton.transform.DOLocalRotate( new Vector3( 0 , 0 , -90f ) , duration * 0.5f ));
 		}
 		yield break;
 	}
