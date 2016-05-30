@@ -42,6 +42,7 @@ public class CameraHolder : MonoBehaviour {
 		if ( to == VRMode.VR_2D && LogicManager.ActiveWindow != WindowArg.Type.PLAY_WINDOW )
 		{
 			head.isLockVertical = true;
+
 		}else
 		{
 			head.isLockVertical = false;
@@ -51,7 +52,6 @@ public class CameraHolder : MonoBehaviour {
 	void Start()
 	{
 		RotateTowardSelection();
-
 	}
 		
 	void RotateTowardSelection( )
@@ -63,15 +63,27 @@ public class CameraHolder : MonoBehaviour {
 	}
 
 	void OnFingerMove( FingerMotionEvent e ) {
-		
-		Vector3 to = Camera.main.ScreenPointToRay( e.Position - e.Finger.DeltaPosition ).direction;
-		Vector3 from = Camera.main.ScreenPointToRay( e.Position ).direction;
 
-//		if ( LogicManager.isLockVerticle )
+		if ( e.Phase == FingerMotionPhase.Updated )
 		{
-			from.y = to.y = 0;
+			Vector2 delta = e.Finger.DeltaPosition;
+			if ( LogicManager.isLockVerticle )
+			{
+				delta.y = 0;
+			}
+
+			head.UpdateHead( delta );
 		}
-		transform.rotation *= Quaternion.FromToRotation( from , to );
+
+
+//		Vector3 to = Camera.main.ScreenPointToRay( e.Position - e.Finger.DeltaPosition ).direction;
+//		Vector3 from = Camera.main.ScreenPointToRay( e.Position ).direction;
+//
+//		if ( LogicManager.isLockVerticle )
+//		{
+//			from.y = to.y = 0;
+//		}
+//		transform.rotation *= Quaternion.FromToRotation( from , to );
 	}
 
 }

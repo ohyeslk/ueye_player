@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using UnityEngine;
+using System.Collections;
 
 /// @ingroup Scripts
 /// This script provides head tracking support for a camera.
@@ -40,6 +41,26 @@ public class CardboardHead : MonoBehaviour {
   public bool trackRotation = true;
 
   public bool isLockVertical = true;
+
+	public Vector2 deltaPos;
+	Quaternion handDelta = Quaternion.identity;
+
+	public void UpdateHead( Vector2 deltaPos )
+	{
+		if ( deltaPos.magnitude > 0 )
+		{
+			Vector2 center = new Vector2( Screen.width / 2f , Screen.height / 2f );
+			Vector3 to = Camera.main.ScreenPointToRay( center - deltaPos ).direction;
+			Vector3 from = Camera.main.ScreenPointToRay( center ).direction;
+
+			var rot = Cardboard.SDK.HeadPose.Orientation;
+
+			transform.forward = to;
+
+			handDelta = transform.localRotation * Quaternion.Inverse( rot );
+		}
+	}
+
   [SerializeField] float verticalYThreshod = 0.7f;
 
   /// Determines whether to apply ther user's head offset to this gameobject's
@@ -111,10 +132,11 @@ public class CardboardHead : MonoBehaviour {
 
     if (trackRotation) {
       		var rot = Cardboard.SDK.HeadPose.Orientation;
+
 			if ( isLockVertical )
 			{
-				float temY =  transform.localRotation.eulerAngles.y;
-				float toY =  rot.eulerAngles.y;
+				float temY = transform.localRotation.eulerAngles.y;
+				float toY = ( handDelta * rot ) .eulerAngles.y;
 				if ( Mathf.Abs( temY - toY ) > verticalYThreshod )
 				{
 					Vector3 toEular = Quaternion.Lerp( transform.localRotation , rot  , 0.2f ).eulerAngles;
@@ -124,12 +146,13 @@ public class CardboardHead : MonoBehaviour {
 			}
 			else {
 		      if (target == null) {
-		        transform.localRotation = rot;
+				transform.localRotation = handDelta * rot;
 		      } else {
 		        transform.rotation = target.rotation * rot;
 		      }
 
 			}
+
 
     }
 
