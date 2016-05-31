@@ -18,6 +18,7 @@ public class UIInputModel : GazeInputModule {
 
 	public void ProcessUI()
 	{
+		
 		// deal with the hover 
 		UIHoverEvent hoverEvent = new UIHoverEvent();
 		hoverEvent.point = GetIntersectionPosition();
@@ -48,6 +49,8 @@ public class UIInputModel : GazeInputModule {
 		}
 		else if ( hoverSensor.GetSensorType() == SensorType.Normal )
 		{
+			Debug.Log("Hover " + hoverSensor.transform.parent.name );
+
 			if ( lastSensor != hoverSensor )
 			{
 				if ( lastSensor != null )
@@ -175,6 +178,9 @@ public class UIInputModel : GazeInputModule {
 			m_fingerTargetObject = FingerPointData.pointerCurrentRaycast.gameObject;
 			rayCastResults.Clear();
 
+			Vector3 camPos = Camera.main.transform.position;
+			Debug.DrawLine( camPos ,  camPos + Camera.main.ScreenPointToRay( e.Position ).direction * 100f );
+
 			// specified for the 2D/3D switch button
 			ExecuteEvents.Execute (m_fingerTargetObject, new PointerEventData (eventSystem), ExecuteEvents.pointerClickHandler);
 		}
@@ -182,6 +188,10 @@ public class UIInputModel : GazeInputModule {
 
 	public void OnFingerMove( FingerMotionEvent e )
 	{
+
+		Vector3 camPos = Camera.main.transform.position;
+		Debug.DrawLine( camPos ,  camPos + Camera.main.ScreenPointToRay( e.Position ).direction * 100f );
+
 		{
 			if ( FingerPointData == null ) {
 				FingerPointData = new PointerEventData(eventSystem);
