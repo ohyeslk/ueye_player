@@ -51,12 +51,9 @@ public class CardboardHead : MonoBehaviour {
 		{
 			Vector2 center = new Vector2( Screen.width / 2f , Screen.height / 2f );
 			Vector3 to = Camera.main.ScreenPointToRay( center - deltaPos ).direction;
-			Vector3 from = Camera.main.ScreenPointToRay( center ).direction;
-
 			var rot = Cardboard.SDK.HeadPose.Orientation;
 
 			transform.forward = to;
-
 			handDelta = transform.localRotation * Quaternion.Inverse( rot );
 		}
 	}
@@ -131,10 +128,10 @@ public class CardboardHead : MonoBehaviour {
     Cardboard.SDK.UpdateState();
 
     if (trackRotation) {
-      		var rot = Cardboard.SDK.HeadPose.Orientation;
+  		var rot = Cardboard.SDK.HeadPose.Orientation;
 
-			if ( isLockVertical )
-			{
+		if ( isLockVertical )
+		{
 				float temY = transform.localRotation.eulerAngles.y;
 				float toY = ( handDelta * rot ) .eulerAngles.y;
 				if ( Mathf.Abs( temY - toY ) > verticalYThreshod )
@@ -143,17 +140,14 @@ public class CardboardHead : MonoBehaviour {
 					toEular.x = toEular.z = 0;
 					transform.localRotation = Quaternion.Euler( toEular );
 				}
-			}
-			else {
+		}
+		else {
 		      if (target == null) {
 				transform.localRotation = handDelta * rot;
 		      } else {
 		        transform.rotation = target.rotation * rot;
 		      }
-
-			}
-
-
+		}
     }
 
     if (trackPosition) {
