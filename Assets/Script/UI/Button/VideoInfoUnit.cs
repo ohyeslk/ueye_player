@@ -82,6 +82,7 @@ public class VideoInfoUnit : VRBasicButton {
 	/// </summary>
 	bool isVisible = false;
 	Quaternion initRotation;
+	int m_index;
 
 	public VideoInfo Info{
 		get { return m_info; }
@@ -143,41 +144,58 @@ public class VideoInfoUnit : VRBasicButton {
 	/// <summary>
 	/// record the start time of hovering 
     /// </summary>
-	public void Init(VideoInfo info , int index , VideoSelectWindow _p )
+	public void Init(VideoInfo _info , int _index , VideoSelectWindow _p )
 	{
-		// initilize the sprite first
+		// save the parameter
+		m_info = _info;
+		parent = _p;
+		m_index = _index;
+
+		// set state to init
+		m_state = VideoInfoUnitState.Init;
+
+		// initilize the sprite
 		URLRequestMessage msg = new URLRequestMessage(this);
-		msg.url = info.coverUrl;
+		msg.url = m_info.coverUrl;
 		VREvents.FireRequesTexture( msg );
 
-		m_state = VideoInfoUnitState.Init;
-		parent = _p;
-
 		// update the delay time
-		m_setting.initDelay = index * m_setting.InitDelayPerUnit;
+		m_setting.initDelay = m_index * m_setting.InitDelayPerUnit;
 
-		m_info = info;
-		if ( text != null )
-		{
-			text.text = info.title;
-			text.DOFade(0 , 0);
-			text.enabled = false;
-		}
+		// hide the text
+		ResetText();
 
-		// set angle and position offset 
-		float angle = m_setting.anglePerUnit * ( ( index % parent.VideoPerRow ) - ( parent.VideoPerRow - 1f ) / 2f ) ;
-		transform.localRotation = Quaternion.Euler ( 0 ,angle , 0 );
-		initRotation = transform.localRotation;
-		Vector3 pos = transform.localPosition;
-		pos.z = ( Mathf.Cos( angle * Mathf.Deg2Rad ) - 1 ) * m_setting.radius;
-		transform.localPosition = pos;
+		// set the rotation and positon of the game object
+		ResetAngleAndOffset();
 
 		// set visible to true
 		isVisible = true;
 
 		ResetSubButton();
 
+		// play the show up animation
 		PlayInitAnimation();
+	}
+
+	public void ResetText()
+	{
+		if ( text != null )
+		{
+			text.text = m_info.title;
+			text.DOFade(0 , 0);
+			text.enabled = false;
+		}
+	}
+
+	public void ResetAngleAndOffset()
+	{
+		// set angle and position offset 
+		float angle = m_setting.anglePerUnit * ( ( m_index % parent.VideoPerRow ) - ( parent.VideoPerRow - 1f ) / 2f ) ;
+		transform.localRotation = Quaternion.Euler ( 0 ,angle , 0 );
+		initRotation = transform.localRotation;
+		Vector3 pos = transform.localPosition;
+		pos.z = ( Mathf.Cos( angle * Mathf.Deg2Rad ) - 1 ) * m_setting.radius;
+		transform.localPosition = pos;
 	}
 
 	public override void OnEnterHover ()
@@ -354,13 +372,13 @@ public class VideoInfoUnit : VRBasicButton {
 		if ( p == Global.ONHOVERV3_PHASE_EXIT )
 		{
 
-				Vector3 offset =  img.transform.InverseTransformPoint( p );
-				Vector3 to = new Vector3( offset.y , - offset.x , 0 ) * hoverAnimation.hoverSensity ;
-				Sequence seq = DOTween.Sequence();
-				seq.Append( transform.DOLocalRotate( initRotation.eulerAngles - to * 0.5f , hoverAnimation.remainNormalDuration * 0.25f ));
-				seq.Append( transform.DOLocalRotate( initRotation.eulerAngles + to * 0.25f , hoverAnimation.remainNormalDuration * 0.25f ));
-				seq.Append( transform.DOLocalRotate( initRotation.eulerAngles - to * 0.1f , hoverAnimation.remainNormalDuration * 0.25f ));
-				seq.Append( transform.DOLocalRotate( initRotation.eulerAngles , hoverAnimation.remainNormalDuration * 0.25f ));
+			Vector3 offset =  img.transform.InverseTransformPoint( p );
+			Vector3 to = new Vector3( offset.y , - offset.x , 0 ) * hoverAnimation.hoverSensity ;
+			Sequence seq = DOTween.Sequence();
+			seq.Append( transform.DOLocalRotate( initRotation.eulerAngles - to * 0.5f , hoverAnimation.remainNormalDuration * 0.25f ));
+			seq.Append( transform.DOLocalRotate( initRotation.eulerAngles + to * 0.25f , hoverAnimation.remainNormalDuration * 0.25f ));
+			seq.Append( transform.DOLocalRotate( initRotation.eulerAngles - to * 0.1f , hoverAnimation.remainNormalDuration * 0.25f ));
+			seq.Append( transform.DOLocalRotate( initRotation.eulerAngles , hoverAnimation.remainNormalDuration * 0.25f ));
 			
 		}else
 		{
@@ -427,6 +445,8 @@ public class VideoInfoUnit : VRBasicButton {
 		float t = ( time <= 0 ) ? m_setting.FadeInTime : time;
 		img.DOFade( 1f , t );
 		frame.DOFade( 1f , t );
+		ResetAngleAndOffset();
+		ResetText();
 	}
 
 	override public void OnBecomeInvisible( float time )

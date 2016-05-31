@@ -15,6 +15,7 @@ public class UIInputModel : GazeInputModule {
 	protected UISensor lastSubSensor = null;
 	float hoverDuration = 0;
 	float subHoverDuration = 0;
+
 	public void ProcessUI()
 	{
 		// deal with the hover 
@@ -126,7 +127,6 @@ public class UIInputModel : GazeInputModule {
 			if (FingerPointData != null && FingerPointData.enterEventCamera != null) {
 				return FingerPointData.pointerCurrentRaycast.gameObject;
 			}
-
 		}
 		return null;
 	}
@@ -145,9 +145,9 @@ public class UIInputModel : GazeInputModule {
 				}
 
 				float intersectionDistance = FingerPointData.pointerCurrentRaycast.distance + cam.nearClipPlane;
-				Vector3 intersectionPosition = cam.transform.position + cam.transform.forward * intersectionDistance;
+				Vector3 to = Camera.main.ScreenPointToRay( FingerPointData.position ).direction.normalized;
 
-				return intersectionPosition;
+				return  cam.transform.position + to * intersectionDistance;
 			}
 			return Vector3.zero;
 		}
@@ -167,8 +167,6 @@ public class UIInputModel : GazeInputModule {
 				FingerPointData = new PointerEventData(eventSystem);
 			}
 
-//			Debug.Log( "On Down" + e.Name );
-
 			List<RaycastResult> rayCastResults = new List<RaycastResult>();
 			FingerPointData.Reset();
 			FingerPointData.position = e.Position;
@@ -177,6 +175,7 @@ public class UIInputModel : GazeInputModule {
 			m_fingerTargetObject = FingerPointData.pointerCurrentRaycast.gameObject;
 			rayCastResults.Clear();
 
+			// specified for the 2D/3D switch button
 			ExecuteEvents.Execute (m_fingerTargetObject, new PointerEventData (eventSystem), ExecuteEvents.pointerClickHandler);
 		}
 	}
@@ -189,7 +188,7 @@ public class UIInputModel : GazeInputModule {
 			}
 			FingerPointData.Reset();
 
-			if ( e.Phase != FingerMotionPhase.Ended )
+			if ( e.Phase == FingerMotionPhase.Updated )
 			{
 				FingerPointData.position = e.Position;
 				List<RaycastResult> rayCastResults = new List<RaycastResult>();
@@ -202,8 +201,14 @@ public class UIInputModel : GazeInputModule {
 				FingerPointData = null;
 			}
 
-	//		ExecuteEvents.Execute (m_fingerTargetObject, new PointerEventData (eventSystem), ExecuteEvents.updateSelectedHandler);
 		}
+	}
+
+	void OnDrawGizmos()
+	{
+		Gizmos.color = Color.red;
+
+		Gizmos.DrawWireSphere( GetIntersectionPosition() , 0.3f  );
 	}
 
 }

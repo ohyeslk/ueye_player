@@ -44,7 +44,6 @@ public class VideoPlayWindow : UIWindow {
 		video.gameObject.SetActive(false);
 		video.Pause();
 		buttons = FollowView.gameObject.GetComponentsInChildren<VRBasicButton>();
-		Debug.Log("Buttons " + buttons.Length );
 		HidePlayPanelButtons(0);
 		HideLoadAnimation();
 	}
