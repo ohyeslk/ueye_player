@@ -31,6 +31,8 @@ public class VREvents
 	public static event MessageEventHandler PlayVideo;
 	public static void FirePlayVideo(Message arg){if ( PlayVideo != null ) PlayVideo(arg); }
 
+	public static event MessageEventHandler ResetCenter;
+	public static void FireResetCenter(Message arg){if ( ResetCenter != null ) ResetCenter(arg); }
 
 
 

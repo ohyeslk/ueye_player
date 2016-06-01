@@ -14,6 +14,7 @@
 
 using UnityEngine;
 using System.Collections;
+using DG.Tweening;
 
 /// @ingroup Scripts
 /// This script provides head tracking support for a camera.
@@ -118,6 +119,11 @@ public class CardboardHead : MonoBehaviour {
   void LateUpdate() {
     UpdateHead();
   }
+
+	public void ResetCenter()
+	{
+		DOTween.To( ()=>  handDelta , x=> handDelta = x , Vector3.zero , 0.5f );
+	}
 
   // Compute new head pose.
   private void UpdateHead() {
