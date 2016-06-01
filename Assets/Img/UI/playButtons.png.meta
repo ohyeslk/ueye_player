@@ -1,0 +1,251 @@
+fileFormatVersion: 2
+guid: f486c49a76f8b465e9f533ec6661075b
+timeCreated: 1464746478
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: talk-button-group
+    21300002: play-button-group
+    21300004: present-button-group
+    21300006: pause-button-group
+    21300008: expand-button-group
+    21300010: expend-button-group
+    21300012: back-button-group
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 7
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -2
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  allowsAlphaSplitting: 0
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: talk-button-group
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 768
+        width: 256
+        height: 256
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 128, y: -32}
+        - {x: 128, y: 30}
+        - {x: 127, y: 40}
+        - {x: 113, y: 65}
+        - {x: 107, y: 76}
+        - {x: 79, y: 105}
+        - {x: 50, y: 123}
+        - {x: 31, y: 128}
+        - {x: -30, y: 128}
+        - {x: -52, y: 122}
+        - {x: -79, y: 110}
+        - {x: -118, y: 69}
+        - {x: -128, y: 39}
+        - {x: -128, y: -40}
+        - {x: -108, y: -82}
+        - {x: -69, y: -116}
+        - {x: -36, y: -128}
+        - {x: 31, y: -128}
+        - {x: 68, y: -116}
+        - {x: 100, y: -86}
+        - {x: 122, y: -51}
+    - name: play-button-group
+      rect:
+        serializedVersion: 2
+        x: 259
+        y: 768
+        width: 254
+        height: 254
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 127, y: -32}
+        - {x: 127, y: 37}
+        - {x: 108, y: 77}
+        - {x: 81, y: 105}
+        - {x: 51, y: 122}
+        - {x: 30, y: 127}
+        - {x: -27, y: 127}
+        - {x: -32, y: 126}
+        - {x: -52, y: 124}
+        - {x: -104, y: 89}
+        - {x: -126, y: 43}
+        - {x: -127, y: 41}
+        - {x: -127, y: -44}
+        - {x: -105, y: -81}
+        - {x: -69, y: -116}
+        - {x: -32, y: -127}
+        - {x: 29, y: -127}
+        - {x: 43, y: -125}
+        - {x: 87, y: -102}
+        - {x: 115, y: -66}
+    - name: present-button-group
+      rect:
+        serializedVersion: 2
+        x: 515
+        y: 770
+        width: 253
+        height: 253
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 126.5, y: -39.5}
+        - {x: 126.5, y: 40.5}
+        - {x: 121.5, y: 56.5}
+        - {x: 84.5, y: 103.5}
+        - {x: 53.5, y: 120.5}
+        - {x: 31.5, y: 126.5}
+        - {x: -31.5, y: 126.5}
+        - {x: -48.5, y: 121.5}
+        - {x: -78.5, y: 105.5}
+        - {x: -101.5, y: 84.5}
+        - {x: -122.5, y: 48.5}
+        - {x: -126.5, y: 31.5}
+        - {x: -126.5, y: -28.5}
+        - {x: -120.5, y: -48.5}
+        - {x: -107.5, y: -75.5}
+        - {x: -70.5, y: -113.5}
+        - {x: -39.5, y: -126.5}
+        - {x: 37.5, y: -126.5}
+        - {x: 49.5, y: -125.5}
+        - {x: 83.5, y: -101.5}
+        - {x: 101.5, y: -82.5}
+        - {x: 125.5, y: -49.5}
+    - name: pause-button-group
+      rect:
+        serializedVersion: 2
+        x: 769
+        y: 769
+        width: 253
+        height: 253
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 126.5, y: 42.5}
+        - {x: 112.5, y: 68.5}
+        - {x: 102.5, y: 86.5}
+        - {x: 54.5, y: 123.5}
+        - {x: 44.5, y: 126.5}
+        - {x: -41.5, y: 126.5}
+        - {x: -69.5, y: 112.5}
+        - {x: -101.5, y: 85.5}
+        - {x: -125.5, y: 50.5}
+        - {x: -126.5, y: 42.5}
+        - {x: -126.5, y: -34.5}
+        - {x: -122.5, y: -47.5}
+        - {x: -101.5, y: -82.5}
+        - {x: -77.5, y: -104.5}
+        - {x: -48.5, y: -121.5}
+        - {x: -25.5, y: -126.5}
+        - {x: 29.5, y: -126.5}
+        - {x: 64.5, y: -114.5}
+        - {x: 84.5, y: -102.5}
+        - {x: 126.5, y: -50.5}
+    - name: expend-button-group
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 510
+        width: 256
+        height: 256
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 128, y: 36}
+        - {x: 124, y: 46}
+        - {x: 112, y: 79}
+        - {x: 53, y: 128}
+        - {x: -53, y: 128}
+        - {x: -103, y: 88}
+        - {x: -117, y: 69}
+        - {x: -128, y: 36}
+        - {x: -128, y: -29}
+        - {x: -122, y: -51}
+        - {x: -106, y: -81}
+        - {x: -76, y: -108}
+        - {x: -67, y: -113}
+        - {x: -46, y: -124}
+        - {x: -34, y: -128}
+        - {x: 41, y: -128}
+        - {x: 77, y: -109}
+        - {x: 109, y: -76}
+        - {x: 128, y: -47}
+    - name: back-button-group
+      rect:
+        serializedVersion: 2
+        x: 259
+        y: 509
+        width: 256
+        height: 256
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 128, y: 36}
+        - {x: 124, y: 46}
+        - {x: 112, y: 79}
+        - {x: 53, y: 128}
+        - {x: -53, y: 128}
+        - {x: -103, y: 88}
+        - {x: -117, y: 69}
+        - {x: -128, y: 36}
+        - {x: -128, y: -29}
+        - {x: -122, y: -51}
+        - {x: -106, y: -81}
+        - {x: -76, y: -108}
+        - {x: -67, y: -113}
+        - {x: -46, y: -124}
+        - {x: -34, y: -128}
+        - {x: 41, y: -128}
+        - {x: 77, y: -109}
+        - {x: 109, y: -76}
+        - {x: 128, y: -47}
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
