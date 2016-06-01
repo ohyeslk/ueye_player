@@ -33,14 +33,23 @@ public class HoverSensor : UISensor {
 
 	void SetToMode( VRMode to )
 	{
-
 		Image img = GetComponent<Image>();
 		if ( ( to & mode ) > 0 )
 		{
-			if ( img != null ) img.raycastTarget = true;
+			if ( img != null ) 
+			{
+				img.enabled = true;
+				img.raycastTarget = true;
+			}
+
 		}else
 		{
-			if ( img != null ) img.raycastTarget = false;
+			if ( img != null )
+			{
+				img.raycastTarget = false;
+				if ( img.color.a < 0.01f )
+					img.enabled = false;
+			}
 		}
 	}
 

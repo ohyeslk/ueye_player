@@ -323,7 +323,7 @@ public class VideoInfoUnit : VRBasicButton {
 			yield return null;
 		}
 
-		frame.enabled = true;
+		// frame.enabled = true;
 		if ( isVisible )
 		{
 			Color col = frame.color;
@@ -445,6 +445,11 @@ public class VideoInfoUnit : VRBasicButton {
 		float t = ( time <= 0 ) ? m_setting.FadeInTime : time;
 		img.DOFade( 1f , t );
 		frame.DOFade( 1f , t );
+
+		subButtonAnimation.subButton.DOKill();
+		subButtonAnimation.subButtonRing.DOKill();
+		subButtonAnimation.subButton.DOFade( 0 , t );
+		subButtonAnimation.subButtonRing.DOFade( 0 , t );
 		ResetAngleAndOffset();
 		ResetText();
 	}
@@ -456,9 +461,14 @@ public class VideoInfoUnit : VRBasicButton {
 		float t = ( time <= 0 ) ? m_setting.FadeInTime : time;
 		img.DOKill();
 		frame.DOKill();
-
+		subButtonAnimation.subButton.DOKill();
+		subButtonAnimation.subButtonRing.DOKill();
 		img.DOFade( 0 , t );
 		frame.DOFade( 0 , t );
+
+		subButtonAnimation.subButton.DOFade( 0 , t );
+		subButtonAnimation.subButtonRing.DOFade( 0 , t );
+
 		HideBlackCover(t);
 		HideText(t);
 	}

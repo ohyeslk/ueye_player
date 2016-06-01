@@ -46,6 +46,19 @@ public class VRBasicButton : MonoBehaviour {
 		}
 	}
 
+	void LateUpdate()
+	{
+		if ( subButtonAnimation.subButton.color.a < 0.02f )
+			subButtonAnimation.subButton.enabled = false;
+		else
+			subButtonAnimation.subButton.enabled = true;
+
+		if ( subButtonAnimation.subButtonRing.color.a < 0.02f || subButtonAnimation.subButtonRing.fillAmount < 0.02f )
+			subButtonAnimation.subButtonRing.enabled = false;
+		else
+			subButtonAnimation.subButtonRing.enabled = true;
+	}
+
 
 	/// <summary>
 	/// Show the confirm button 
@@ -107,6 +120,7 @@ public class VRBasicButton : MonoBehaviour {
 		{
 			subButtonAnimation.subButtonRing.DOKill();
 			subButtonAnimation.subButtonRing.DOFillAmount( 0 , time  * subButtonAnimation.subButtonRing.fillAmount ).OnComplete(ResetSubButton);
+				subButtonAnimation.subButtonRing.DOFade( 0 , time  * subButtonAnimation.subButtonRing.fillAmount);
 		}
 		}
 	}
@@ -141,6 +155,8 @@ public class VRBasicButton : MonoBehaviour {
 
 			subButtonAnimation.subButtonRing.DOKill();
 			subButtonAnimation.subButtonRing.DOFillAmount( 0 , time );
+			subButtonAnimation.subButtonRing.DOFade( 0 , time );
+
 		}
 	}
 		
@@ -162,7 +178,7 @@ public class VRBasicButton : MonoBehaviour {
 			if ( subButtonAnimation.subButtonFade )
 			{
 				Color col = subButtonAnimation.subButton.color;
-				col.a = 0.01f;
+				col.a = 0.00f;
 				subButtonAnimation.subButton.color = col;
 			}
 		}
