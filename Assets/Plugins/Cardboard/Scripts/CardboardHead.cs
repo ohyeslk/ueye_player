@@ -136,7 +136,7 @@ public class CardboardHead : MonoBehaviour {
 				float toY = ( handDelta * rot ) .eulerAngles.y;
 				if ( Mathf.Abs( temY - toY ) > verticalYThreshod )
 				{
-					Vector3 toEular = Quaternion.Lerp( transform.localRotation , rot  , 0.2f ).eulerAngles;
+					Vector3 toEular = Quaternion.Lerp( transform.localRotation , handDelta * rot  , 0.2f ).eulerAngles;
 					toEular.x = toEular.z = 0;
 					transform.localRotation = Quaternion.Euler( toEular );
 				}
