@@ -140,9 +140,11 @@ public class VideoPlayWindow : UIWindow {
 
 //		videoPlayer.DownloadStreamingVideoAndLoad( info.playUrl );
 //		videoPlayer.m_strFileName = info.playUrl;
-		StartCoroutine( videoPlayer.DownloadStreamingVideoAndLoad( info.playUrl ));
+		videoPlayer.Load( info.playUrl );
 
 		yield return new WaitForSeconds( 1f );
+
+		videoPlayer.Play();
 
 		while( videoPlayer.GetCurrentState() == MediaPlayerCtrl.MEDIAPLAYER_STATE.NOT_READY )
 		{
