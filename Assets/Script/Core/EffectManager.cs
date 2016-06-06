@@ -37,10 +37,17 @@ public class EffectManager : MonoBehaviour {
 		if ( arg.type == WindowArg.Type.DETAIL_WINDOWS )
 		{
 			BGPMeshRender.material.DOColor( BGPFadeToColor , BGPFadeTime );
+			BGPMeshRender.gameObject.SetActive( true );
 		}else if ( arg.type == WindowArg.Type.SELECT_WINDOW )
 		{
 			BGPMeshRender.material.DOColor( Color.white , BGPFadeTime );
+			BGPMeshRender.gameObject.SetActive( true );
+		}else if ( arg.type == WindowArg.Type.PLAY_WINDOW )
+		{
+			BGPMeshRender.gameObject.SetActive( false );
 		}
+
+
 	}
 
 	void DisableRippleEffect() { rippleEffect.enabled = false ; }

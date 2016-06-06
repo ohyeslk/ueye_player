@@ -22,7 +22,7 @@ public class CategoryButton : VRBasicButton {
 
 	override public void OnConfirm ()
 	{
-		Debug.Log("[On Confirm]" + name);
+//		Debug.Log("[On Confirm]" + name);
 		base.OnConfirm();
 		URLRequestMessage msg = new URLRequestMessage( this );
 		msg.AddMessage(Global.MSG_REQUEST_CATEGORYVIDEO_CATEGORY_KEY , m_info.name );

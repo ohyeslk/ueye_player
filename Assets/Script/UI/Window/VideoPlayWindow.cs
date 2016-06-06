@@ -6,7 +6,8 @@ using DG.Tweening;
 
 public class VideoPlayWindow : UIWindow {
 
-	[SerializeField] MediaPlayerCtrl video;
+	[SerializeField] GameObject screenPrefab;
+	MediaPlayerCtrl videoPlayer;
 
 	[SerializeField] VRBasicButton playButton;
 	[SerializeField] VRBasicButton pauseButton;
@@ -40,9 +41,10 @@ public class VideoPlayWindow : UIWindow {
 
 	void Start()
 	{
+		UpdateScreen();
 		FollowView.gameObject.SetActive ( false );
-		video.gameObject.SetActive(false);
-		video.Pause();
+		videoPlayer.gameObject.SetActive(false);
+		videoPlayer.Pause();
 		buttons = FollowView.gameObject.GetComponentsInChildren<VRBasicButton>();
 		HidePlayPanelButtons(0);
 		HideLoadAnimation();
@@ -66,7 +68,23 @@ public class VideoPlayWindow : UIWindow {
 		Debug.Log("Play Video " + info.title + " " + info.playUrl );
 
 		StartCoroutine( PlayVideoFake( info , 3f ));
-//		OnPlayVideo();
+		UpdateScreen();
+
+	}
+
+	void UpdateScreen()
+	{
+		if ( videoPlayer != null )
+		{
+			// remove the old video
+			videoPlayer.gameObject.SetActive( false );
+		}
+
+		GameObject screen = Instantiate( screenPrefab ) as GameObject;
+		screen.transform.SetParent( transform , true );
+		screen.transform.position = Vector3.zero;
+
+		videoPlayer = screen.GetComponent<MediaPlayerCtrl>();
 	}
 
 	protected override void OnBecomeInvsible ( float time )
@@ -83,7 +101,7 @@ public class VideoPlayWindow : UIWindow {
 
 	void BecomeVisible( bool to , float time )
 	{
-		video.gameObject.SetActive(to);
+		videoPlayer.gameObject.SetActive(to);
 		ShouldUpdate = to;
 
 		FollowView.enabled = to;
@@ -92,8 +110,6 @@ public class VideoPlayWindow : UIWindow {
 		{
 			FollowView.gameObject.SetActive( true );
 			lastDegree = 90f;
-
-
 		}else
 		{
 			PlayPanelBack.DOFade( 0 , time ).OnComplete( DisablePlayPanel );
@@ -102,6 +118,7 @@ public class VideoPlayWindow : UIWindow {
 		}
 	}
 
+
 	public void DisablePlayPanel()
 	{
 		FollowView.gameObject.SetActive( false );
@@ -109,26 +126,25 @@ public class VideoPlayWindow : UIWindow {
 
 	public void OnPlayVideo()
 	{
-		video.Play();
+		videoPlayer.Play();
 		playButton.gameObject.SetActive(false);
 		pauseButton.gameObject.SetActive(true);
 	}
 
 	IEnumerator PlayVideoFake( VideoInfo info , float delay )
 	{
-
+		UpdateScreen();
 		ShowLoadAnimation();
-//		video.DownloadStreamingVideoAndLoad( info.playUrl );
-
-		video.enabled = false;
 
 		yield return new WaitForSeconds( 1f );
 
-		video.enabled = true;
+//		videoPlayer.DownloadStreamingVideoAndLoad( info.playUrl );
+//		videoPlayer.m_strFileName = info.playUrl;
+		StartCoroutine( videoPlayer.DownloadStreamingVideoAndLoad( info.playUrl ));
 
-		video.Load( info.playUrl );
+		yield return new WaitForSeconds( 1f );
 
-		while( video.GetCurrentState() == MediaPlayerCtrl.MEDIAPLAYER_STATE.NOT_READY )
+		while( videoPlayer.GetCurrentState() == MediaPlayerCtrl.MEDIAPLAYER_STATE.NOT_READY )
 		{
 			yield return null;
 		}
@@ -139,7 +155,7 @@ public class VideoPlayWindow : UIWindow {
 
 	public void OnPauseVideo()
 	{
-		video.Pause();
+		videoPlayer.Pause();
 		playButton.gameObject.SetActive(true);
 		pauseButton.gameObject.SetActive(false);
 	}

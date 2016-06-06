@@ -49,7 +49,7 @@ public class UIInputModel : GazeInputModule {
 		}
 		else if ( hoverSensor.GetSensorType() == SensorType.Normal )
 		{
-			Debug.Log("Hover " + hoverSensor.transform.parent.name );
+//			Debug.Log("Hover " + hoverSensor.transform.parent.name );
 
 			if ( lastSensor != hoverSensor )
 			{

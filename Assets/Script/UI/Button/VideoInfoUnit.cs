@@ -9,6 +9,7 @@ public class VideoInfoUnit : VRBasicButton {
 	VideoSelectWindow parent;
 
 	[SerializeField] protected Image img;
+	[SerializeField] protected Transform imgOutside;
 	[SerializeField] protected Text text;
 
 	[System.Serializable]
@@ -290,7 +291,7 @@ public class VideoInfoUnit : VRBasicButton {
 		while( timer < m_setting.recieveDuration )
 		{
 			float curveTime = timer / m_setting.recieveDuration;
-			img.transform.localScale = Vector3.one * m_setting.recieveScaleCurve.Evaluate( curveTime );
+			imgOutside.localScale = Vector3.one * m_setting.recieveScaleCurve.Evaluate( curveTime );
 			timer += Time.deltaTime;
 			yield return null;
 		}
@@ -317,7 +318,8 @@ public class VideoInfoUnit : VRBasicButton {
 		while( timer < m_setting.initDuration )
 		{
 			float curveTime = timer / m_setting.initDuration;
-			img.gameObject.transform.localScale = Vector3.one * m_setting.initScaleCurve.Evaluate( curveTime );
+			imgOutside.localScale = Vector3.one * m_setting.initScaleCurve.Evaluate( curveTime );
+
 			timer += Time.deltaTime;
 
 			yield return null;

@@ -71,7 +71,7 @@ public class HTTPManager : MonoBehaviour {
 	/// <param name="msg">Message.</param>
 	void RequestVideoInfo( URLRequestMessage msg )
 	{
-		Debug.Log(" Request Video Info ");
+//		Debug.Log(" Request Video Info ");
 		string url = msg.url;
 		if ( url == null || url == "")
 		{
@@ -85,7 +85,7 @@ public class HTTPManager : MonoBehaviour {
 
 	void RequestLiveVideoInfo( URLRequestMessage msg )
 	{
-		Debug.Log(" Request Video Info ");
+//		Debug.Log(" Request Video Info ");
 		string url = msg.url;
 		if ( url == null || url == "")
 		{
