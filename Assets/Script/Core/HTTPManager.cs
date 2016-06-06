@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System;
 
 public class HTTPManager : MonoBehaviour {
 
@@ -104,7 +107,7 @@ public class HTTPManager : MonoBehaviour {
 				return;
 			}
 		}
-		StartCoroutine( WaitForRequest( url , TextureHandler , msg));
+		StartCoroutine( WaitForRequestAsy( url , TextureHandler , msg));
 	}
 
 	/// <summary>
@@ -218,7 +221,32 @@ public class HTTPManager : MonoBehaviour {
 			
 			Debug.Log("WWW Error" + www.error );
 		}
+
+		www.Dispose();
 	}
 
+	IEnumerator WaitForRequestAsy( string url , RequestHandler handler , URLRequestMessage postMsg )
+	{
+//		Debug.Log("Request " + url );
+		HttpHelper httpHelper = new HttpHelper(Application.persistentDataPath+"/TemData");
 
+		httpHelper.AsyDownLoad(url );
+
+		while( !httpHelper.Done )
+		{
+			yield return null;
+		}
+
+		WWW www = new WWW( httpHelper.LocalFilePath );
+		yield return www;
+
+		if ( string.IsNullOrEmpty(www.error) ){
+			handler(www, postMsg);
+		}else{
+
+			Debug.Log("WWW Error" + www.error );
+		}
+
+		www.Dispose();
+	}
 }

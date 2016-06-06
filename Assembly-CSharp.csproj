@@ -48,6 +48,7 @@
      <Compile Include="Assets\Script\Core\EffectManager.cs" />
      <Compile Include="Assets\Script\Core\Global.cs" />
      <Compile Include="Assets\Script\Core\HTTPManager.cs" />
+     <Compile Include="Assets\Script\Core\HttpHelper.cs" />
      <Compile Include="Assets\Script\Core\LogicManager.cs" />
      <Compile Include="Assets\Script\Core\VREvents.cs" />
      <Compile Include="Assets\Script\Core\WindowManager.cs" />

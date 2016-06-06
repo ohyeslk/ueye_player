@@ -46,7 +46,6 @@ public class CategoryButton : VRBasicButton {
 			img.sprite = (Sprite)msg.GetMessage(Global.MSG_REQUEST_TEXTURE_SPRITE_KEY);
 		}
 
-		PlayInitAnimation();
 	}
 
 	public void Init( CategoryInfo info , int index , CategoryWindow p )
@@ -62,6 +61,9 @@ public class CategoryButton : VRBasicButton {
 
 		img.DOFade(0,0);
 		text.DOFade(0,0);
+		text.text = "";
+
+		PlayInitAnimation();
 
 		//set the angle and position offset
 		float angle = m_setting.anglePerUnit * ( ( index % parent.column ) - ( parent.column - 1f ) / 2f ) ;

@@ -1737,8 +1737,9 @@ public class MediaPlayerCtrl : MonoBehaviour
 		}
 	}
 	
-private unsafe bool Call_Load(string strFileName, int iSeek)
+private  bool Call_Load(string strFileName, int iSeek)
 	{
+		Debug.Log("Load File " + strFileName );
 		fCurrentSeekTime = 0.0f;
 		fLastFrameTime = 0.0f;
 
@@ -1779,7 +1780,7 @@ private unsafe bool Call_Load(string strFileName, int iSeek)
 		
 		if (ffmpeg.avformat_find_stream_info(pFormatContext, null) != 0)
 		{
-			m_CurrentState = MEDIAPLAYER_STATE.ERROR;
+		m_CurrentState = MEDIAPLAYER_STATE.ERROR;
 			throw new ApplicationException(@"Could not find stream info");
 		}
 
