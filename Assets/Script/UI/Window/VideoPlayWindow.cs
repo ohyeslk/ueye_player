@@ -92,7 +92,8 @@ public class VideoPlayWindow : UIWindow {
 		{
 			FollowView.gameObject.SetActive( true );
 			lastDegree = 90f;
-			
+
+
 		}else
 		{
 			PlayPanelBack.DOFade( 0 , time ).OnComplete( DisablePlayPanel );
@@ -117,6 +118,7 @@ public class VideoPlayWindow : UIWindow {
 	{
 
 		ShowLoadAnimation();
+//		video.DownloadStreamingVideoAndLoad( info.playUrl );
 
 		video.enabled = false;
 
