@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System;
+using System.Text;
 
 public class HTTPManager : MonoBehaviour {
 
@@ -17,6 +18,11 @@ public class HTTPManager : MonoBehaviour {
 	/// Save the texture in in the dictionary
 	/// </summary>
 	Dictionary<string,Sprite> textureCache = new Dictionary<string, Sprite>();
+
+	void Awake()
+	{
+		HttpHelper.Init();
+	}
 
 	public void OnEnable()
 	{
@@ -212,7 +218,12 @@ public class HTTPManager : MonoBehaviour {
 	IEnumerator WaitForRequest(string url , RequestHandler handler , URLRequestMessage postMsg)
 	{
 //		Debug.Log( "Wait for request " + url  + " " + postMsg.postObj);
-		WWW www = new WWW(url);
+		string path = url;
+
+		if ( File.Exists( HttpHelper.GetLocalFilePath( url ) ) )
+			path = "file://" + HttpHelper.GetLocalFilePath( url );
+		
+		WWW www = new WWW(path);
 		yield return www;
 
 		if ( string.IsNullOrEmpty(www.error) ){
@@ -228,16 +239,19 @@ public class HTTPManager : MonoBehaviour {
 	IEnumerator WaitForRequestAsy( string url , RequestHandler handler , URLRequestMessage postMsg )
 	{
 //		Debug.Log("Request " + url );
-		HttpHelper httpHelper = new HttpHelper(Application.persistentDataPath+"/TemData");
-
-		httpHelper.AsyDownLoad(url );
-
-		while( !httpHelper.Done )
+		if ( !File.Exists( HttpHelper.GetLocalFilePath( url ) ) )
 		{
-			yield return null;
-		}
+			HttpHelper httpHelper = new HttpHelper( url );
 
-		WWW www = new WWW( httpHelper.LocalFilePath );
+			httpHelper.AsyDownLoad();
+
+			while( !httpHelper.Done )
+			{
+				yield return null;
+			}
+		}
+		Debug.Log(" path " + HttpHelper.GetLocalFilePath( url ) );
+		WWW www = new WWW( "file://" + HttpHelper.GetLocalFilePath( url ) );
 		yield return www;
 
 		if ( string.IsNullOrEmpty(www.error) ){

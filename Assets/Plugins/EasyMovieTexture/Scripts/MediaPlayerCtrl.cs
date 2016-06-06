@@ -471,7 +471,6 @@ public class MediaPlayerCtrl : MonoBehaviour
 
         }
 
-
     }
 
     public void Resize()
