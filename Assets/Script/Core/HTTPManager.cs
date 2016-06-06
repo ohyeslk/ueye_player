@@ -238,7 +238,7 @@ public class HTTPManager : MonoBehaviour {
 
 	IEnumerator WaitForRequestAsy( string url , RequestHandler handler , URLRequestMessage postMsg )
 	{
-//		Debug.Log("Request " + url );
+		//		Debug.Log("WaitForRequestAsy URL " + url );
 		if ( !File.Exists( HttpHelper.GetLocalFilePath( url ) ) )
 		{
 			HttpHelper httpHelper = new HttpHelper( url );
@@ -250,7 +250,7 @@ public class HTTPManager : MonoBehaviour {
 				yield return null;
 			}
 		}
-		Debug.Log(" path " + HttpHelper.GetLocalFilePath( url ) );
+		//		Debug.Log("WaitForRequestAsy Local file path " + HttpHelper.GetLocalFilePath( url ) );
 		WWW www = new WWW( "file://" + HttpHelper.GetLocalFilePath( url ) );
 		yield return www;
 

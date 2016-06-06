@@ -41,7 +41,19 @@ public class HttpHelper {
 	static public string GetTemperarySavePath()
 	{
 		if ( TemperarySavePath == "" )
+		{
 			TemperarySavePath = Application.persistentDataPath + "/TemData";
+//			if ( Application.platform == RuntimePlatform.OSXEditor )
+//			{
+//				TemperarySavePath = Application.persistentDataPath + "/TemData";
+//			}else if ( Application.platform == RuntimePlatform.IPhonePlayer )
+//			{
+//				TemperarySavePath = Application.persistentDataPath + "/TemData";
+//			}else if ( Application.platform == RuntimePlatform.Android )
+//			{
+//				TemperarySavePath = Application.persistentDataPath + "/TemData";
+//			}
+		}
 		return TemperarySavePath;
 	}
 
@@ -58,26 +70,33 @@ public class HttpHelper {
 		
 	static public Int64 GetInt64HashFromURL( string url )
 	{
+//		Int64 hashCode = 0;
+//		if (!string.IsNullOrEmpty(url))
+//		{
+//			//Unicode Encode Covering all characterset
+//			byte[] byteContents = Encoding.Unicode.GetBytes(url);
+//			System.Security.Cryptography.SHA256 hash = 
+//				new System.Security.Cryptography.SHA256CryptoServiceProvider();
+//			byte[] hashText = hash.ComputeHash(byteContents);
+//			//32Byte hashText separate
+//			//hashCodeStart = 0~7  8Byte
+//			//hashCodeMedium = 8~23  8Byte
+//			//hashCodeEnd = 24~31  8Byte
+//			//and Fold
+//			Int64 hashCodeStart = BitConverter.ToInt64(hashText, 0);
+//			Int64 hashCodeMedium = BitConverter.ToInt64(hashText, 8);
+//			Int64 hashCodeEnd = BitConverter.ToInt64(hashText, 24);
+//			hashCode = hashCodeStart ^ hashCodeMedium ^ hashCodeEnd;
+//		}
+//		return (hashCode);
 
-		Int64 hashCode = 0;
-		if (!string.IsNullOrEmpty(url))
-		{
-			//Unicode Encode Covering all characterset
-			byte[] byteContents = Encoding.Unicode.GetBytes(url);
-			System.Security.Cryptography.SHA256 hash = 
-				new System.Security.Cryptography.SHA256CryptoServiceProvider();
-			byte[] hashText = hash.ComputeHash(byteContents);
-			//32Byte hashText separate
-			//hashCodeStart = 0~7  8Byte
-			//hashCodeMedium = 8~23  8Byte
-			//hashCodeEnd = 24~31  8Byte
-			//and Fold
-			Int64 hashCodeStart = BitConverter.ToInt64(hashText, 0);
-			Int64 hashCodeMedium = BitConverter.ToInt64(hashText, 8);
-			Int64 hashCodeEnd = BitConverter.ToInt64(hashText, 24);
-			hashCode = hashCodeStart ^ hashCodeMedium ^ hashCodeEnd;
-		}
-		return (hashCode);
+		var s1 = url.Substring(0, url.Length / 2);
+		var s2 = url.Substring( url.Length / 2);
+
+		var x= ((long)s1.GetHashCode()) << 0x20 | s2.GetHashCode();
+
+		return x;
+
 	}
 
 	/// <summary>
