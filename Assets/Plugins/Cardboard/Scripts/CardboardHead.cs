@@ -120,9 +120,14 @@ public class CardboardHead : MonoBehaviour {
     UpdateHead();
   }
 
-	public void ResetCenter()
+	public void ResetCenterHand()
 	{
 		DOTween.To( ()=>  handDelta , x=> handDelta = x , Vector3.zero , 0.5f );
+	}
+
+	public void ResetCenterSDK()
+	{
+		
 	}
 
   // Compute new head pose.

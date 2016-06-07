@@ -20,6 +20,28 @@ public class CategoryButton : VRBasicButton {
 	[SerializeField] CategorySetting m_setting;
 
 
+	[System.Serializable]
+	public struct HoverAnimation
+	{
+		public float duration;
+		public float moveZ;
+	}
+	[SerializeField] HoverAnimation hoverAnimation;
+
+	public override void OnEnterHover ()
+	{
+		base.OnEnterHover ();
+
+		img.transform.DOLocalMoveZ( hoverAnimation.moveZ , hoverAnimation.duration ).SetRelative(true);
+	}
+
+	public override void OnExitHover ()
+	{
+		base.OnExitHover ();
+
+		img.transform.DOLocalMoveZ( 0 , hoverAnimation.duration );
+	}
+
 	override public void OnConfirm ()
 	{
 //		Debug.Log("[On Confirm]" + name);

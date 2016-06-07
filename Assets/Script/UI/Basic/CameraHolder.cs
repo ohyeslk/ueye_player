@@ -54,6 +54,16 @@ public class CameraHolder : MonoBehaviour {
 		RotateTowardSelection();
 	}
 		
+
+	void Update()
+	{
+		if ( Input.GetKeyDown( KeyCode.R ) )
+		{
+			Debug.Log(" Press R ");
+			RotateTowardSelection();
+		}
+	}
+
 	void RotateTowardSelection( )
 	{
 		if ( selectionWindow == null )

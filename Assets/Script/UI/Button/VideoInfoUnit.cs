@@ -11,6 +11,8 @@ public class VideoInfoUnit : VRBasicButton {
 	[SerializeField] protected Image img;
 	[SerializeField] protected Transform imgOutside;
 	[SerializeField] protected Text text;
+	[SerializeField] AudioSource initSound;
+	[SerializeField] AudioSource imageLoadSound;
 
 	[System.Serializable]
 	public struct HoverAnimation
@@ -107,6 +109,11 @@ public class VideoInfoUnit : VRBasicButton {
 		parent.ShowVideoDetail( Info );
 	}
 
+	public override void OnFucus ()
+	{
+		base.OnFucus ();
+	}
+
 //	override public void OnHover(UIHoverEvent e)
 //	{
 //		Debug.Log("On Hover");
@@ -140,6 +147,8 @@ public class VideoInfoUnit : VRBasicButton {
 			m_info.Post = (Sprite)msg.GetMessage(Global.MSG_REQUEST_TEXTURE_SPRITE_KEY);
 			PlayRecieveImgAnimation();
 		}
+
+
 	}
 
 	/// <summary>
@@ -211,6 +220,7 @@ public class VideoInfoUnit : VRBasicButton {
 
 	public override void OnExitHover ()
 	{
+		Debug.Log( "On Exit Hover");
 		base.OnExitHover ();
 		if ( m_Enable  )
 		{
@@ -276,6 +286,9 @@ public class VideoInfoUnit : VRBasicButton {
 
 		if ( isVisible )
 		{
+			if ( imageLoadSound != null )
+				imageLoadSound.Play();
+			
 			help.enabled = true;
 			{ 
 				Color col = help.color;
@@ -310,6 +323,9 @@ public class VideoInfoUnit : VRBasicButton {
 	IEnumerator DoInitAnimation()
 	{
 		yield return new WaitForSeconds( m_setting.initDelay );
+
+		if ( initSound != null )
+			initSound.Play();
 
 		img.enabled = true;
 		img.DOFade( 0 , m_setting.initDuration ).From();
