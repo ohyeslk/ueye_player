@@ -7,6 +7,9 @@ using DG.Tweening;
 public class VRBasicButton : MonoBehaviour {
 	[SerializeField] public SubAnimation subButtonAnimation;
 
+	[SerializeField] Color normalColor = Color.white;
+	[SerializeField] Color disableColor = Color.gray;
+
 	bool inner_enable = true;
 	public bool m_Enable{
 		get {
@@ -16,6 +19,20 @@ public class VRBasicButton : MonoBehaviour {
 			inner_enable = value;
 			if ( subButtonAnimation.subButton != null )
 				subButtonAnimation.subButton.raycastTarget = inner_enable;
+			if ( inner_enable )
+			{
+				float alpha = subButtonAnimation.subButton.color.a;
+				Color toCol = normalColor;
+				toCol.a = alpha;
+				subButtonAnimation.subButton.color = toCol;
+			}
+			else
+			{
+				float alpha = subButtonAnimation.subButton.color.a;
+				Color toCol = disableColor;
+				toCol.a = alpha;
+				subButtonAnimation.subButton.color = toCol;
+			}
 		}
 	}
 

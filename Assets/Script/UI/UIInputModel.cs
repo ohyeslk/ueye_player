@@ -214,6 +214,12 @@ public class UIInputModel : GazeInputModule {
 		}
 	}
 
+	public void OnFingerUp( FingerUpEvent e )
+	{
+		FingerPointData = null;
+	}
+
+
 	void OnDrawGizmos()
 	{
 		Gizmos.color = Color.red;

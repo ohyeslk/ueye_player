@@ -70,10 +70,6 @@ public class CameraHolder : MonoBehaviour {
 			selectionWindow = GameObject.FindGameObjectWithTag( "SelectionWindow" );
 		if ( selectionWindow != null )
 			transform.LookAt( selectionWindow.transform.position );
-		if ( head != null )
-		{
-			
-		}
 	}
 
 	void OnFingerMove( FingerMotionEvent e ) {

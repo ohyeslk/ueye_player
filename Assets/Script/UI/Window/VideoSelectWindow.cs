@@ -209,7 +209,10 @@ public class VideoSelectWindow : UIWindow  {
 		UpButton.m_Enable = true;
 		DownButton.m_Enable = true;
 
-		if ( temPage <= 0 ) UpButton.m_Enable = false;
+		if ( temPage <= 0 ) 
+		{
+			UpButton.m_Enable = false;
+		}
 		if ( ( temPage + 1 ) * VideoPerPage >= m_videoManager.GetVideoCount() ) DownButton.m_Enable = false;
 	}
 
