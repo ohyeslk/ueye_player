@@ -112,6 +112,7 @@ public class VideoInfoUnit : VRBasicButton {
 	public override void OnFucus ()
 	{
 		base.OnFucus ();
+		Debug.Log("On Focus");
 	}
 
 //	override public void OnHover(UIHoverEvent e)

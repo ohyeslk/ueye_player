@@ -231,6 +231,8 @@ public class VRBasicButton : MonoBehaviour {
 		}
 	}
 
+
+
 	protected void ResetSubButton()
 	{
 		if ( subButtonAnimation.subButton != null )
@@ -254,6 +256,8 @@ public class VRBasicButton : MonoBehaviour {
 			subButtonAnimation.UpdateHoverSound.Stop();
 		}
 	}
+
+
 
 	public void OnBecomeVisible( float time , bool setEnableTo)
 	{
