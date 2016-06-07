@@ -54,12 +54,26 @@ public class CameraHolder : MonoBehaviour {
 		RotateTowardSelection();
 	}
 		
+
+	void Update()
+	{
+		if ( Input.GetKeyDown( KeyCode.R ) )
+		{
+			Debug.Log(" Press R ");
+			RotateTowardSelection();
+		}
+	}
+
 	void RotateTowardSelection( )
 	{
 		if ( selectionWindow == null )
 			selectionWindow = GameObject.FindGameObjectWithTag( "SelectionWindow" );
 		if ( selectionWindow != null )
 			transform.LookAt( selectionWindow.transform.position );
+		if ( head != null )
+		{
+			
+		}
 	}
 
 	void OnFingerMove( FingerMotionEvent e ) {
