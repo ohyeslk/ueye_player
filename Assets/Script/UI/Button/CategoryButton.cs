@@ -24,9 +24,12 @@ public class CategoryButton : VRBasicButton {
 	{
 //		Debug.Log("[On Confirm]" + name);
 		base.OnConfirm();
-		URLRequestMessage msg = new URLRequestMessage( this );
-		msg.AddMessage(Global.MSG_REQUEST_CATEGORYVIDEO_CATEGORY_KEY , m_info.name );
-		VREvents.FireRequestCategoryVideoList( msg );
+		{
+			URLRequestMessage msg = new URLRequestMessage( this );
+			msg.AddMessage(Global.MSG_REQUEST_CATEGORYVIDEO_CATEGORY_KEY , m_info.name );
+			VREvents.FireRequestCategoryVideoList( msg );
+		}
+
 	}
 
 	void OnDisable()
