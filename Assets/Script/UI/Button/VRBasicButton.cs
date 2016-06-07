@@ -40,6 +40,14 @@ public class VRBasicButton : MonoBehaviour {
 	{
 		if ( m_Enable )
 		{
+			if ( subButtonAnimation.FocusSound != null )
+			{
+				subButtonAnimation.FocusSound.Play();
+			}
+			if ( subButtonAnimation.UpdateHoverSound != null )
+			{
+				subButtonAnimation.UpdateHoverSound.Play();
+			}
 		}
 	}
 
@@ -47,19 +55,30 @@ public class VRBasicButton : MonoBehaviour {
 	{
 		if ( m_Enable)
 		{
-		if ( subButtonAnimation.subButtonRing != null )
-		{
-			subButtonAnimation.subButtonRing.transform.DOScale( subButtonAnimation.subRingScaleUp , subButtonAnimation.subRingScaleUpTime );
-			subButtonAnimation.subButtonRing.DOFade( 0 , subButtonAnimation.subRingScaleUpTime );
-		}
-		if ( subButtonAnimation.subButton != null )
-		{
-			if ( subButtonAnimation.subButtonFade )
+			if ( subButtonAnimation.subButtonRing != null )
 			{
-					subButtonAnimation.subButton.DOKill();	
-				subButtonAnimation.subButton.DOFade( 0 , subButtonAnimation.subRingScaleUpTime );
+				subButtonAnimation.subButtonRing.transform.DOScale( subButtonAnimation.subRingScaleUp , subButtonAnimation.subRingScaleUpTime ).OnComplete(ResetSubButton);
+				subButtonAnimation.subButtonRing.DOFade( 0 , subButtonAnimation.subRingScaleUpTime );
 			}
-		}
+
+			if ( subButtonAnimation.subButton != null )
+			{
+				if ( subButtonAnimation.subButtonFade )
+				{
+					subButtonAnimation.subButton.DOKill();	
+					subButtonAnimation.subButton.DOFade( 0 , subButtonAnimation.subRingScaleUpTime );
+				}
+			}
+
+			if ( subButtonAnimation.ConfirmSound != null )
+			{
+				subButtonAnimation.ConfirmSound.Play();
+			}
+
+			if ( subButtonAnimation.UpdateHoverSound != null )
+			{
+				subButtonAnimation.UpdateHoverSound.Stop();
+			}
 		}
 	}
 
@@ -95,6 +114,11 @@ public class VRBasicButton : MonoBehaviour {
 				subButtonAnimation.subButtonRing.DOFade( 1f , 0 );
 				subButtonAnimation.subButtonRing.transform.localScale = Vector3.one;
 			}
+
+			if ( subButtonAnimation.EnterHoverSound != null )
+			{
+				subButtonAnimation.EnterHoverSound.Play();
+			}
 		}
 
 	}
@@ -106,25 +130,36 @@ public class VRBasicButton : MonoBehaviour {
 	{
 		if ( m_Enable )
 		{
-		float time = subButtonAnimation.hideTime;
-		if ( subButtonAnimation.subButton != null )
-		{
-			if ( subButtonAnimation.subButtonFade)
+			float time = subButtonAnimation.hideTime;
+			if ( subButtonAnimation.subButton != null )
 			{
-				subButtonAnimation.subButton.DOKill();
-				subButtonAnimation.subButton.DOFade( 0 , time  );
+				if ( subButtonAnimation.subButtonFade)
+				{
+					subButtonAnimation.subButton.DOKill();
+					subButtonAnimation.subButton.DOFade( 0 , time  );
+				}
+				if ( subButtonAnimation.subButtonMove )
+				{
+					subButtonAnimation.subButton.transform.DOKill();
+					subButtonAnimation.subButton.transform.DOLocalMoveY( subButtonAnimation.posY + subButtonAnimation.moveY , time );
+				}
 			}
-			if ( subButtonAnimation.subButtonMove )
+
+			if ( subButtonAnimation.subButtonRing != null )
 			{
-				subButtonAnimation.subButton.transform.DOKill();
-				subButtonAnimation.subButton.transform.DOLocalMoveY( subButtonAnimation.posY + subButtonAnimation.moveY , time );
+				subButtonAnimation.subButtonRing.DOKill();
+				subButtonAnimation.subButtonRing.DOFillAmount( 0 , time  * subButtonAnimation.subButtonRing.fillAmount ).OnComplete(ResetSubButton);
 			}
-		}
-		if ( subButtonAnimation.subButtonRing != null )
-		{
-			subButtonAnimation.subButtonRing.DOKill();
-			subButtonAnimation.subButtonRing.DOFillAmount( 0 , time  * subButtonAnimation.subButtonRing.fillAmount ).OnComplete(ResetSubButton);
-		}
+
+			if ( subButtonAnimation.ExitHoverSound != null )
+			{
+				subButtonAnimation.ExitHoverSound.Play();
+			}
+
+			if ( subButtonAnimation.UpdateHoverSound != null )
+			{
+				subButtonAnimation.UpdateHoverSound.DOPitch( 0.5f , time  * subButtonAnimation.subButtonRing.fillAmount );
+			}
 		}
 	}
 
@@ -143,21 +178,40 @@ public class VRBasicButton : MonoBehaviour {
 					subButtonAnimation.subButton.DOFade( 1f , time );
 				}
 			}
+
+			if ( subButtonAnimation.EnterSubSound != null )
+			{
+				subButtonAnimation.EnterSubSound.Play();
+			}
+
+			if ( subButtonAnimation.UpdateHoverSound != null )
+			{
+				subButtonAnimation.UpdateHoverSound.Stop();
+			}
 		}
 	}
 
 	virtual public void OnExitSub()
 	{
-		float time = subButtonAnimation.hideTime;
-		if ( subButtonAnimation.subButtonRing != null )
+		if ( m_Enable )
 		{
-			Color col = subButtonAnimation.subButtonRing.color ; 
-			col.a = 1f ; 
-			subButtonAnimation.subButtonRing.color = col;
-			subButtonAnimation.subButtonRing.transform.localScale = Vector3.one;
+			float time = subButtonAnimation.hideTime;
+			if ( subButtonAnimation.subButtonRing != null )
+			{
+				Color col = subButtonAnimation.subButtonRing.color ; 
+				col.a = 1f ; 
+				subButtonAnimation.subButtonRing.color = col;
+				subButtonAnimation.subButtonRing.transform.localScale = Vector3.one;
 
-			subButtonAnimation.subButtonRing.DOKill();
-			subButtonAnimation.subButtonRing.DOFillAmount( 0 , time );
+				subButtonAnimation.subButtonRing.DOKill();
+				subButtonAnimation.subButtonRing.DOFillAmount( 0 , time );
+
+
+				if ( subButtonAnimation.ExitSubSound != null )
+				{
+					subButtonAnimation.ExitSubSound.Play();
+				}
+			}
 		}
 	}
 		
@@ -165,10 +219,15 @@ public class VRBasicButton : MonoBehaviour {
 	{
 		if ( m_Enable )
 		{
-		if ( subButtonAnimation.subButtonRing != null )
-		{
-			subButtonAnimation.subButtonRing.fillAmount = subButtonAnimation.confirmCurve.Evaluate( process );
-		}
+			if ( subButtonAnimation.subButtonRing != null )
+			{
+				subButtonAnimation.subButtonRing.fillAmount = subButtonAnimation.confirmCurve.Evaluate( process );
+			}
+
+			if ( subButtonAnimation.UpdateHoverSound != null )
+			{
+				subButtonAnimation.UpdateHoverSound.pitch = 0.5f + process * 1f;
+			}
 		}
 	}
 
@@ -183,10 +242,16 @@ public class VRBasicButton : MonoBehaviour {
 				subButtonAnimation.subButton.color = col;
 			}
 		}
+
 		if ( subButtonAnimation.subButtonRing )
 		{
 			subButtonAnimation.subButtonRing.fillAmount = 0;
 			subButtonAnimation.subButtonRing.enabled = false;
+		}
+
+		if ( subButtonAnimation.UpdateHoverSound != null )
+		{
+			subButtonAnimation.UpdateHoverSound.Stop();
 		}
 	}
 
@@ -249,4 +314,12 @@ public struct SubAnimation
 	public float subRingScaleUpTime;
 	public bool subButtonFade;
 	public bool subButtonMove;
+
+	public AudioSource EnterHoverSound;
+	public AudioSource ExitHoverSound;
+	public AudioSource UpdateHoverSound;
+	public AudioSource EnterSubSound;
+	public AudioSource ExitSubSound;
+	public AudioSource FocusSound;
+	public AudioSource ConfirmSound;
 }
