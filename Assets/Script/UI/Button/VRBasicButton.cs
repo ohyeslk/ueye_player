@@ -188,7 +188,7 @@ public class VRBasicButton : MonoBehaviour {
 
 			if ( subButtonAnimation.UpdateHoverSound != null )
 			{
-				subButtonAnimation.UpdateHoverSound.Stop();
+				subButtonAnimation.UpdateHoverSound.Play();
 			}
 		}
 	}
@@ -208,11 +208,17 @@ public class VRBasicButton : MonoBehaviour {
 				subButtonAnimation.subButtonRing.DOKill();
 				subButtonAnimation.subButtonRing.DOFillAmount( 0 , time );
 
+			}
 
-				if ( subButtonAnimation.ExitSubSound != null )
-				{
-					subButtonAnimation.ExitSubSound.Play();
-				}
+			if ( subButtonAnimation.ExitSubSound != null )
+			{
+				subButtonAnimation.ExitSubSound.Play();
+			}
+
+			if ( subButtonAnimation.UpdateHoverSound != null )
+			{
+				subButtonAnimation.UpdateHoverSound.DOPitch(0.5f,time);
+
 			}
 		}
 	}
