@@ -34,6 +34,9 @@ public class VREvents
 	public static event MessageEventHandler ResetCenter;
 	public static void FireResetCenter(Message arg){if ( ResetCenter != null ) ResetCenter(arg); }
 
+	public static event MessageEventHandler UIInputResetTarget;
+	public static void FireUIInputResetTarget(Message arg){if ( UIInputResetTarget != null ) UIInputResetTarget(arg); }
+
 
 
 	/// <summary>

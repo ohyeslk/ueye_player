@@ -112,6 +112,7 @@ public class VideoInfoUnit : VRBasicButton {
 	public override void OnFucus ()
 	{
 		base.OnFucus ();
+		Debug.Log("On Focus");
 	}
 
 //	override public void OnHover(UIHoverEvent e)
@@ -446,14 +447,14 @@ public class VideoInfoUnit : VRBasicButton {
 		seq.AppendCallback( CompleteClear );
 		HideBlackCover( clearAnimation.duration);
 		HideText(clearAnimation.duration);
-		OnExitHover();
+		OnBecomeInvisible( clearAnimation.duration );
 	}
 
 	void CompleteClear()
 	{
 		transform.SetParent( null , true );
 		gameObject.SetActive( false );
-		GameObject.Destroy( gameObject , 1f );
+//		GameObject.Destroy( gameObject , 1f );
 	}
 
 	override public void OnBecomeVisible( float time )
