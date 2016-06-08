@@ -454,7 +454,7 @@ public class VideoInfoUnit : VRBasicButton {
 	{
 		transform.SetParent( null , true );
 		gameObject.SetActive( false );
-		GameObject.Destroy( gameObject , 1f );
+//		GameObject.Destroy( gameObject , 1f );
 	}
 
 	override public void OnBecomeVisible( float time )

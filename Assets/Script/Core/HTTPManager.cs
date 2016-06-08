@@ -22,6 +22,8 @@ public class HTTPManager : MonoBehaviour {
 	void Awake()
 	{
 		HttpHelper.Init();
+
+
 	}
 
 	public void OnEnable()
@@ -112,6 +114,7 @@ public class HTTPManager : MonoBehaviour {
 				VREvents.FirePostTexture( msg );
 				return;
 			}
+				
 		}
 		StartCoroutine( WaitForRequestAsy( url , TextureHandler , msg));
 	}
@@ -206,9 +209,10 @@ public class HTTPManager : MonoBehaviour {
 	{
 		Texture2D tex = www.texture;
 		Rect rec = new Rect(0,0,tex.width ,tex.height );
+	
 		Sprite sprite = Sprite.Create( tex , rec , new Vector2(0.5f,0.5f) , 100);
 
-		if ( !textureCache.ContainsKey( postMsg.url ))
+		if ( !textureCache.ContainsKey( postMsg.url ) && HttpHelper.GetDownloadState(postMsg.url) == HttpHelper.DownloadState.Finished)
 			textureCache.Add( postMsg.url , sprite );
 		
 		postMsg.AddMessage( Global.MSG_REQUEST_TEXTURE_SPRITE_KEY , sprite );
@@ -243,14 +247,15 @@ public class HTTPManager : MonoBehaviour {
 		{
 			HttpHelper httpHelper = new HttpHelper( url );
 
-			httpHelper.AsyDownLoad();
+			httpHelper.AsyDownload();
 
 			while( !httpHelper.Done )
 			{
 				yield return null;
 			}
 		}
-		//		Debug.Log("WaitForRequestAsy Local file path " + HttpHelper.GetLocalFilePath( url ) );
+			
+		Debug.Log("WaitForRequestAsy Local file path " + HttpHelper.GetLocalFilePath( url ) );
 		WWW www = new WWW( "file://" + HttpHelper.GetLocalFilePath( url ) );
 		yield return www;
 

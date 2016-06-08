@@ -4,6 +4,7 @@ using System;
 using System.Net;
 using System.IO;
 using System.Text;
+using System.Collections.Generic;
 
 internal class WebReqState
 {
@@ -30,7 +31,36 @@ public class HttpHelper {
 	bool m_Done = false;
 	public static string TemperarySavePath = "";
 	public bool Done{
-		get { return m_Done;}
+		get { 
+			if ( downloadingInfo.ContainsKey(m_url) )
+				return downloadingInfo[m_url];
+			return m_Done;
+		}
+	}
+
+	static Dictionary<string,bool> downloadingInfo = new Dictionary<string, bool>();
+
+	public enum DownloadState
+	{
+		None,
+		Downloading,
+		Finished,
+	}
+
+	static public DownloadState GetDownloadState( string url )
+	{
+		if ( downloadingInfo.ContainsKey( url ))
+		{
+			if ( downloadingInfo[url] )
+			{
+				return DownloadState.Finished;
+			}else
+			{
+				return DownloadState.Downloading;
+			}
+		}
+
+		return DownloadState.None;
 	}
 
 	static public string GetLocalFilePath( string url )
@@ -93,7 +123,7 @@ public class HttpHelper {
 		var s1 = url.Substring(0, url.Length / 2);
 		var s2 = url.Substring( url.Length / 2);
 
-		var x= ((long)s1.GetHashCode()) << 0x20 | s2.GetHashCode();
+		var x = ((long)s1.GetHashCode()) << 0x20 | s2.GetHashCode();
 
 		return x;
 
@@ -103,11 +133,25 @@ public class HttpHelper {
 	/// initilize the temparary save directory
 	/// need to be called in awake or start because the Application.persistentDataPath 
 	/// can only be called on main thread
+	/// FOR TEST : Clean the tempSave Directory
 	/// </summary>
 	public static void Init()
 	{
 		if ( ! Directory.Exists( GetTemperarySavePath() ) )
 			Directory.CreateDirectory( GetTemperarySavePath());
+
+		// TODO: change this code
+		// clean the tempSave Directory
+		CleanTemperarySavePath();
+	}
+
+	public static void CleanTemperarySavePath()
+	{
+		System.IO.DirectoryInfo di = new DirectoryInfo(GetTemperarySavePath());
+		foreach (FileInfo file in di.GetFiles())
+		{
+			file.Delete(); 
+		}
 	}
 
 	public HttpHelper( string url )
@@ -115,13 +159,16 @@ public class HttpHelper {
 //		this.path = path;
 		m_url = url;
 	}
-
-
-	public void AsyDownLoad()
+		
+	public void AsyDownload()
 	{
 //		Debug.Log("Start Down Load " + url );
-		HttpWebRequest httpRequest = WebRequest.Create(m_url) as HttpWebRequest;
-		httpRequest.BeginGetResponse( new AsyncCallback(ResponseCallback) , httpRequest );
+		if ( GetDownloadState( m_url ) == DownloadState.None )
+		{
+			HttpWebRequest httpRequest = WebRequest.Create(m_url) as HttpWebRequest;
+			httpRequest.BeginGetResponse( new AsyncCallback(ResponseCallback) , httpRequest );
+			downloadingInfo.Add( m_url , false ); 
+		}
 	}
 
 	public string GetLocalFilePath()
@@ -170,6 +217,10 @@ public class HttpHelper {
 			rs.WebResponse.Close();
 //			Debug.Log(assetName+":::: success");
 			m_Done = true;
+			if ( downloadingInfo.ContainsKey( m_url ))
+			{
+				downloadingInfo[m_url] = true;
+			}
 		}
 	}
 }
