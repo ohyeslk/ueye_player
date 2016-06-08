@@ -22,8 +22,6 @@ public class HTTPManager : MonoBehaviour {
 	void Awake()
 	{
 		HttpHelper.Init();
-
-
 	}
 
 	public void OnEnable()
@@ -255,7 +253,7 @@ public class HTTPManager : MonoBehaviour {
 			}
 		}
 			
-		Debug.Log("WaitForRequestAsy Local file path " + HttpHelper.GetLocalFilePath( url ) );
+//		Debug.Log("WaitForRequestAsy Local file path " + HttpHelper.GetLocalFilePath( url ) );
 		WWW www = new WWW( "file://" + HttpHelper.GetLocalFilePath( url ) );
 		yield return www;
 

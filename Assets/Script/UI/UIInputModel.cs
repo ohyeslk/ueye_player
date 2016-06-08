@@ -16,9 +16,30 @@ public class UIInputModel : GazeInputModule {
 	float hoverDuration = 0;
 	float subHoverDuration = 0;
 
+	protected override void OnEnable ()
+	{
+		base.OnEnable ();
+		VREvents.UIInputResetTarget += OnResetTarget;
+	}
+
+	protected override void OnDisable ()
+	{
+		base.OnDisable ();
+		VREvents.UIInputResetTarget -= OnResetTarget;
+
+	}
+
+	void OnResetTarget (Message msg)
+	{
+		// only response in 2d Mode
+		if ( LogicManager.VRMode == VRMode.VR_2D )
+		{
+			FingerPointData = null;
+		}
+	}
+
 	public void ProcessUI()
 	{
-		
 		// deal with the hover 
 		UIHoverEvent hoverEvent = new UIHoverEvent();
 		hoverEvent.point = GetIntersectionPosition();
@@ -212,11 +233,6 @@ public class UIInputModel : GazeInputModule {
 			}
 
 		}
-	}
-
-	public void OnFingerUp( FingerUpEvent e )
-	{
-		FingerPointData = null;
 	}
 
 

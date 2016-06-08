@@ -79,6 +79,8 @@ public class VRBasicButton : MonoBehaviour {
 			{
 				subButtonAnimation.UpdateHoverSound.Stop();
 			}
+
+			VREvents.FireUIInputResetTarget(new Message(this));
 		}
 	}
 

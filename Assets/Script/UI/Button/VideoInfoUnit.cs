@@ -447,7 +447,7 @@ public class VideoInfoUnit : VRBasicButton {
 		seq.AppendCallback( CompleteClear );
 		HideBlackCover( clearAnimation.duration);
 		HideText(clearAnimation.duration);
-		OnExitHover();
+		OnBecomeInvisible( clearAnimation.duration );
 	}
 
 	void CompleteClear()
