@@ -12,7 +12,6 @@ public class Global {
 
 	public static string MSG_REQUEST_TEXTURE_SPRITE_KEY = "sprite";
 
-
 	public static string MSG_SWITCHVRMODE_MODE_KEY = "VRMode";
 
 	public static string MSG_POSTCATEGORY_CATEGORYLIST_KEY = "categoryList";

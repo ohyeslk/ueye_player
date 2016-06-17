@@ -254,7 +254,6 @@ public class HTTPManager : MonoBehaviour {
 		if ( File.Exists( HttpHelper.GetLocalFilePath( url ) ) )
 			path = "file://" + HttpHelper.GetLocalFilePath( url );
 
-
 		WWW www;
 		if ( form == null )
 		{

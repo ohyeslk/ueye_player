@@ -76,7 +76,7 @@ public class HoverSensor : UISensor {
 				}
 			}else if ( e.hoverPhase == UIHoverEvent.HoverPhase.End )
 			{
-				Debug.Log("OnHover End " + name + " " + transform.parent.name );
+//				Debug.Log("OnHover End " + name + " " + transform.parent.name );
 				if ( onExitHover != null ) onExitHover.Invoke();
 				if ( onUpdateHoverV3 != null ) onUpdateHoverV3.Invoke( Global.ONHOVERV3_PHASE_EXIT );
 			}
