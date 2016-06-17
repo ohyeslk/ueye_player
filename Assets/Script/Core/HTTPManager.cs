@@ -251,8 +251,12 @@ public class HTTPManager : MonoBehaviour {
 //		Debug.Log( "Wait for request " + url  + " " + postMsg.postObj);
 		string path = url;
 
-		if ( File.Exists( HttpHelper.GetLocalFilePath( url ) ) )
-			path = "file://" + HttpHelper.GetLocalFilePath( url );
+
+		if ( Application.platform == RuntimePlatform.IPhonePlayer )
+		{
+			if ( File.Exists( HttpHelper.GetLocalFilePath( url ) ) )
+				path = "file://" + HttpHelper.GetLocalFilePath( url );
+		}
 
 		WWW www;
 		if ( form == null )
