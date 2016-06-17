@@ -68,6 +68,12 @@ public class VREvents
 	public static event URLEventHandler PostTexture;
 	public static void FirePostTexture(URLRequestMessage arg){if ( PostTexture != null ) PostTexture(arg) ; }
 
+	public static event URLEventHandler RequestLogin;
+	public static void FireRequestLogin(URLRequestMessage arg){if ( RequestLogin != null ) RequestLogin(arg) ; }
+
+	public static event URLEventHandler PostLogin;
+	public static void FirePostLogin(URLRequestMessage arg){if ( PostLogin != null ) PostLogin(arg) ; }
+
 	/// <summary>
 	/// Active window event handler. Handle the window events
 	/// </summary>
