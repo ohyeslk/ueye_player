@@ -17,6 +17,11 @@ extern "C" __attribute__((visibility ("default"))) NSString *const kUnityViewDid
     bool bLoop;
     
     bool m_bFinish;
+    bool m_bUnload;
+    bool m_bLoading;
+    
+    bool m_bLoopPlay;
+    NSURL* m_videoURL;
 }
 - (void)playVideo:(NSURL *)videoURL;
 
@@ -25,6 +30,7 @@ extern "C" __attribute__((visibility ("default"))) NSString *const kUnityViewDid
 - (void)onPlayerReady;
 
 - (void)onPlayerDidFinishPlayingVideo;
+
 
 @end
 
@@ -47,10 +53,25 @@ extern "C" __attribute__((visibility ("default"))) NSString *const kUnityViewDid
 
 - (void)onPlayerReady {
     
+
+    m_bLoading = false;
+    
+    if(m_bUnload == true)
+    {
+        m_bUnload = false;
+        [self unload];
+    }
+    
+    if( m_bLoopPlay == true)
+    {
+        [self play];
+        m_bLoopPlay =false;
+    }
     if (!player.isPlaying) {
         if (view) [self resizeView];
         //[self play];
     }
+    
 }
 
 - (void)resizeView {
@@ -84,6 +105,13 @@ extern "C" __attribute__((visibility ("default"))) NSString *const kUnityViewDid
 }
 
 - (void)unload {
+    
+  
+    if( m_bLoading == true)
+    {
+        m_bUnload = true;
+        return;
+    }
     if (view) {
         [view removeFromSuperview];
         view = nil;
@@ -97,8 +125,20 @@ extern "C" __attribute__((visibility ("default"))) NSString *const kUnityViewDid
     
     if(bLoop)
     {
-        [player seekTo:0.0f];
-        [self play];
+        if( [m_videoURL isFileURL])
+        {
+            [player seekTo:0.0f];
+            [self play];
+        }
+        else
+        {
+            [self unload];
+            [self loadVideo:m_videoURL];
+            m_bLoopPlay = true;
+        }
+        
+        
+        
     }
     else
     {
@@ -108,6 +148,8 @@ extern "C" __attribute__((visibility ("default"))) NSString *const kUnityViewDid
     
 }
 @end
+
+
 
 const int PLAYER_MAX = 8;
 static CustomVideoPlayerInterface * _Player[PLAYER_MAX];
@@ -197,8 +239,12 @@ extern "C" void VideoPlayerPluginLoadVideo(int iID,const char *videoURL) {
     }
     
     _GetPlayer(iID)->m_bFinish = false;
+    _GetPlayer(iID)->m_bLoading = true;
+    
+    _GetPlayer(iID)->m_videoURL = _GetUrl(videoURL);
 
     [_GetPlayer(iID) loadVideo:_GetUrl(videoURL)];
+    
 }
 
 extern "C" void VideoPlayerPluginPlayVideo(int iID) {
@@ -256,8 +302,6 @@ extern "C" void VideoPlayerPluginRewindVideo(int iID) {
 }
 extern "C" bool VideoPlayerPluginCanOutputToTexture(const char *videoURL) {
 
-
-    
     return [CustomVideoPlayer CanPlayToTexture:_GetUrl(videoURL)];
 }
 
@@ -347,4 +391,18 @@ extern "C" bool VideoPlayerPluginFinish(int iID) {
         return _GetPlayer(iID)->m_bFinish;
     }
 
+}
+
+extern "C" bool VideoPlayerPluginError(int iID) {
+    if(iID < 0 || iID >= PLAYER_MAX)
+        return false;
+    
+    if (_GetPlayer(iID)->player) {
+        return [_GetPlayer(iID)->player getError ];
+        //return _GetPlayer(iID)->player get;
+        
+    }
+    
+    
+    
 }

@@ -29,6 +29,7 @@
 - (BOOL)playToView:(CustomVideoPlayerView*)view;
 - (BOOL)playToTexture;
 - (BOOL)isPlaying;
+- (BOOL)getError;
 
 - (intptr_t)curFrameTexture;
 
