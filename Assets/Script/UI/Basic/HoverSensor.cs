@@ -12,6 +12,7 @@ public class HoverSensor : UISensor {
 	[SerializeField] VRVec3Event onUpdateHoverV3;
 	[SerializeField] UnityEvent onFocus;
 	[SerializeField] VRMode mode;
+	[SerializeField] bool ifUseUpdateEvent = false;
 
 	void OnDisable()
 	{
@@ -64,19 +65,28 @@ public class HoverSensor : UISensor {
 			}
 			else if ( e.hoverPhase == UIHoverEvent.HoverPhase.Middle )
 			{
-				if ( onUpdateHover != null ) 
+
+				if ( ifUseUpdateEvent )
 				{
-					float process = FocusTime / GetTotalConfirmTime();
-					onUpdateHover.Invoke(process);
+					//TODO add c# event here 
+
 				}
-				if ( onUpdateHoverV3 != null )
+				else
 				{
-					
-					onUpdateHoverV3.Invoke(e.point);
+					if ( onUpdateHover != null ) 
+					{
+						float process = FocusTime / GetTotalConfirmTime();
+						onUpdateHover.Invoke(process);
+					}
+
+					if ( onUpdateHoverV3 != null )
+					{
+						onUpdateHoverV3.Invoke(e.point);
+					}
 				}
 			}else if ( e.hoverPhase == UIHoverEvent.HoverPhase.End )
 			{
-				Debug.Log("OnHover End " + name + " " + transform.parent.name );
+//				Debug.Log("OnHover End " + name + " " + transform.parent.name );
 				if ( onExitHover != null ) onExitHover.Invoke();
 				if ( onUpdateHoverV3 != null ) onUpdateHoverV3.Invoke( Global.ONHOVERV3_PHASE_EXIT );
 			}

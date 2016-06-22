@@ -126,11 +126,13 @@ public class VideoInfoUnit : VRBasicButton {
 	void OnDisable()
 	{
 		VREvents.PostTexture -= RecieveTexture;
+		// TODO add event listener here
 	}
 
 	void OnEnable()
 	{
 		VREvents.PostTexture += RecieveTexture;
+		// TODO remove event listener here
 	}
 
 	void Awake()
@@ -148,8 +150,6 @@ public class VideoInfoUnit : VRBasicButton {
 			m_info.Post = (Sprite)msg.GetMessage(Global.MSG_REQUEST_TEXTURE_SPRITE_KEY);
 			PlayRecieveImgAnimation();
 		}
-
-
 	}
 
 	/// <summary>

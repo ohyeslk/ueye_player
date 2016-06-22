@@ -43,7 +43,7 @@ public class UIInputModel : GazeInputModule {
 		// deal with the hover 
 		UIHoverEvent hoverEvent = new UIHoverEvent();
 		hoverEvent.point = GetIntersectionPosition();
-		UISensor hoverSensor = null ;
+		UISensor hoverSensor = null;
 
 		GameObject currentObj = GetCurrentGameObject();
 		if  ( currentObj != null )

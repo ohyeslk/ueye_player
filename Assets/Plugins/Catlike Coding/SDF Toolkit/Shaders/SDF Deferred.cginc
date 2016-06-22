@@ -1,6 +1,4 @@
-﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
-
-/*
+﻿/*
  * Copyright 2015, Catlike Coding
  * http://catlikecoding.com
  * An adaptation of the Unity 5 standard shader code to work with SDF.
@@ -17,7 +15,7 @@ v2fSDF vertDeferred (VertexInput v) {
 	v2fSDF o = CreateV2FSDF(v);
 	o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
 	
-	float4 posWorld = mul(unity_ObjectToWorld, v.vertex);
+	float4 posWorld = mul(_Object2World, v.vertex);
 	#if UNITY_SPECCUBE_BOX_PROJECTION
 		o.posWorld = posWorld.xyz;
 	#endif

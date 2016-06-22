@@ -31,21 +31,27 @@ public class HTTPManager : MonoBehaviour {
 		VREvents.RequesTexture += RequestTexture;
 		VREvents.RequestCategory += RequestCategory;
 		VREvents.RequestCategoryVideoList += RequestCategoryVideoList;
+		VREvents.RequestLogin += RequestLogin;
 	}
-
-	public void OnDisable()
+		
+	void RequestLogin (URLRequestMessage msg)
 	{
-		VREvents.RequestVideoList -= RequestVideoInfo;
-		VREvents.RequestLiveVideoList -= RequestLiveVideoInfo;
-		VREvents.RequesTexture -= RequestTexture;
-		VREvents.RequestCategory -= RequestCategory;
-		VREvents.RequestCategoryVideoList -= RequestCategoryVideoList;
+		WWWForm form = new WWWForm();
+		form.AddField("username" , msg.GetMessage(Global.MSG_LOGIN_USERNAME ).ToString() );
+		form.AddField("password" , msg.GetMessage(Global.MSG_LOGIN_PASSWORD ).ToString() );
+
+		string url = msg.url;
+		if ( string.IsNullOrEmpty(url) )
+		{
+			url = Global.LoginURL;
+		}
+		StartCoroutine( WaitForRequest ( url , LoginHandler , msg , form ));
 	}
 
 	void RequestCategory( URLRequestMessage msg )
 	{
 		string url = msg.url;
-		if ( url == null || url == "" )
+		if (string.IsNullOrEmpty(url) )
 		{
 			url = Global.CategoryRequstURL;
 		}
@@ -56,7 +62,7 @@ public class HTTPManager : MonoBehaviour {
 	void RequestCategoryVideoList( URLRequestMessage msg )
 	{
 		string url = msg.url;
-		if ( url == null || url == "" )
+		if ( string.IsNullOrEmpty(url) )
 		{
 			string category = msg.GetMessage(Global.MSG_REQUEST_CATEGORYVIDEO_CATEGORY_KEY ).ToString();
 			url = Global.CategoryVideoRequestURL.Replace("CATEGORY" , category );
@@ -73,7 +79,7 @@ public class HTTPManager : MonoBehaviour {
 	{
 //		Debug.Log(" Request Video Info ");
 		string url = msg.url;
-		if ( url == null || url == "")
+		if (string.IsNullOrEmpty(url) )
 		{
 			string number = msg.GetMessage(Global.MSG_REQUESTVIDEO_NUMBER_KEY ).ToString();
 			url = Global.VideoRequestURL.Replace( "NUMBER" , number );
@@ -87,7 +93,7 @@ public class HTTPManager : MonoBehaviour {
 	{
 //		Debug.Log(" Request Video Info ");
 		string url = msg.url;
-		if ( url == null || url == "")
+		if ( string.IsNullOrEmpty(url) )
 		{
 			string number = msg.GetMessage(Global.MSG_REQUESTVIDEO_NUMBER_KEY ).ToString();
 			url = Global.LiveVideoRequestURL.Replace( "NUMBER" , number );
@@ -116,6 +122,17 @@ public class HTTPManager : MonoBehaviour {
 		}
 		StartCoroutine( WaitForRequestAsy( url , TextureHandler , msg));
 	}
+		
+	public void OnDisable()
+	{
+		VREvents.RequestVideoList -= RequestVideoInfo;
+		VREvents.RequestLiveVideoList -= RequestLiveVideoInfo;
+		VREvents.RequesTexture -= RequestTexture;
+		VREvents.RequestCategory -= RequestCategory;
+		VREvents.RequestCategoryVideoList -= RequestCategoryVideoList;
+		VREvents.RequestLogin -= RequestLogin;
+	}
+
 
 	/// <summary>
 	/// Transfrom the video info from jason(string) to VideoInfo(class),
@@ -174,6 +191,18 @@ public class HTTPManager : MonoBehaviour {
 		return res;
 	}
 
+	void LoginHandler( WWW www , URLRequestMessage msg )
+	{
+		JSONObject info = new JSONObject( www.text );
+
+		string token = info.GetField("token").str;
+
+		Debug.Log("Get TOKEN" + token );
+
+		msg.AddMessage(Global.MSG_LOGIN_TOKEN , token );
+		VREvents.FirePostLogin( msg );
+
+	}
 
 	void CategoryHandler( WWW www , URLRequestMessage msg )
 	{
@@ -217,21 +246,34 @@ public class HTTPManager : MonoBehaviour {
 		VREvents.FirePostTexture( postMsg );
 	}
 
-	IEnumerator WaitForRequest(string url , RequestHandler handler , URLRequestMessage postMsg)
+	IEnumerator WaitForRequest(string url , RequestHandler handler , URLRequestMessage postMsg , WWWForm form = null )
 	{
 //		Debug.Log( "Wait for request " + url  + " " + postMsg.postObj);
 		string path = url;
 
-		if ( File.Exists( HttpHelper.GetLocalFilePath( url ) ) )
-			path = "file://" + HttpHelper.GetLocalFilePath( url );
+
+		if ( Application.platform == RuntimePlatform.IPhonePlayer )
+		{
+			if ( File.Exists( HttpHelper.GetLocalFilePath( url ) ) )
+				path = "file://" + HttpHelper.GetLocalFilePath( url );
+		}
+
+		WWW www;
+		if ( form == null )
+		{
+			www= new WWW(path);
+		}
+		else
+		{
+			Debug.Log("WWW with form");
+			www = new WWW(path,form);
+		}
 		
-		WWW www = new WWW(path);
 		yield return www;
 
 		if ( string.IsNullOrEmpty(www.error) ){
 			handler(www, postMsg);
-		}else{
-			
+		} else {
 			Debug.Log("WWW Error" + www.error );
 		}
 
