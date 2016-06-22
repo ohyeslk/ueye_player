@@ -66,6 +66,7 @@ static void* _ObservePlayerItemContext = (void*)0x2;
     // we need to have both because the order of asset/item getting ready is not strict
     BOOL            _assetReady;
     BOOL            _itemReady;
+    BOOL            _error;
 }
 
 @synthesize delegate;
@@ -171,6 +172,7 @@ static void* _ObservePlayerItemContext = (void*)0x2;
 
 - (BOOL)loadVideo:(NSURL*)url
 {
+    _error = false;
     
     AVURLAsset* asset = [AVURLAsset URLAssetWithURL:url options:nil];
     if(!asset) return NO;
@@ -205,6 +207,7 @@ static void* _ObservePlayerItemContext = (void*)0x2;
 - (BOOL)playToTexture                       { return [self _play:nil]; }
 
 - (BOOL)isPlaying	{ return _playerReady && _player.rate != 0.0f; }
+- (BOOL)getError           { return _error;}
 
 - (void)pause	{ if(_playerReady && _player.rate != 0.0f) [_player pause]; }
 - (void)resume	{ if(_playerReady && _player.rate == 0.0f) [_player play]; }
@@ -264,7 +267,7 @@ static void* _ObservePlayerItemContext = (void*)0x2;
         {
 
             
-           if(UnitySelectedRenderingAPI() == apiMetal || UnitySelectedRenderingAPI() == apiOpenGLES3)
+           if(UnitySelectedRenderingAPI() == apiMetal || UnitySelectedRenderingAPI() == apiOpenGLES3 || UnitySelectedRenderingAPI() == apiOpenGLES2)
             {
                 if(_videoSampling.cvTextureCacheTexture)
                 {
@@ -276,6 +279,15 @@ static void* _ObservePlayerItemContext = (void*)0x2;
                     curTex = GetTextureFromCVTextureCache(_videoSampling.cvTextureCacheTexture);
                 
 
+                if(UnitySelectedRenderingAPI() == apiOpenGLES2 || UnitySelectedRenderingAPI() == apiOpenGLES3)
+                {
+                    GLES_CHK(glBindTexture(GL_TEXTURE_2D, (GLuint)curTex));
+                    GLES_CHK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+                    GLES_CHK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+                    GLES_CHK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+                    GLES_CHK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+                    GLES_CHK(glBindTexture(GL_TEXTURE_2D, 0));
+                }
                 
                 CVPixelBufferUnlockBaseAddress(pixelBuffer, 0);
                 
@@ -445,6 +457,7 @@ static bool _AudioRouteWasChanged = false;
             {
                 AVPlayerItem *playerItem = (AVPlayerItem*)object;
                 [self reportError:playerItem.error category:"prepareAsset"];
+                _error = true;
             }
             break;
         }
@@ -487,6 +500,7 @@ static bool _AudioRouteWasChanged = false;
     {
    
         [self reportErrorWithString:"Item cannot be played" category:"prepareAsset"];
+        _error = true;
         return;
     }
 
@@ -607,6 +621,7 @@ static bool _AudioRouteWasChanged = false;
         if(![_reader canAddOutput:_videoOut])
         {
             [self reportErrorWithString:"canAddOutput returned false" category:"prepareReader"];
+            _error = true;
             return NO;
         }
         [_reader addOutput:_videoOut];
@@ -614,6 +629,7 @@ static bool _AudioRouteWasChanged = false;
         if(![_reader startReading])
         {
             [self reportError:[_reader error] category:"prepareReader"];
+            _error = true;
             return NO;
         }
     
@@ -686,8 +702,10 @@ static bool _AudioRouteWasChanged = false;
     {
         NSError* error = nil;
         _reader = [AVAssetReader assetReaderWithAsset:_playerItem.asset error:&error];
-        if(error)
+        if(error){
             [self reportError:error category:"prepareReader"];
+            _error = true;
+        }
         
         _reader.timeRange = CMTimeRangeMake(time, _duration);
         
@@ -702,6 +720,7 @@ static bool _AudioRouteWasChanged = false;
         if(![_reader canAddOutput:_videoOut])
         {
             [self reportErrorWithString:"canAddOutput returned false" category:"prepareReader"];
+            _error = true;
             return NO;
         }
         [_reader addOutput:_videoOut];
@@ -709,6 +728,7 @@ static bool _AudioRouteWasChanged = false;
         if(![_reader startReading])
         {
             [self reportError:[_reader error] category:"prepareReader"];
+            _error = true;
             return NO;
         }
         
