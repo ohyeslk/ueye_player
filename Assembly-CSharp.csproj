@@ -129,6 +129,7 @@
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ConvertDepth.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ColorCorrectionCurvesSimple.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\NoiseEffectShaderYUV.shader" />
+     <None Include="Assets\Plugins\SocketIO\readme.txt" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\CreaseApply.shader" />
      <None Include="Assets\Plugins\Catlike Coding\SDF Toolkit\Shaders\SDF Unlit.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ChromaticAberrationShader.shader" />
@@ -205,24 +206,6 @@
  </Reference>
  <Reference Include="DOTween50">
  <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/DOTween/DOTween50.dll</HintPath>
- </Reference>
- <Reference Include="SimpleJson">
- <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/SocketIO/bin/Debug/SimpleJson.dll</HintPath>
- </Reference>
- <Reference Include="SuperSocket.ClientEngine.Common">
- <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/SocketIO/bin/Debug/SuperSocket.ClientEngine.Common.dll</HintPath>
- </Reference>
- <Reference Include="SuperSocket.ClientEngine.Core">
- <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/SocketIO/bin/Debug/SuperSocket.ClientEngine.Core.dll</HintPath>
- </Reference>
- <Reference Include="SuperSocket.ClientEngine.Protocol">
- <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/SocketIO/bin/Debug/SuperSocket.ClientEngine.Protocol.dll</HintPath>
- </Reference>
- <Reference Include="SuperSocket.ClientEngine.Proxy">
- <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/SocketIO/bin/Debug/SuperSocket.ClientEngine.Proxy.dll</HintPath>
- </Reference>
- <Reference Include="WebSocket4Net">
- <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/SocketIO/bin/Debug/WebSocket4Net.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>
