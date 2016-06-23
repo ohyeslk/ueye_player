@@ -197,8 +197,6 @@ public class HTTPManager : MonoBehaviour {
 
 		string token = info.GetField("token").str;
 
-		Debug.Log("Get TOKEN" + token );
-
 		msg.AddMessage(Global.MSG_LOGIN_TOKEN , token );
 		VREvents.FirePostLogin( msg );
 
@@ -248,9 +246,7 @@ public class HTTPManager : MonoBehaviour {
 
 	IEnumerator WaitForRequest(string url , RequestHandler handler , URLRequestMessage postMsg , WWWForm form = null )
 	{
-//		Debug.Log( "Wait for request " + url  + " " + postMsg.postObj);
 		string path = url;
-
 
 		if ( Application.platform == RuntimePlatform.IPhonePlayer )
 		{
@@ -265,7 +261,7 @@ public class HTTPManager : MonoBehaviour {
 		}
 		else
 		{
-			Debug.Log("WWW with form");
+//			Debug.Log("WWW with form");
 			www = new WWW(path,form);
 		}
 		
@@ -282,7 +278,6 @@ public class HTTPManager : MonoBehaviour {
 
 	IEnumerator WaitForRequestAsy( string url , RequestHandler handler , URLRequestMessage postMsg )
 	{
-		//		Debug.Log("WaitForRequestAsy URL " + url );
 		if ( !File.Exists( HttpHelper.GetLocalFilePath( url ) ) )
 		{
 			HttpHelper httpHelper = new HttpHelper( url );
@@ -294,9 +289,15 @@ public class HTTPManager : MonoBehaviour {
 				yield return null;
 			}
 		}
-			
-//		Debug.Log("WaitForRequestAsy Local file path " + HttpHelper.GetLocalFilePath( url ) );
-		WWW www = new WWW( "file://" + HttpHelper.GetLocalFilePath( url ) );
+
+		string path = "file://" + HttpHelper.GetLocalFilePath( url );
+
+		if ( Application.platform == RuntimePlatform.IPhonePlayer )
+		{
+			path = "file://" + HttpHelper.GetLocalFilePath( url );
+		}
+
+		WWW www = new WWW( path );
 		yield return www;
 
 		if ( string.IsNullOrEmpty(www.error) ){

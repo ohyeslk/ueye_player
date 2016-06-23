@@ -78,6 +78,7 @@ public class CategoryButton : VRBasicButton {
 		// initilize the sprite first
 		URLRequestMessage msg = new URLRequestMessage(this);
 		msg.url = info.bgUrl;
+//		Debug.Log("Category button texture " + msg.url );
 		VREvents.FireRequesTexture( msg );
 
 		parent = p;

@@ -96,6 +96,14 @@ public class VREvents
 	public static void FireUIConfirm(UISensorArg arg){if ( UIConfirm != null ) UIConfirm(arg) ; }
 
 
+	/// <summary>
+	/// For the chat system
+	/// </summary>
+	public delegate void ChatEventHandler(ChatArg msg); 
+
+	public static event ChatEventHandler ChatMessage;
+	public static void FireChatMessage(ChatArg arg){if ( ChatMessage != null ) ChatMessage(arg) ; }
+
 }
 
 public class BasicArg : EventArgs
@@ -159,4 +167,12 @@ public class Message : BasicArg
 	{
 		return dict.ContainsKey(key);
 	}
+}
+
+public class ChatArg : BasicArg
+{
+	public ChatArg( object _this ):base(_this){}
+	public string message;
+	public string userName;
+	public Color color;
 }

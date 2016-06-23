@@ -50,6 +50,7 @@
      <Compile Include="Assets\Script\Core\HTTPManager.cs" />
      <Compile Include="Assets\Script\Core\HttpHelper.cs" />
      <Compile Include="Assets\Script\Core\LogicManager.cs" />
+     <Compile Include="Assets\Script\Core\SocketManager.cs" />
      <Compile Include="Assets\Script\Core\UserManager.cs" />
      <Compile Include="Assets\Script\Core\VREvents.cs" />
      <Compile Include="Assets\Script\Core\WindowManager.cs" />
@@ -204,6 +205,24 @@
  </Reference>
  <Reference Include="DOTween50">
  <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/DOTween/DOTween50.dll</HintPath>
+ </Reference>
+ <Reference Include="SimpleJson">
+ <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/SocketIO/bin/Debug/SimpleJson.dll</HintPath>
+ </Reference>
+ <Reference Include="SuperSocket.ClientEngine.Common">
+ <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/SocketIO/bin/Debug/SuperSocket.ClientEngine.Common.dll</HintPath>
+ </Reference>
+ <Reference Include="SuperSocket.ClientEngine.Core">
+ <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/SocketIO/bin/Debug/SuperSocket.ClientEngine.Core.dll</HintPath>
+ </Reference>
+ <Reference Include="SuperSocket.ClientEngine.Protocol">
+ <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/SocketIO/bin/Debug/SuperSocket.ClientEngine.Protocol.dll</HintPath>
+ </Reference>
+ <Reference Include="SuperSocket.ClientEngine.Proxy">
+ <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/SocketIO/bin/Debug/SuperSocket.ClientEngine.Proxy.dll</HintPath>
+ </Reference>
+ <Reference Include="WebSocket4Net">
+ <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/SocketIO/bin/Debug/WebSocket4Net.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>

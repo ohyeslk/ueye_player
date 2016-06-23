@@ -135,6 +135,9 @@ public class VideoInfoUnit : VRBasicButton {
 		// TODO remove event listener here
 	}
 
+	//TODO FUNCTION to handle event
+
+
 	void Awake()
 	{
 		if ( blackCover != null )

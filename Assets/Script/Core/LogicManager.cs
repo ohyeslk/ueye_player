@@ -88,6 +88,10 @@ public class LogicManager : MonoBehaviour {
 	void Start()
 	{
 		SetVRMode(Global.initMode);
+		if ( gameObject.GetComponent<UserManager>() == null )
+			gameObject.AddComponent<UserManager>();
+		if ( gameObject.GetComponent<SocketManager>() == null )
+			gameObject.AddComponent<SocketManager>();
 	}
 
 	void OnEnable()
