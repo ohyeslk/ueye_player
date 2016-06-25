@@ -9,6 +9,7 @@ public class VRBasicButton : MonoBehaviour {
 
 	[SerializeField] Color normalColor = Color.white;
 	[SerializeField] Color disableColor = Color.gray;
+	[SerializeField] bool ifResetTargetOnConfirm = true;
 
 	bool inner_enable = true;
 	public bool m_Enable{
@@ -79,8 +80,8 @@ public class VRBasicButton : MonoBehaviour {
 			{
 				subButtonAnimation.UpdateHoverSound.Stop();
 			}
-
-			VREvents.FireUIInputResetTarget(new Message(this));
+			if ( ifResetTargetOnConfirm )
+				VREvents.FireUIInputResetTarget(new Message(this));
 		}
 	}
 

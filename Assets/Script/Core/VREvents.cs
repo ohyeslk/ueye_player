@@ -37,7 +37,11 @@ public class VREvents
 	public static event MessageEventHandler UIInputResetTarget;
 	public static void FireUIInputResetTarget(Message arg){if ( UIInputResetTarget != null ) UIInputResetTarget(arg); }
 
+	public static event MessageEventHandler VoiceRecord;
+	public static void FireVoiceRecord(Message arg){if ( VoiceRecord != null ) VoiceRecord(arg); }
 
+	public static event MessageEventHandler PostChatMessage;
+	public static void FirePostChatMessage(Message arg){if ( PostChatMessage != null ) PostChatMessage(arg); }
 
 	/// <summary>
 	/// URL event handler. handle with the URL related events
@@ -73,6 +77,13 @@ public class VREvents
 
 	public static event URLEventHandler PostLogin;
 	public static void FirePostLogin(URLRequestMessage arg){if ( PostLogin != null ) PostLogin(arg) ; }
+
+	public static event URLEventHandler RequestBaiduYuyinToken;
+	public static void FireRequestBaiduYuyinToken(URLRequestMessage arg){if ( RequestBaiduYuyinToken != null ) RequestBaiduYuyinToken(arg) ; }
+
+	public static event URLEventHandler PostBaiduYuyinToken;
+	public static void FirePostBaiduYuyinToken(URLRequestMessage arg){if ( PostBaiduYuyinToken != null ) PostBaiduYuyinToken(arg) ; }
+
 
 	/// <summary>
 	/// Active window event handler. Handle the window events

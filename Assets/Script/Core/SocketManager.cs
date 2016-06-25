@@ -12,6 +12,26 @@ public class SocketManager : MonoBehaviour {
 	public SocketIOComponent socketIO;
 	//	public Player	playerGameObj;
 
+	void OnEnable()
+	{
+		VREvents.PostChatMessage += OnPostChatMessage;
+	}
+
+	void OnPostChatMessage (Message msg)
+	{
+		string data="";
+		if ( msg.ContainMessage("data") )
+			data = msg.GetMessage("data").ToString();
+
+		postMessage( data );
+
+	}
+
+	void OnDisable()
+	{
+		VREvents.PostChatMessage -= OnPostChatMessage;
+	}
+
 	void Awake()
 	{
 		if ( socketIO == null )
@@ -26,32 +46,21 @@ public class SocketManager : MonoBehaviour {
 	void Start () {
 		socketIO.On( "response" , OnResponse );
 		socketIO.On( "message" , OnMessage );
+
 	}
 
-	void Update()
-	{
-		if ( Input.GetKeyDown(KeyCode.E ))
-		{
-			EnterChanel();
-		}
-
-		if ( Input.GetKeyDown(KeyCode.M ))
-		{
-			SendMessage();
-		}
-	}
-
-	public void EnterChanel()
+	public void EnterChanel( string id )
 	{
 		JSONObject data = new JSONObject();
+		data.AddField("id" , id );
 		Debug.Log("Enter Channel " + data["id"].ToString());
 		socketIO.Emit("enterChannel" , data );
 	}
 
-	public void SendMessage()
+	public void postMessage( string msgData )
 	{
 		JSONObject data = new JSONObject();
-		data.AddField("data" , "hahaha");
+		data.AddField("data" , msgData );
 		data.AddField("userid" , UserManager.UserName.ToString() );
 		socketIO.Emit("sendmessage" , data );
 	}
@@ -67,7 +76,27 @@ public class SocketManager : MonoBehaviour {
 
 	void OnResponse( SocketIOEvent obj )
 	{
+		string message = obj.data.GetField("message").str;
+		if ( message == "I got you!")
+		{
+			EnterChanel("r");
+		}
+
 		Debug.Log("On Response " + obj.data.GetField("message").str );
+	}
+
+	void Update()
+	{
+		if ( Input.GetKeyDown( KeyCode.C ) && Input.GetKey( KeyCode.LeftControl ) )
+		{
+			EnterChanel("r");
+		}
+
+		if ( Input.GetKeyDown( KeyCode.M ) && Input.GetKey( KeyCode.LeftControl ) )
+		{
+			postMessage("hahaha");
+		}
+
 	}
 
 ///////////////////////////////

@@ -92,6 +92,8 @@ public class LogicManager : MonoBehaviour {
 			gameObject.AddComponent<UserManager>();
 		if ( gameObject.GetComponent<SocketManager>() == null )
 			gameObject.AddComponent<SocketManager>();
+		if ( gameObject.GetComponent<VoiceManager>() == null )
+			gameObject.AddComponent<VoiceManager>();
 	}
 
 	void OnEnable()

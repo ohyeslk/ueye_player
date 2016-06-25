@@ -31,6 +31,11 @@ public class UIInputModel : GazeInputModule {
 
 	void OnResetTarget (Message msg)
 	{
+		ResetTarget();
+	}
+
+	public void ResetTarget()
+	{
 		// only response in 2d Mode
 		if ( LogicManager.VRMode == VRMode.VR_2D )
 		{
@@ -209,7 +214,6 @@ public class UIInputModel : GazeInputModule {
 
 	public void OnFingerMove( FingerMotionEvent e )
 	{
-
 		Vector3 camPos = Camera.main.transform.position;
 		Debug.DrawLine( camPos ,  camPos + Camera.main.ScreenPointToRay( e.Position ).direction * 100f );
 
@@ -231,7 +235,20 @@ public class UIInputModel : GazeInputModule {
 			{
 				FingerPointData = null;
 			}
+		}
+	}
 
+	public void OnFingerUp( FingerUpEvent e )
+	{
+		GameObject currentObj = GetCurrentGameObject();
+		if  ( currentObj != null )
+		{
+			UISensor hoverSensor = currentObj.GetComponent<UISensor>();
+
+			if ( hoverSensor != null )
+			{
+				hoverSensor.OnFingerUp(  );
+			}
 		}
 	}
 

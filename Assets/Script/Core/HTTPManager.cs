@@ -32,6 +32,17 @@ public class HTTPManager : MonoBehaviour {
 		VREvents.RequestCategory += RequestCategory;
 		VREvents.RequestCategoryVideoList += RequestCategoryVideoList;
 		VREvents.RequestLogin += RequestLogin;
+		VREvents.RequestBaiduYuyinToken += RequestBaiduYuyin;
+	}
+
+	void RequestBaiduYuyin (URLRequestMessage msg)
+	{
+		string url = msg.url;
+		if ( string.IsNullOrEmpty(url) )
+		{
+			url = Global.BaiduYuyinURL;
+		}
+		StartCoroutine( WaitForRequest( url , BaiduYuyinTokenHandler , msg ));
 	}
 		
 	void RequestLogin (URLRequestMessage msg)
@@ -189,6 +200,16 @@ public class HTTPManager : MonoBehaviour {
 			}
 		}
 		return res;
+	}
+
+	void BaiduYuyinTokenHandler( WWW www , URLRequestMessage msg )
+	{
+		JSONObject info = new JSONObject( www.text );
+
+		string token = info.GetField("access_token").str;
+
+		msg.AddMessage(Global.MSG_BAIDU_YUYIN_TOKEN , token );
+		VREvents.FirePostBaiduYuyinToken(msg);
 	}
 
 	void LoginHandler( WWW www , URLRequestMessage msg )

@@ -14,7 +14,7 @@ public class UserManager : MonoBehaviour {
 	static public string UserName
 	{
 		get {
-			return "HaHaHa ~ Undifined";
+			return "custom";
 		}
 	}
 

@@ -11,6 +11,7 @@ public class HoverSensor : UISensor {
 	[SerializeField] VRFloatEvent onUpdateHover;
 	[SerializeField] VRVec3Event onUpdateHoverV3;
 	[SerializeField] UnityEvent onFocus;
+	[SerializeField] UnityEvent onFingerUp;
 	[SerializeField] VRMode mode;
 	[SerializeField] bool ifUseUpdateEvent = false;
 
@@ -100,7 +101,16 @@ public class HoverSensor : UISensor {
 			base.OnFocus ();
 			if ( onFocus != null ) onFocus.Invoke();
 		}
+	}
 
+
+	public override void OnFingerUp()
+	{
+		if ( ( LogicManager.VRMode & mode ) > 0 )
+		{
+			base.OnFingerUp ();
+			if ( onFingerUp != null ) onFingerUp.Invoke();
+		}		
 	}
 
 }
