@@ -159,6 +159,7 @@ public class HttpHelper {
 //		this.path = path;
 		m_url = url;
 	}
+
 		
 	public void AsyDownload()
 	{
@@ -204,6 +205,7 @@ public class HttpHelper {
 		WebReqState rs = ar.AsyncState as WebReqState;
 		int read =rs.OrginalStream.EndRead(ar);
 
+
 		if(read>0)
 		{
 			rs.fs.Write(rs.Buffer,0,read);
@@ -222,5 +224,53 @@ public class HttpHelper {
 				downloadingInfo[m_url] = true;
 			}
 		}
+	}
+}
+
+public class HttpHelperStream
+{
+	HttpWebRequest request;
+	string m_result = "";
+	public string Result
+	{
+		get { return m_result;}
+	}
+	bool m_Done = false;
+	public bool Done
+	{
+		get { return m_Done ; }
+	}
+
+	public HttpHelperStream()
+	{
+	}
+
+	public HttpHelperStream( HttpWebRequest _r)
+	{
+		request = _r;
+	}
+
+	private void GetRequestStreamCallback(IAsyncResult asynchronousResult)
+	{
+		HttpWebRequest request = (HttpWebRequest)asynchronousResult.AsyncState;
+
+		HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asynchronousResult);
+		Stream streamResponse = response.GetResponseStream();
+		StreamReader streamRead = new StreamReader(streamResponse);
+		m_result = streamRead.ReadToEnd();
+
+		// close stream object
+		streamResponse.Close();
+		streamRead.Close();
+
+		//reset the HttpWebResponse
+		response.Close();
+		m_Done = true;
+	}
+
+
+	public void AsyBegin()
+	{
+		request.BeginGetResponse( new AsyncCallback(GetRequestStreamCallback) , request );
 	}
 }

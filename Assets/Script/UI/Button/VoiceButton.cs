@@ -30,5 +30,6 @@ public class VoiceButton : VRBasicButton {
 		msg.AddMessage("isOn" , false);
 		VREvents.FireVoiceRecord(msg);
 	
+		VREvents.FireUIInputResetTarget(msg);
 	}
 }

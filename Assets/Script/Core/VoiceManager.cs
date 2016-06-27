@@ -39,12 +39,33 @@ public class VoiceManager : MonoBehaviour {
 	{
 		VREvents.PostBaiduYuyinToken += onBaiduYuyinToken;
 		VREvents.VoiceRecord += onRecordVoice;
+		VREvents.PostBaiduYuyinTranslate += OnPostBaiduYuyinTranslate;
 	}
+
 
 	void OnDisable()
 	{
 		VREvents.PostBaiduYuyinToken -= onBaiduYuyinToken;
 		VREvents.VoiceRecord -= onRecordVoice;
+	}
+		
+	void OnPostBaiduYuyinTranslate (URLRequestMessage msg)
+	{
+		string res = msg.GetMessage(Global.MSG_BAIDU_YYIN_TRANSLATE_RESULT).ToString();
+
+		JSONObject resJSON = new JSONObject(res );
+		Debug.Log("Json " + resJSON.ToString());
+
+		if ( resJSON.GetField("result") != null )
+		{
+			string sentence = resJSON.GetField("result").ToString();
+			sentence = sentence.Substring(2,sentence.Length-4);
+
+			Debug.Log("Send sentence " + sentence );
+			Message msgSend = new Message(this);
+			msgSend.AddMessage("data" , sentence) ;
+			VREvents.FirePostChatMessage(msgSend);
+		}
 	}
 
 	void onBaiduYuyinToken (URLRequestMessage msg)
@@ -141,20 +162,11 @@ public class VoiceManager : MonoBehaviour {
 
 		string base64str = System.Convert.ToBase64String(lastbyte);
 
-		string res = request("http://vop.baidu.com/server_api", base64str, lastbyte.Length);
+		request("http://vop.baidu.com/server_api", base64str, lastbyte.Length);
 
-		JSONObject resJSON = new JSONObject(res );
-		Debug.Log("Json " + resJSON.ToString());
-		string sentence = resJSON.GetField("result").ToString();
-		sentence = sentence.Substring(2,sentence.Length-4);
-
-		Debug.Log("Send sentence " + sentence );
-		Message msg = new Message(this);
-		msg.AddMessage("data" , sentence) ;
-		VREvents.FirePostChatMessage(msg);
 	}
 
-	public static string request(string url, string base64audio,int length)
+	public void request(string url, string base64audio, int length)
 	{
 		postObj jsonObj = new postObj()
 		{
@@ -165,37 +177,16 @@ public class VoiceManager : MonoBehaviour {
 			token = TOKEN,
 			cuid = "77777778888883",
 			len=length,
-			speech=base64audio
+			speech = base64audio
 		};
 		string strJson= JsonConvert.SerializeObject(jsonObj, Formatting.Indented);
 
-		string strURL = url;
-		System.Net.HttpWebRequest request;
-		request = (System.Net.HttpWebRequest)WebRequest.Create(strURL);
-		request.Method = "POST";
-		// add header
-		request.Headers.Add("apikey", "9scx4TOCR18A2EZNlXkOYjUK");
-		request.ContentType = "application/json";
+		URLRequestMessage msg = new URLRequestMessage(this);
+		msg.AddMessage(Global.MSG_BAIDU_YYIN_TRANSLATE_JSON,strJson );
+		msg.url = url;
 
-		byte[] payload;
+		VREvents.FireRequestBaiduYuyinTranslate( msg );
 
-		payload = System.Text.Encoding.UTF8.GetBytes(strJson);
-		request.ContentLength = payload.Length;
-
-		Stream writer = request.GetRequestStream();
-		writer.Write(payload, 0, payload.Length);
-		writer.Close();
-		System.Net.HttpWebResponse response = (System.Net.HttpWebResponse)request.GetResponse();
-		System.IO.Stream s;
-		s = response.GetResponseStream();
-		string StrDate = "";
-		string strValue = "";
-		StreamReader Reader = new StreamReader(s, Encoding.UTF8);
-		while ((StrDate = Reader.ReadLine()) != null)
-		{
-			strValue += StrDate + "\r\n";
-		}
-		return strValue;
 	}
 
 	private static void WriteHeader(Stream stream, AudioClip clip)

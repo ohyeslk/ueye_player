@@ -33,6 +33,60 @@ public class HTTPManager : MonoBehaviour {
 		VREvents.RequestCategoryVideoList += RequestCategoryVideoList;
 		VREvents.RequestLogin += RequestLogin;
 		VREvents.RequestBaiduYuyinToken += RequestBaiduYuyin;
+		VREvents.RequestBaiduYuyinTranslate += RequestBaiduYuyinTranslate;
+
+	}
+
+	void RequestBaiduYuyinTranslate (URLRequestMessage msg)
+	{
+		string strJson= msg.GetMessage(Global.MSG_BAIDU_YYIN_TRANSLATE_JSON).ToString();
+
+		string strURL = msg.url;
+		System.Net.HttpWebRequest request;
+		request = (System.Net.HttpWebRequest)WebRequest.Create(strURL);
+		request.Method = "POST";
+		// add header
+		request.Headers.Add("apikey", "9scx4TOCR18A2EZNlXkOYjUK");
+		request.ContentType = "application/json";
+
+		byte[] payload;
+
+		payload = System.Text.Encoding.UTF8.GetBytes(strJson);
+		request.ContentLength = payload.Length;
+
+		Stream writer = request.GetRequestStream();
+		writer.Write(payload, 0, payload.Length);
+		writer.Close();
+
+		StartCoroutine( ReadStream( msg , request ));
+
+	}
+
+	IEnumerator ReadStream(URLRequestMessage msg, System.Net.HttpWebRequest request )
+	{
+		HttpHelperStream helper = new HttpHelperStream(request );
+		helper.AsyBegin();
+
+		while( !helper.Done ) { yield return null ; }
+
+		string strValue = helper.Result;
+
+//		System.Net.HttpWebResponse response = (System.Net.HttpWebResponse)request;
+//
+//		System.IO.Stream s;
+//		Debug.Log("Time " + Time.time );
+//		s = response.GetResponseStream();
+//		string StrDate = "";
+//		string strValue = "";
+//		StreamReader Reader = new StreamReader(s, Encoding.UTF8);
+//		Debug.Log("Time " + Time.time );
+//		while ((StrDate = Reader.ReadLine()) != null)
+//		{
+//			strValue += StrDate + "\r\n";
+//			yield return null;
+//		}
+		msg.AddMessage( Global.MSG_BAIDU_YYIN_TRANSLATE_RESULT , strValue );
+		VREvents.FirePostBaiduYuyinTranslate( msg );
 	}
 
 	void RequestBaiduYuyin (URLRequestMessage msg)
