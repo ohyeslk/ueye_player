@@ -102,7 +102,7 @@ public class HTTPManager : MonoBehaviour {
 
 	void RequestLiveVideoInfo( URLRequestMessage msg )
 	{
-//		Debug.Log(" Request Video Info ");
+//		Debug.Log(" Request Live Video Info ");
 		string url = msg.url;
 		if ( string.IsNullOrEmpty(url) )
 		{
@@ -195,7 +195,9 @@ public class HTTPManager : MonoBehaviour {
 				info.description = info.description.Replace( "\\n" , "\n");
 				info.playUrl = video.GetField("playUrl").str;
 				info.coverUrl = video.GetField("coverForFeed").str;
-
+				info.isLive = video.GetField("islive").i == 1;
+				if ( info.isLive )
+					Debug.Log( info.title + " is live " + info.isLive );
 				res.Add( info );
 			}
 		}

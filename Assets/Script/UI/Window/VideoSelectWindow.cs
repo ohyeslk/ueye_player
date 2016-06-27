@@ -269,7 +269,7 @@ public class VideoSelectWindow : UIWindow  {
 	public void RequestVideoList()
 	{
 		RequestLatestVideoList( 50 );
-		RequestLiveVideoList( 3 );
+		RequestLiveVideoList( 50 );
 	}
 	public void RequestLatestVideoList ( int number )
 	{

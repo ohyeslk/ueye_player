@@ -7,6 +7,7 @@ using DG.Tweening;
 public class VideoPlayWindow : UIWindow {
 
 	[SerializeField] GameObject screenPrefab;
+	[SerializeField] GameObject liveScreenPrefab;
 	MediaPlayerCtrl videoPlayer;
 
 	[SerializeField] VRBasicButton playButton;
@@ -41,10 +42,7 @@ public class VideoPlayWindow : UIWindow {
 
 	void Start()
 	{
-		UpdateScreen();
 		FollowView.gameObject.SetActive ( false );
-		videoPlayer.gameObject.SetActive(false);
-		videoPlayer.Pause();
 		buttons = FollowView.gameObject.GetComponentsInChildren<VRBasicButton>();
 		HidePlayPanelButtons(0);
 		HideLoadAnimation();
@@ -68,11 +66,11 @@ public class VideoPlayWindow : UIWindow {
 		Debug.Log("Play Video " + info.title + " " + info.playUrl );
 
 		StartCoroutine( PlayVideoFake( info , 3f ));
-		UpdateScreen();
+		UpdateScreen(info);
 
 	}
 
-	void UpdateScreen()
+	void UpdateScreen( VideoInfo info )
 	{
 		if ( videoPlayer != null )
 		{
@@ -80,7 +78,8 @@ public class VideoPlayWindow : UIWindow {
 			videoPlayer.gameObject.SetActive( false );
 		}
 
-		GameObject screen = Instantiate( screenPrefab ) as GameObject;
+
+		GameObject screen = Instantiate( info.isLive ? liveScreenPrefab : screenPrefab ) as GameObject;
 		screen.transform.SetParent( transform , true );
 		screen.transform.position = Vector3.zero;
 
@@ -101,7 +100,8 @@ public class VideoPlayWindow : UIWindow {
 
 	void BecomeVisible( bool to , float time )
 	{
-		videoPlayer.gameObject.SetActive(to);
+		if ( videoPlayer != null )
+			videoPlayer.gameObject.SetActive(to);
 		ShouldUpdate = to;
 
 		FollowView.enabled = to;
@@ -133,7 +133,7 @@ public class VideoPlayWindow : UIWindow {
 
 	IEnumerator PlayVideoFake( VideoInfo info , float delay )
 	{
-		UpdateScreen();
+		UpdateScreen(info);
 		ShowLoadAnimation();
 
 		yield return new WaitForSeconds( 1f );
