@@ -97,9 +97,9 @@ public class LogicManager : MonoBehaviour {
 
 		// for test
 		// TODO remove this codes
-		WindowArg arg = new WindowArg(this);
-		arg.type = WindowArg.Type.PLAY_WINDOW;
-		VREvents.FireActiveWindow( arg );
+//		WindowArg arg = new WindowArg(this);
+//		arg.type = WindowArg.Type.PLAY_WINDOW;
+//		VREvents.FireActiveWindow( arg );
 	}
 
 	void OnEnable()
