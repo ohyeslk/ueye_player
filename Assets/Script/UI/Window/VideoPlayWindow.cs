@@ -31,6 +31,20 @@ public class VideoPlayWindow : UIWindow {
 	[SerializeField] float ButtonHideTime = 0.5f;
 
 	[System.Serializable]
+	public struct VoiceInteraction
+	{
+		public VoiceButton voiceButton;
+		public VRBasicButton confirmButton;
+		public VRBasicButton cancleButton;
+		public Text voiceText;
+		public Image backImage;
+		public float fadeInDuration;
+		public float fadeOutDuration;
+	}
+	[SerializeField] VoiceInteraction m_voiceInteraction;
+	ChatArg temMsg;
+
+	[System.Serializable]
 	public struct LoadAnimation
 	{
 		public Image IconFrame;
@@ -38,26 +52,100 @@ public class VideoPlayWindow : UIWindow {
 		public float fadeDuration;
 	}
 	[SerializeField] LoadAnimation m_loadAnimation;
-	VRBasicButton[] buttons;
+	[SerializeField] VRBasicButton[] panelButtons;
 
 	void Start()
 	{
 		FollowView.gameObject.SetActive ( false );
-		buttons = FollowView.gameObject.GetComponentsInChildren<VRBasicButton>();
+//		panelButtons = FollowView.gameObject.GetComponentsInChildren<VRBasicButton>();
 		HidePlayPanelButtons(0);
 		HideLoadAnimation();
+		HideVoiceComponents(0);
 	}
 
 	override protected void OnDisable()
 	{
 		base.OnDisable();
 		VREvents.PlayVideo -= OnPlayVideoEvent;
+		VREvents.VoiceRecord -= OnVoiceRecord;
+		VREvents.ChatMessageRecieve -= OnChatMessageRecieve;
 	}
 
 	override protected void OnEnable()
 	{
 		base.OnEnable();
 		VREvents.PlayVideo += OnPlayVideoEvent;
+		VREvents.VoiceRecord += OnVoiceRecord;
+		VREvents.ChatMessageRecieve += OnChatMessageRecieve;
+	}
+
+	void OnChatMessageRecieve (ChatArg msg)
+	{
+		isWaittingForMessage = false;
+
+		float dur = m_voiceInteraction.fadeInDuration;
+		m_voiceInteraction.confirmButton.OnBecomeVisible(dur,true);
+		m_voiceInteraction.cancleButton.OnBecomeVisible(dur,true);
+		m_voiceInteraction.voiceText.text = msg.message;
+		temMsg = msg;
+	}
+
+	void OnVoiceRecord (Message msg)
+	{
+		bool isOn = (bool)msg.GetMessage("isOn");
+		if ( isOn == false ) // end record
+		{
+			float dur = m_voiceInteraction.fadeInDuration;
+			m_voiceInteraction.backImage.DOFade( 0.5f , dur );
+			m_voiceInteraction.voiceText.DOFade( 1f , dur );
+
+			StartCoroutine ( WaitForMessage() );
+		}
+	}
+
+	bool isWaittingForMessage = false;
+	IEnumerator WaitForMessage()
+	{
+		isWaittingForMessage = true;
+		m_voiceInteraction.voiceText.text = "。";
+
+		while( true  )
+		{
+			yield return new WaitForSeconds(1f);
+
+			if ( !isWaittingForMessage ) 
+				yield break;
+				
+			m_voiceInteraction.voiceText.text = m_voiceInteraction.voiceText.text + "。";
+			if ( m_voiceInteraction.voiceText.text.Length > 3 )
+				m_voiceInteraction.voiceText.text = "。";
+		}
+	}
+
+	public void OnVoiceConfirm()
+	{
+		if ( temMsg != null )
+		{
+			VREvents.FireChatMessage( temMsg );
+		}
+
+		OnVoiceCancle();
+	}
+
+	public void OnVoiceCancle()
+	{
+		m_voiceInteraction.voiceButton.Reset();
+		float dur = m_voiceInteraction.fadeOutDuration;
+		HideVoiceComponents( dur );
+	}
+
+	public void HideVoiceComponents( float dur )
+	{
+		Debug.Log("Hide Voice Components");
+		m_voiceInteraction.cancleButton.OnBecomeInvisible(dur,true);
+		m_voiceInteraction.confirmButton.OnBecomeInvisible(dur,true);
+		m_voiceInteraction.backImage.DOFade(0,dur);
+		m_voiceInteraction.voiceText.DOFade(0,dur);
 	}
 
 	void OnPlayVideoEvent (Message msg)
@@ -77,8 +165,7 @@ public class VideoPlayWindow : UIWindow {
 			// remove the old video
 			videoPlayer.gameObject.SetActive( false );
 		}
-
-
+			
 		GameObject screen = Instantiate( info.isLive ? liveScreenPrefab : screenPrefab ) as GameObject;
 		screen.transform.SetParent( transform , true );
 		screen.transform.position = Vector3.zero;
@@ -86,38 +173,40 @@ public class VideoPlayWindow : UIWindow {
 		videoPlayer = screen.GetComponent<MediaPlayerCtrl>();
 	}
 
-	protected override void OnBecomeInvsible ( float time )
-	{
-		base.OnBecomeInvsible ( time );
-		BecomeVisible ( false , time  );
-	}
-
 	protected override void OnBecomeVisible ( float time )
 	{
 		base.OnBecomeVisible ( time );
-		BecomeVisible ( true , time );
+
+		if ( videoPlayer != null )
+			videoPlayer.gameObject.SetActive(true);
+		ShouldUpdate = true;
+
+		FollowView.enabled = true;
+
+		FollowView.gameObject.SetActive( true );
+		lastDegree = 90f;
+		HideVoiceComponents(0);
 	}
 
-	void BecomeVisible( bool to , float time )
+	protected override void OnBecomeInvsible ( float time )
 	{
+		base.OnBecomeInvsible ( time );
+
 		if ( videoPlayer != null )
-			videoPlayer.gameObject.SetActive(to);
-		ShouldUpdate = to;
+			videoPlayer.gameObject.SetActive(false);
+		ShouldUpdate = false;
 
-		FollowView.enabled = to;
+		FollowView.enabled = false;
 
-		if ( to )
+		PlayPanelBack.DOFade( 0 , time ).OnComplete( DisablePlayPanel );
+
+		// all buttons become invisible
+		VRBasicButton[] buttons = FollowView.GetComponentsInChildren<VRBasicButton>();
+		foreach( VRBasicButton btn in buttons )
 		{
-			FollowView.gameObject.SetActive( true );
-			lastDegree = 90f;
-		}else
-		{
-			PlayPanelBack.DOFade( 0 , time ).OnComplete( DisablePlayPanel );
-			HidePlayPanelButtons( time );
-			ExpandButton.OnBecomeInvisible( time );
+			btn.OnBecomeInvisible( time );
 		}
 	}
-
 
 	public void DisablePlayPanel()
 	{
@@ -126,7 +215,8 @@ public class VideoPlayWindow : UIWindow {
 
 	public void OnPlayVideo()
 	{
-		videoPlayer.Play();
+		if ( videoPlayer != null )
+			videoPlayer.Play();
 		playButton.gameObject.SetActive(false);
 		pauseButton.gameObject.SetActive(true);
 	}
@@ -157,7 +247,8 @@ public class VideoPlayWindow : UIWindow {
 
 	public void OnPauseVideo()
 	{
-		videoPlayer.Pause();
+		if ( videoPlayer != null )
+			videoPlayer.Pause();
 		playButton.gameObject.SetActive(true);
 		pauseButton.gameObject.SetActive(false);
 	}
@@ -184,14 +275,14 @@ public class VideoPlayWindow : UIWindow {
 				// update teh color of the PlayPanelBack
 				if ( degree < ShowPanelDegree ) {
 					{
-					Color col = PlayPanelBack.color;
-					col.a = Mathf.Clamp01( ( ShowPanelDegree - degree ) / ( ShowPanelDegree - ShowButtonDegree )) * 0.33f;
-					PlayPanelBack.color = col;
+						Color col = PlayPanelBack.color;
+						col.a = Mathf.Clamp01( ( ShowPanelDegree - degree ) / ( ShowPanelDegree - ShowButtonDegree )) * 0.33f;
+						PlayPanelBack.color = col;
 					}
 					{
-					Color col = ExpandButton.subButtonAnimation.subButton.color;
-					col.a = Mathf.Clamp01( ( ShowPanelDegree - degree ) / ( ShowPanelDegree - ShowButtonDegree ));
-					ExpandButton.subButtonAnimation.subButton.color = col;
+						Color col = ExpandButton.subButtonAnimation.subButton.color;
+						col.a = Mathf.Clamp01( ( ShowPanelDegree - degree ) / ( ShowPanelDegree - ShowButtonDegree ));
+						ExpandButton.subButtonAnimation.subButton.color = col;
 					}
 				}
 			}
@@ -251,12 +342,11 @@ public class VideoPlayWindow : UIWindow {
 	
 			yield return new WaitForSeconds( duration * 0.5f );
 
-			foreach( VRBasicButton btn in buttons )
+			foreach( VRBasicButton btn in panelButtons )
 			{
 				if ( btn != ExpandButton )
 				{
 					btn.OnBecomeVisible(duration * 0.5f);
-//					btn.transform.rotation = Quaternion.LookRotation( Camera.main.transform.position - btn.transform.position );
 				}
 			}
 		}
@@ -278,12 +368,11 @@ public class VideoPlayWindow : UIWindow {
 	IEnumerator HidePlayPanelButtonsDo(float duration)
 	{
 		{
-			foreach( VRBasicButton btn in buttons )
+			foreach( VRBasicButton btn in panelButtons )
 			{
 				if ( btn != ExpandButton )
 				{
 					btn.OnBecomeInvisible(duration * 0.5f );
-//					btn.transform.rotation = Quaternion.LookRotation( Camera.main.transform.position - btn.transform.position );
 				}
 			}
 

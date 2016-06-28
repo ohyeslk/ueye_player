@@ -121,6 +121,10 @@ public class VREvents
 	public static event ChatEventHandler ChatMessage;
 	public static void FireChatMessage(ChatArg arg){if ( ChatMessage != null ) ChatMessage(arg) ; }
 
+	public static event ChatEventHandler ChatMessageRecieve;
+	public static void FireChatMessageRecieve(ChatArg arg){if ( ChatMessageRecieve != null ) ChatMessageRecieve(arg) ; }
+
+
 }
 
 public class BasicArg : EventArgs

@@ -71,7 +71,7 @@ public class SocketManager : MonoBehaviour {
 		ChatArg chatMessage = new ChatArg(this);
 		chatMessage.message = obj.data.GetField("data").str;
 		chatMessage.userName = obj.data.GetField("userid").str;
-		VREvents.FireChatMessage(chatMessage);
+		VREvents.FireChatMessageRecieve(chatMessage);
 	}
 
 	void OnResponse( SocketIOEvent obj )

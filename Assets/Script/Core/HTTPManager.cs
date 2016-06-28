@@ -70,6 +70,8 @@ public class HTTPManager : MonoBehaviour {
 		while( !helper.Done ) { yield return null ; }
 
 		string strValue = helper.Result;
+		msg.AddMessage( Global.MSG_BAIDU_YYIN_TRANSLATE_RESULT , strValue );
+		VREvents.FirePostBaiduYuyinTranslate( msg );
 
 //		System.Net.HttpWebResponse response = (System.Net.HttpWebResponse)request;
 //
@@ -85,8 +87,6 @@ public class HTTPManager : MonoBehaviour {
 //			strValue += StrDate + "\r\n";
 //			yield return null;
 //		}
-		msg.AddMessage( Global.MSG_BAIDU_YYIN_TRANSLATE_RESULT , strValue );
-		VREvents.FirePostBaiduYuyinTranslate( msg );
 	}
 
 	void RequestBaiduYuyin (URLRequestMessage msg)

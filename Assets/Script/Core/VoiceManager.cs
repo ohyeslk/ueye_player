@@ -18,6 +18,15 @@ public class VoiceManager : MonoBehaviour {
 			return m_token;
 		}
 	}
+
+	static bool m_isRecording;
+	public static bool IsRecording
+	{
+		get {
+			return m_isRecording;
+		}
+	}
+
 	void Awake()
 	{
 		if ( m_audio == null )
@@ -47,6 +56,7 @@ public class VoiceManager : MonoBehaviour {
 	{
 		VREvents.PostBaiduYuyinToken -= onBaiduYuyinToken;
 		VREvents.VoiceRecord -= onRecordVoice;
+		VREvents.PostBaiduYuyinTranslate -= OnPostBaiduYuyinTranslate;
 	}
 		
 	void OnPostBaiduYuyinTranslate (URLRequestMessage msg)
@@ -56,16 +66,17 @@ public class VoiceManager : MonoBehaviour {
 		JSONObject resJSON = new JSONObject(res );
 		Debug.Log("Json " + resJSON.ToString());
 
+		string sentence = "请问你在说什么？";
+
 		if ( resJSON.GetField("result") != null )
 		{
-			string sentence = resJSON.GetField("result").ToString();
+			sentence = resJSON.GetField("result").ToString();
 			sentence = sentence.Substring(2,sentence.Length-4);
-
-			Debug.Log("Send sentence " + sentence );
-			Message msgSend = new Message(this);
-			msgSend.AddMessage("data" , sentence) ;
-			VREvents.FirePostChatMessage(msgSend);
 		}
+
+		Message msgSend = new Message(this);
+		msgSend.AddMessage("data" , sentence);
+		VREvents.FirePostChatMessage(msgSend);
 	}
 
 	void onBaiduYuyinToken (URLRequestMessage msg)
@@ -81,6 +92,18 @@ public class VoiceManager : MonoBehaviour {
 
 		if ( isOn )
 		{
+			BeginRecord( msg );
+		}else
+		{
+			EndRecord( msg );
+		}
+	}
+
+	void BeginRecord( Message msg )
+	{
+		if ( !IsRecording )
+		{
+			m_isRecording = true;
 			m_audio.clip = Microphone.Start(Microphone.devices[0], true , 600 , 8000);
 			m_audio.loop = true;
 			m_audio.mute = true;
@@ -88,12 +111,15 @@ public class VoiceManager : MonoBehaviour {
 			m_audio.Play();
 
 			audioDeviceName = Microphone.devices[0];
-			currP = 0;
-			isRec = true;
+			m_isRecording = true;
+		}
+	}
 
-		}else
+	void EndRecord( Message msg )
+	{
+		if ( IsRecording )
 		{
-			isRec = false;
+			m_isRecording = false;
 
 			int pos = Microphone.GetPosition(audioDeviceName);
 
@@ -108,19 +134,9 @@ public class VoiceManager : MonoBehaviour {
 		}
 	}
 
-	void Update () {
-		
-	}
-
 	[SerializeField] AudioSource m_audio;
 	private string audioDeviceName;
-	private int currP, lastP;
 	private int recStart;
-	public bool isRec = false, Speaking = false;
-	public float voiceLevel = 0.001f;
-	public bool isSpeak = false;
-	public float time;
-	public const float deltaT = 0.2f;
 
 
 	public class postObj
@@ -173,6 +189,7 @@ public class VoiceManager : MonoBehaviour {
 			format = "wav",
 			rate = 8000,
 			channel = 1,
+			// TODO : adjust the language option
 			// lan= "en",
 			token = TOKEN,
 			cuid = "77777778888883",
@@ -239,7 +256,6 @@ public class VoiceManager : MonoBehaviour {
 
 		Byte[] subChunk2 = BitConverter.GetBytes(samples * channels * 2);
 		stream.Write(subChunk2, 0, 4);
-
 	}
 
 	private static Stream CreateEmpty()
