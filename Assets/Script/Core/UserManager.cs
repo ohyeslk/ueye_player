@@ -11,6 +11,13 @@ public class UserManager : MonoBehaviour {
 	}
 	static string m_token = "";
 
+	static public string UserName
+	{
+		get {
+			return "custom";
+		}
+	}
+
 	void Start()
 	{
 		Login();

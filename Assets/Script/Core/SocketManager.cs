@@ -1,71 +1,102 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
-using SocketIOClient;
 using System.Net.Sockets;
 using System.IO;
+using SocketIO;
 
 public class SocketManager : MonoBehaviour {
 //	static string url = "http://balala-dev.us-west-1.elasticbeanstalk.com";
-	static string url = "http://54.183.94.108";
-	Client client;
+	public string url = "http://54.183.94.108";
 
-	void Start()
+	public SocketIOComponent socketIO;
+	//	public Player	playerGameObj;
+
+	void OnEnable()
 	{
-		Connect();
+		VREvents.PostChatMessage += OnPostChatMessage;
 	}
 
-	void Connect()
+	void OnPostChatMessage (Message msg)
 	{
-		client = new Client(url);
+		string data="";
+		if ( msg.ContainMessage("data") )
+			data = msg.GetMessage("data").ToString();
 
-		client.Opened += SocketOpened;
-		client.Message += SocketMessage;
-		client.SocketConnectionClosed += SocketClosed;
-		client.Error += SocketError;
+		postMessage( data );
 
-		client.Connect();
 	}
 
-	void SocketOpened(object sender, EventArgs e)
+	void OnDisable()
 	{
-		Debug.Log("Opened");
+		VREvents.PostChatMessage -= OnPostChatMessage;
 	}
 
-	void SocketMessage (object sender, MessageEventArgs e) {
-		Debug.Log("Get messsage " + e.Message.MessageText );
-		if ( e!= null && e.Message.Event == "message") {
-			string msg = e.Message.MessageText;
+	void Awake()
+	{
+		if ( socketIO == null )
+		{
+			socketIO = gameObject.AddComponent<SocketIOComponent>();
+			socketIO.autoConnect = true;
 		}
+
+		socketIO.url = url;
 	}
 
-	void SocketClosed(object sender, EventArgs e)
-	{
-		Debug.Log("Socket Closed");
+	void Start () {
+		socketIO.On( "response" , OnResponse );
+		socketIO.On( "message" , OnMessage );
+
 	}
 
-	void SocketError( object sender , SocketIOClient.ErrorEventArgs e )
+	public void EnterChanel( string id )
 	{
-		Debug.Log("Socket Error " + e.Message );
+		JSONObject data = new JSONObject();
+		data.AddField("id" , id );
+		Debug.Log("Enter Channel " + data["id"].ToString());
+		socketIO.Emit("enterChannel" , data );
 	}
 
-	void SendMessage( string key , string content )
+	public void postMessage( string msgData )
 	{
-		Debug.Log("Send " + key + " " + content );
-		client.Emit( key , content );
+		JSONObject data = new JSONObject();
+		data.AddField("data" , msgData );
+		data.AddField("userid" , UserManager.UserName.ToString() );
+		socketIO.Emit("sendmessage" , data );
+	}
+
+	void OnMessage( SocketIOEvent obj )
+	{
+		Debug.Log("On Message " + obj.data.GetField("data").str);
+		ChatArg chatMessage = new ChatArg(this);
+		chatMessage.message = obj.data.GetField("data").str;
+		chatMessage.userName = obj.data.GetField("userid").str;
+		VREvents.FireChatMessageRecieve(chatMessage);
+	}
+
+	void OnResponse( SocketIOEvent obj )
+	{
+		string message = obj.data.GetField("message").str;
+		if ( message == "I got you!")
+		{
+			EnterChanel("r");
+		}
+
+		Debug.Log("On Response " + obj.data.GetField("message").str );
 	}
 
 	void Update()
 	{
-		if ( Input.GetKeyDown( KeyCode.C ) )
+		if ( Input.GetKeyDown( KeyCode.C ) && Input.GetKey( KeyCode.LeftControl ) )
 		{
-			SendMessage( "enterChannel" , "1" );
+			EnterChanel("r");
 		}
 
-		if ( Input.GetKeyDown( KeyCode.M ) )
+		if ( Input.GetKeyDown( KeyCode.M ) && Input.GetKey( KeyCode.LeftControl ) )
 		{
-			SendMessage( "sendMsg" , "hahaha" );
+			postMessage("hahaha");
 		}
+
 	}
 
 ///////////////////////////////

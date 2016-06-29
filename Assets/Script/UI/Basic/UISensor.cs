@@ -75,6 +75,10 @@ public class UISensor : MonoBehaviour {
 		
 	}
 
+	virtual public void OnFingerUp( ) {
+		
+	}
+
 	/// <summary>
 	/// Checks the start time.
 	/// </summary>

@@ -92,6 +92,14 @@ public class LogicManager : MonoBehaviour {
 			gameObject.AddComponent<UserManager>();
 		if ( gameObject.GetComponent<SocketManager>() == null )
 			gameObject.AddComponent<SocketManager>();
+		if ( gameObject.GetComponent<VoiceManager>() == null )
+			gameObject.AddComponent<VoiceManager>();
+
+		// for test
+		// TODO remove this codes
+//		WindowArg arg = new WindowArg(this);
+//		arg.type = WindowArg.Type.PLAY_WINDOW;
+//		VREvents.FireActiveWindow( arg );
 	}
 
 	void OnEnable()

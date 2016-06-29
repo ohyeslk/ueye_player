@@ -37,7 +37,11 @@ public class VREvents
 	public static event MessageEventHandler UIInputResetTarget;
 	public static void FireUIInputResetTarget(Message arg){if ( UIInputResetTarget != null ) UIInputResetTarget(arg); }
 
+	public static event MessageEventHandler VoiceRecord;
+	public static void FireVoiceRecord(Message arg){if ( VoiceRecord != null ) VoiceRecord(arg); }
 
+	public static event MessageEventHandler PostChatMessage;
+	public static void FirePostChatMessage(Message arg){if ( PostChatMessage != null ) PostChatMessage(arg); }
 
 	/// <summary>
 	/// URL event handler. handle with the URL related events
@@ -74,6 +78,19 @@ public class VREvents
 	public static event URLEventHandler PostLogin;
 	public static void FirePostLogin(URLRequestMessage arg){if ( PostLogin != null ) PostLogin(arg) ; }
 
+	public static event URLEventHandler RequestBaiduYuyinToken;
+	public static void FireRequestBaiduYuyinToken(URLRequestMessage arg){if ( RequestBaiduYuyinToken != null ) RequestBaiduYuyinToken(arg) ; }
+
+	public static event URLEventHandler PostBaiduYuyinToken;
+	public static void FirePostBaiduYuyinToken(URLRequestMessage arg){if ( PostBaiduYuyinToken != null ) PostBaiduYuyinToken(arg) ; }
+
+	public static event URLEventHandler RequestBaiduYuyinTranslate;
+	public static void FireRequestBaiduYuyinTranslate(URLRequestMessage arg){if ( RequestBaiduYuyinTranslate != null ) RequestBaiduYuyinTranslate(arg) ; }
+
+	public static event URLEventHandler PostBaiduYuyinTranslate;
+	public static void FirePostBaiduYuyinTranslate(URLRequestMessage arg){if ( PostBaiduYuyinTranslate != null ) PostBaiduYuyinTranslate(arg) ; }
+
+
 	/// <summary>
 	/// Active window event handler. Handle the window events
 	/// </summary>
@@ -103,6 +120,10 @@ public class VREvents
 
 	public static event ChatEventHandler ChatMessage;
 	public static void FireChatMessage(ChatArg arg){if ( ChatMessage != null ) ChatMessage(arg) ; }
+
+	public static event ChatEventHandler ChatMessageRecieve;
+	public static void FireChatMessageRecieve(ChatArg arg){if ( ChatMessageRecieve != null ) ChatMessageRecieve(arg) ; }
+
 
 }
 

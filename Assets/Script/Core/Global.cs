@@ -21,11 +21,28 @@ public class Global {
 	public static string MSG_LOGIN_PASSWORD = "password";
 	public static string MSG_LOGIN_TOKEN = "token";
 
+	public static string MSG_BAIDU_YUYIN_TOKEN = "access_token";
+
+	public static string MSG_BAIDU_YYIN_TRANSLATE_JSON = "json";
+	public static string MSG_BAIDU_YYIN_TRANSLATE_RESULT = "result";
+
 	public static string VideoRequestURL = "http://balala-dev-beta.us-west-1.elasticbeanstalk.com/api/v1/channels/recordedstreams?days=NUMBER";
 	public static string CategoryRequstURL = "http://balala-dev-beta.us-west-1.elasticbeanstalk.com/api/v1/channels/category/";
 	public static string CategoryVideoRequestURL = "http://balala-dev-beta.us-west-1.elasticbeanstalk.com/api/v1/channels/category/CATEGORY";
 	public static string LiveVideoRequestURL = "http://balala-dev-beta.us-west-1.elasticbeanstalk.com/api/v1/channels/livestreams?index=0&days=NUMBER";
 	public static string LoginURL = "http://balala-dev.us-west-1.elasticbeanstalk.com/login";
+	public static string BaiduYuyinURL = "https://openapi.baidu.com/oauth/2.0/token?grant_type=client_credentials" +
+		"&client_id=" +
+		"9scx4TOCR18A2EZNlXkOYjUK" +
+		"&client_secret=" +
+		"87f007189f2b686e7b40b2a140d585b5";
+
+
+
+
+
+
+
 
 	public static VRMode initMode = VRMode.VR_2D;
 
@@ -42,6 +59,7 @@ public struct VideoInfo
 	public string playUrl;
 	public string coverUrl;
 	public string description;
+	public bool isLive;
 }
 
 [System.Serializable]
