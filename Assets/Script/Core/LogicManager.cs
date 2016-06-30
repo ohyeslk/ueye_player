@@ -58,7 +58,6 @@ public class LogicManager : MonoBehaviour {
 
 	static public void SwitchVRMode()
 	{
-		Debug.Log( "Switch VRMode " );
 		if ( m_vr_mode == VRMode.VR_3D )
 		{
 			SetVRMode( VRMode.VR_2D);
@@ -70,7 +69,7 @@ public class LogicManager : MonoBehaviour {
 
 	static public void SetVRMode(VRMode to)
 	{
-		Debug.Log("Set VRMode to " + to + " Cardboard " + CardBoard );
+//		Debug.Log("Set VRMode to " + to + " Cardboard " + CardBoard );
 		m_vr_mode = to;
 		if ( to == VRMode.VR_2D )
 		{

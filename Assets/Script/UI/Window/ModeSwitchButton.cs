@@ -8,12 +8,28 @@ public class ModeSwitchButton : MonoBehaviour {
 	[SerializeField] Sprite EyeIcon;
 	[SerializeField] Image image;
 
+	void OnEnable()
+	{
+		VREvents.SwitchVRMode += OnSwitchVRMode;
+	}
+
+	void OnDisable()
+	{
+		VREvents.SwitchVRMode -= OnSwitchVRMode;
+	}
+
+	void OnSwitchVRMode (Message msg)
+	{
+		UpdateIcon();
+	}
+
 	void Start()
 	{
 		if ( image == null )
 			image = GetComponent<Image>();
 		UpdateIcon();
 	}
+
 
 
 	void UpdateIcon()

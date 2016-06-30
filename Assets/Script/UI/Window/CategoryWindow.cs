@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-public class CategoryWindow : UIWindow {
+public class CategoryWindow : VRUIWindow {
 	[SerializeField] GameObject CategoryButtonPrefab;
 	[SerializeField] GridLayoutGroup Panel;
 	List<CategoryButton> cateButtons = new List<CategoryButton>();

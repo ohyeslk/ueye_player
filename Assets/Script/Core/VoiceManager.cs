@@ -82,7 +82,6 @@ public class VoiceManager : MonoBehaviour {
 	void onBaiduYuyinToken (URLRequestMessage msg)
 	{
 		m_token = msg.GetMessage(Global.MSG_BAIDU_YUYIN_TOKEN).ToString();
-		Debug.Log("=== Got token === ");
 	}
 
 	void onRecordVoice(Message msg )
@@ -189,8 +188,8 @@ public class VoiceManager : MonoBehaviour {
 			format = "wav",
 			rate = 8000,
 			channel = 1,
-			// TODO : adjust the language option
-			// lan= "en",
+//			TODO : adjust the language option
+//			lan= "en",
 			token = TOKEN,
 			cuid = "77777778888883",
 			len=length,

@@ -41,13 +41,16 @@ public class MediaPlayerCtrl : MonoBehaviour
     public delegate void VideoReady();
     public delegate void VideoError(MEDIAPLAYER_ERROR errorCode, MEDIAPLAYER_ERROR errorCodeExtra);
     public delegate void VideoFirstFrameReady();
+	public delegate void VideoResize ();
 
+
+	public VideoResize OnResize;
     public VideoReady OnReady;
     public VideoEnd OnEnd;
     public VideoError OnVideoError;
     public VideoFirstFrameReady OnVideoFirstFrameReady;
 
-#if UNITY_IPHONE
+#if UNITY_IPHONE || UNITY_TVOS
 	
 	private int m_iPauseFrame;
 #endif
@@ -78,26 +81,25 @@ public class MediaPlayerCtrl : MonoBehaviour
 	private delegate void DebugCallback(string message);
 	
 	[DllImport("EasyMovieTexture")]
-	private static extern void RegisterDebugCallback(DebugCallback callback);
+	private static extern void RegisterDebugCallback(DebugCallback callback);	
 	
-	
+#else
+
+	#if (UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX)
+		[DllImport ("EasyMovieTextureRender")]
+		private static extern void SetTextureFromUnity(System.IntPtr texture, int w, int h,byte[] data);
+
+
+		[DllImport("EasyMovieTextureRender")]
+		private static extern IntPtr GetRenderEventFunc();
+
+		private delegate void DebugCallback(string message);
+
+		[DllImport("EasyMovieTextureRender")]
+		private static extern void RegisterDebugCallback(DebugCallback callback);
+	#endif
+
 #endif
-
-#if (UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX)
-	[DllImport ("EasyMovieTextureRender")]
-	private static extern void SetTextureFromUnity(System.IntPtr texture, int w, int h,byte[] data);
-
-
-	[DllImport("EasyMovieTextureRender")]
-	private static extern IntPtr GetRenderEventFunc();
-
-	private delegate void DebugCallback(string message);
-
-	[DllImport("EasyMovieTextureRender")]
-	private static extern void RegisterDebugCallback(DebugCallback callback);
-#endif
-
-
 
 
 
@@ -151,39 +153,47 @@ public class MediaPlayerCtrl : MonoBehaviour
 
 
 
-#if !UNITY_WEBPLAYER && !UNITY_WEBGL && !UNITY_WP8 && !UNITY_WP8_1
+	#if !UNITY_WEBPLAYER && !UNITY_WEBGL && !UNITY_WP8 && !UNITY_WP8_1
 
-    static MediaPlayerCtrl()
-    {
-#if UNITY_EDITOR
-	String currentPath = Environment.GetEnvironmentVariable ("PATH", EnvironmentVariableTarget.Process);
-
-	String dllPath = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "Assets" + Path.DirectorySeparatorChar + "Plugins";
-
-	if (currentPath.Contains (dllPath) == false) {
-	Environment.SetEnvironmentVariable ("PATH", currentPath + Path.PathSeparator + dllPath, EnvironmentVariableTarget.Process);
-	}
-
-#endif
-    }
-
-    void Awake()
-    {
-
-#if UNITY_STANDALONE
-	String currentPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Process);
-
-	String dllPath = Application.dataPath + Path.DirectorySeparatorChar + "Plugins";
-
-	if(currentPath.Contains(dllPath) == false)
+	static MediaPlayerCtrl()
 	{
-		Environment.SetEnvironmentVariable("PATH", currentPath + Path.PathSeparator + dllPath, EnvironmentVariableTarget.Process);
+	#if UNITY_EDITOR
+		String currentPath = Environment.GetEnvironmentVariable ("PATH", EnvironmentVariableTarget.Process);
+
+		String dllPath = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "Assets" + Path.DirectorySeparatorChar + "Plugins";
+	
+		if (currentPath.Contains (dllPath) == false) {
+			Environment.SetEnvironmentVariable ("PATH", currentPath + Path.PathSeparator + dllPath, EnvironmentVariableTarget.Process);
+		}
+
+		dllPath = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "Assets" + Path.DirectorySeparatorChar + "Plugins"  + Path.DirectorySeparatorChar + "x64";
+
+		if (currentPath.Contains (dllPath) == false) {
+			Environment.SetEnvironmentVariable ("PATH", currentPath + Path.PathSeparator + dllPath, EnvironmentVariableTarget.Process);
+		}
+
+		dllPath = Environment.CurrentDirectory + Path.DirectorySeparatorChar + "Assets" + Path.DirectorySeparatorChar + "Plugins"  + Path.DirectorySeparatorChar + "x86";
+
+		if (currentPath.Contains (dllPath) == false) {
+			Environment.SetEnvironmentVariable ("PATH", currentPath + Path.PathSeparator + dllPath, EnvironmentVariableTarget.Process);
+		}
+
+	#endif
 	}
-#endif
 
+	void Awake()
+	{
 
+	#if UNITY_STANDALONE
+		String currentPath = Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.Process);
 
+		String dllPath = Application.dataPath + Path.DirectorySeparatorChar + "Plugins";
 
+		if(currentPath.Contains(dllPath) == false)
+		{
+			Environment.SetEnvironmentVariable("PATH", currentPath + Path.PathSeparator + dllPath, EnvironmentVariableTarget.Process);
+		}
+	#endif
 
 
         if (SystemInfo.deviceModel.Contains("rockchip"))
@@ -196,7 +206,7 @@ public class MediaPlayerCtrl : MonoBehaviour
         }
 
 
-#if UNITY_IPHONE || UNITY_EDITOR || UNITY_STANDALONE
+#if UNITY_IPHONE  || UNITY_TVOS || UNITY_EDITOR || UNITY_STANDALONE
 		
 		if(m_TargetMaterial!=null)
 		{
@@ -314,24 +324,32 @@ public class MediaPlayerCtrl : MonoBehaviour
             return;
         }
 
+		if (checkNewActions)
+		{			
+			checkNewActions = false;
+			CheckThreading ();
+		}
 
         if (m_bFirst == false)
         {
 
+
+
+
+
             string strName = m_strFileName.Trim();
 
-#if UNITY_IPHONE
-//			if (strName.StartsWith("http",StringComparison.OrdinalIgnoreCase))
-//			{
-//				StartCoroutine( DownloadStreamingVideoAndLoad(strName) );
-//			}
-//			else
+#if UNITY_IPHONE  || UNITY_TVOS
+			/*if (strName.StartsWith("http",StringComparison.OrdinalIgnoreCase))
+			{
+				StartCoroutine( DownloadStreamingVideoAndLoad(strName) );
+			}
+			else*/
 			{
 				Call_Load(strName,0);
 			}
 			
-#endif
-#if UNITY_ANDROID
+#elif UNITY_ANDROID 
 			
 			if(m_bSupportRockchip)
 			{
@@ -352,13 +370,11 @@ public class MediaPlayerCtrl : MonoBehaviour
 			{
 				Call_Load(strName,0);
 			}
-			
+#elif UNITY_STANDALONE
+			Call_Load(strName,0);
 			
 #endif
-
-#if UNITY_STANDALONE
-				Call_Load(strName,0);
-#endif
+			
             Call_SetLooping(m_bLoop);
             m_bFirst = true;
 
@@ -418,7 +434,7 @@ public class MediaPlayerCtrl : MonoBehaviour
 #endif
                 Call_SetWindowSize();
                 m_bCheckFBO = true;
-
+				if (OnResize != null) OnResize ();
             }
 
 
@@ -427,6 +443,8 @@ public class MediaPlayerCtrl : MonoBehaviour
 
 
             m_iCurrentSeekPosition = Call_GetSeekPosition();
+
+
 
 
         }
@@ -470,6 +488,9 @@ public class MediaPlayerCtrl : MonoBehaviour
             }
 
         }
+
+		GL.InvalidateState ();
+
 
     }
 
@@ -522,13 +543,13 @@ public class MediaPlayerCtrl : MonoBehaviour
                     {
                         if (fRatioScreen > 1.0f)
                         {
-                            if (fRatio > fRatioScreen)
+                            if (fRatio >= fRatioScreen)
                             {
                                 m_objResize[i].transform.localScale *= fRatioResult;
                             }
                         }
 
-                        m_ScaleValue = MEDIA_SCALE.SCALE_Y_TO_X;
+						m_ScaleValue = MEDIA_SCALE.SCALE_X_TO_Y;
                     }
                 }
 
@@ -687,7 +708,7 @@ public class MediaPlayerCtrl : MonoBehaviour
                 m_bPause = true;
             }
 
-#if UNITY_IPHONE && !UNITY_EDITOR
+#if (UNITY_IPHONE  || UNITY_TVOS) && !UNITY_EDITOR
 			m_iPauseFrame = m_iCurrentSeekPosition;
 			Stop();
 			
@@ -700,7 +721,7 @@ public class MediaPlayerCtrl : MonoBehaviour
         }
         else
         {
-#if UNITY_IPHONE && !UNITY_EDITOR
+#if ( UNITY_IPHONE  || UNITY_TVOS )&& !UNITY_EDITOR
 			m_bStop = false;
 			Call_Play(m_iPauseFrame);
 #else
@@ -732,6 +753,7 @@ public class MediaPlayerCtrl : MonoBehaviour
     {
         if (m_bStop == true)
         {
+			SeekTo(0);
             Call_Play(0);
             m_bStop = false;
         }
@@ -824,6 +846,33 @@ public class MediaPlayerCtrl : MonoBehaviour
         else
             return 0;
     }
+
+	public float GetSeekBarValue()
+	{
+		if (m_CurrentState == MEDIAPLAYER_STATE.PLAYING || m_CurrentState == MEDIAPLAYER_STATE.PAUSED || m_CurrentState == MEDIAPLAYER_STATE.END || m_CurrentState == MEDIAPLAYER_STATE.READY || m_CurrentState == MEDIAPLAYER_STATE.STOPPED)
+		{
+			if (GetDuration () == 0) {
+				return 0;
+			}
+			return (float)GetSeekPosition() / (float)GetDuration() ;
+		}
+		else
+			return 0;
+	}
+
+	public void SetSeekBarValue(float fValue)
+	{
+		if (m_CurrentState == MEDIAPLAYER_STATE.PLAYING || m_CurrentState == MEDIAPLAYER_STATE.PAUSED || m_CurrentState == MEDIAPLAYER_STATE.END || m_CurrentState == MEDIAPLAYER_STATE.READY || m_CurrentState == MEDIAPLAYER_STATE.STOPPED)
+		{
+			if (GetDuration () == 0) {
+				return;
+			}
+
+			SeekTo( (int)((float)GetDuration() * fValue) );
+		}
+		else
+			return;
+	}
 
     //Get update status in buffering a media stream received through progressive HTTP download. 
     //The received buffering percentage indicates how much of the content has been buffered or played. 
@@ -1211,7 +1260,7 @@ public class MediaPlayerCtrl : MonoBehaviour
 	
 	
 	
-#elif UNITY_IPHONE
+#elif UNITY_IPHONE  || UNITY_TVOS
 	[DllImport("__Internal")]
 	private static extern int VideoPlayerPluginCreateInstance();
 	[DllImport("__Internal")]
@@ -1250,6 +1299,8 @@ public class MediaPlayerCtrl : MonoBehaviour
 	private static extern void VideoPlayerPluginStopVideo(int iID);
 	[DllImport("__Internal")]
 	private static extern bool VideoPlayerPluginFinish(int iID);
+	[DllImport("__Internal")]
+	private static extern bool VideoPlayerPluginError(int iID);
 	[DllImport("__Internal")]
 	private static extern void VideoPlayerPluginSetTexture(int iID,int iTextureID);
 	
@@ -1357,11 +1408,16 @@ public class MediaPlayerCtrl : MonoBehaviour
 	{
 		
 		VideoPlayerPluginStopVideo(m_iID);
+		VideoPlayerPluginDestroyInstance(m_iID);
 	}
 	
 	private bool Call_Load(string strFileName, int iSeek)
 	{
-		
+		if( m_iID == -1)
+		{
+			Call_SetUnityActivity();
+		}
+
 		if(_videoTexture != null)
 		{
 			Destroy(_videoTexture);
@@ -1553,6 +1609,11 @@ public class MediaPlayerCtrl : MonoBehaviour
 		{
 			return MEDIAPLAYER_STATE.END;
 		}
+
+		if( VideoPlayerPluginError(m_iID) )
+		{
+			return MEDIAPLAYER_STATE.ERROR;
+		}
 		
 		if( m_CurrentState == MEDIAPLAYER_STATE.PAUSED || m_CurrentState == MEDIAPLAYER_STATE.STOPPED)
 		{
@@ -1591,6 +1652,9 @@ public class MediaPlayerCtrl : MonoBehaviour
 
 	AudioClip audioClip;
 	AudioSource audioSource;
+	int iSoundCount = 0;
+	int iInitCount = 0;
+
 
 	double pts;
 
@@ -1734,13 +1798,19 @@ public class MediaPlayerCtrl : MonoBehaviour
 			Destroy (audioClip);
 			audioClip = null;
 		}
+
+
+
 	}
 	
-private  bool Call_Load(string strFileName, int iSeek)
+	private unsafe bool Call_Load(string strFileName, int iSeek)
 	{
-		Debug.Log("Load File " + strFileName );
+		
 		fCurrentSeekTime = 0.0f;
 		fLastFrameTime = 0.0f;
+		iSoundCount = 0;
+		iInitCount= 0;
+		bSeekTo = true;
 
 		if (audioSource != null) {
 			audioSource.Stop();
@@ -1765,6 +1835,9 @@ private  bool Call_Load(string strFileName, int iSeek)
 			strFileName = strFileName.Replace("file://", "");
 		}
 
+
+	Thread loader = new Thread ( () => {
+
 		AVFormatContext* ppFomatContext = null;
 		if (ffmpeg.avformat_open_input(&ppFomatContext, strFileName, null, null) != 0)
 		{
@@ -1773,17 +1846,36 @@ private  bool Call_Load(string strFileName, int iSeek)
 			throw new ApplicationException(@"Could not open file");
 		}
 
+		//ffmpeg.av_dict_free(&opts);
+
 		pFormatContext = ppFomatContext;
 
 	
 		
 		if (ffmpeg.avformat_find_stream_info(pFormatContext, null) != 0)
 		{
-		m_CurrentState = MEDIAPLAYER_STATE.ERROR;
+			m_CurrentState = MEDIAPLAYER_STATE.ERROR;
 			throw new ApplicationException(@"Could not find stream info");
 		}
 
+		AddActionForUnityMainThread( () => {
+			LoadVideoPart2 ();
+		});
+
+	});
+
+	loader.Priority = System.Threading.ThreadPriority.AboveNormal;
+
+	loader.Start ();
+
+	return true;
+}
+
+
+void LoadVideoPart2 ()
+{
 		pStream = null;
+		pStreamAudio = null;
 
 		bool bFindVideo = false;
 
@@ -1805,7 +1897,7 @@ private  bool Call_Load(string strFileName, int iSeek)
 			{
 				pStreamAudio = (pFormatContext)->streams[i];
 				iStreamAudioIndex = i;
-			Debug.Log( "Audio"+ iStreamAudioIndex);
+
 			}
 		}
 
@@ -1912,7 +2004,7 @@ private  bool Call_Load(string strFileName, int iSeek)
         else
         {
             action = Interrupt1;
-            pFormatContext->interrupt_callback.callback = Marshal.GetFunctionPointerForDelegate(action);
+            //pFormatContext->interrupt_callback.callback = Marshal.GetFunctionPointerForDelegate(action);
         }
          
 
@@ -1927,12 +2019,14 @@ private  bool Call_Load(string strFileName, int iSeek)
 		}
 		else
 		{
+
+			m_CurrentState = MEDIAPLAYER_STATE.READY;
+
             if( OnReady != null)
                 OnReady();
-			m_CurrentState = MEDIAPLAYER_STATE.READY;
+
 		}
 
-		return true;
 	}
 
 	public delegate void VideoInterrupt();
@@ -2013,9 +2107,9 @@ private  bool Call_Load(string strFileName, int iSeek)
 
             if (listVideo != null)
             {
-                while (listVideo.Count > 10 || bEnd == true )
+                while (listVideo.Count >50 || bEnd == true )
                 {
-                    Thread.Sleep(10);
+                    Thread.Sleep(5);
                 }
             }
             
@@ -2033,9 +2127,10 @@ private  bool Call_Load(string strFileName, int iSeek)
       
            
         
-            Thread.Sleep(5);
+            //Thread.Sleep(5);
         }
     }
+
 
 	private void UpdateVideo()
 	{
@@ -2070,30 +2165,28 @@ private  bool Call_Load(string strFileName, int iSeek)
 						
 
 				        
-						//	Debug.Log (pts);
+							
 		
 
 
 						if (gotPicture == 1) {
 							if (pts > 0) {
-                                if (listVideo.Count > 9)
+                                if (listVideo.Count > 49)
                                 {
                                     if (!m_bIsFirstFrameReady) {
 
-                                    //Debug.Log("FistReady");
+								//Debug.Log("FistReady"  + listVideo.Count);
                                         m_bIsFirstFrameReady = true;
 
 
-
-                                        if (OnVideoFirstFrameReady != null) {
-                                            //OnVideoFirstFrameReady ();
-											bVideoFirstFrameReady = true;
-                                            OnVideoFirstFrameReady = null;
-                                        }
+										bVideoFirstFrameReady = true;
+                                        
                                     }
                                 }
 								
 							}
+
+							//Debug.Log ("Video " + pts);
 
 							//fLastFrameTime = (float)pts;
 							
@@ -2162,7 +2255,9 @@ private  bool Call_Load(string strFileName, int iSeek)
                         
                         if( ret == -541478725)
                         {
-                            bEnd= true;
+
+
+                           	bEnd= true;
 
                             return;
                         }
@@ -2195,18 +2290,18 @@ private  bool Call_Load(string strFileName, int iSeek)
                                     
 
                                     int iDataSize = ffmpeg.av_samples_get_buffer_size(null,pAudioCodecContext->channels,pDecodedAudioFrame->nb_samples,pAudioCodecContext->sample_fmt,1);
-
-
-                                    if( pAudioCodecContext->sample_fmt == AVSampleFormat.AV_SAMPLE_FMT_FLTP)
+									int iDataSize2 = ffmpeg.av_samples_get_buffer_size(null,pAudioCodecContext->channels,pDecodedAudioFrame->nb_samples,AVSampleFormat.AV_SAMPLE_FMT_FLT,1);
+					
+                                    if( pAudioCodecContext->sample_fmt != AVSampleFormat.AV_SAMPLE_FMT_FLT)
                                     {
                                         //for(int i = 0; i < pAudioCodecContext->channels; i++)
                                         {
-                                            sbyte* outData =  (sbyte*)Marshal.AllocCoTaskMem(iDataSize * sizeof(sbyte));;
+											sbyte* outData =  (sbyte*)Marshal.AllocCoTaskMem(iDataSize2 * sizeof(sbyte));;
                                             int out_linesize;
-                                            //ffmpeg.av_samples_alloc(&outData,&out_linesize,pDecodedAudioFrame->channels,pDecodedAudioFrame->nb_samples,AVSampleFormat.AV_SAMPLE_FMT_FLTP,0);
+                                            //ffmpeg.av_samples_alloc(&outData,&out_linesize,pDecodedAudioFrame->channels,pDecodedAudioFrame->nb_samples,AVSampleFormat.AV_SAMPLE_FMT_FLT,0);
 
                                             SwrContext* pAudioCvtContext = null;
-                                            pAudioCvtContext = ffmpeg.swr_alloc_set_opts( null,(long)pAudioCodecContext->channel_layout, AVSampleFormat.AV_SAMPLE_FMT_FLT,pAudioCodecContext->sample_rate
+											pAudioCvtContext = ffmpeg.swr_alloc_set_opts( null,(long)pAudioCodecContext->channel_layout, AVSampleFormat.AV_SAMPLE_FMT_FLT,pAudioCodecContext->sample_rate
                                                 ,(long)pAudioCodecContext->channel_layout,pAudioCodecContext->sample_fmt,pAudioCodecContext->sample_rate,0,(void*)0);
 
                                             int error = 0;
@@ -2216,19 +2311,21 @@ private  bool Call_Load(string strFileName, int iSeek)
                                             }
 
 
+								
+											int iCon = ffmpeg.swr_convert(pAudioCvtContext,&outData,iDataSize2,pDecodedAudioFrame->extended_data,pDecodedAudioFrame->nb_samples );
+									
 
-                                            int iCon = ffmpeg.swr_convert(pAudioCvtContext,&outData,pDecodedAudioFrame->nb_samples,pDecodedAudioFrame->extended_data,pDecodedAudioFrame->nb_samples );
 
 
 
 
-                                            sbyte* soundFrameAddress = outData;
+                                          	sbyte* soundFrameAddress = outData;
 
                                             var soundBufferPtr = new IntPtr (soundFrameAddress);
 
 
-                                            byte[] buffer = new byte[iDataSize  ];
-                                            Marshal.Copy(soundBufferPtr,buffer,0,iDataSize);
+											byte[] buffer = new byte[iDataSize2  ];
+											Marshal.Copy(soundBufferPtr,buffer,0,iDataSize2);
 
 
 
@@ -2244,7 +2341,23 @@ private  bool Call_Load(string strFileName, int iSeek)
                                             pts *= av_q2d(pStreamAudio->time_base);
 
 
+											if( bSeekTo == true)
+											{
+												double value = pts * (double)pDecodedAudioFrame->sample_rate / ((double)iDataSize2 / 4 / pDecodedAudioFrame->channels );
 
+												//Debug.Log(value + " " + pts + " " + GetDuration() + " " + pDecodedAudioFrame->pkt_duration);
+
+												iSoundCount = (int)value;
+												bSeekTo = false;
+											}
+
+											while( pts > 600.0f * (iInitCount + 1))
+											{
+												iSoundCount -=  (int)(600.0f * (double)pDecodedAudioFrame->sample_rate / ((double)iDataSize2 / 4 / pDecodedAudioFrame->channels));
+												iInitCount++;;
+											}
+
+											//Debug.Log ("sound " + iSoundCount);
                                             //Debug.Log (pDecodedAudioFrame->pkt_dts + " " +pDecodedAudioFrame->pkt_duration + " "  + pDecodedAudioFrame->pkt_pos + " " + pDecodedAudioFrame->pkt_pts + " " + pts);
 
 
@@ -2258,17 +2371,21 @@ private  bool Call_Load(string strFileName, int iSeek)
                                             {
                                                 listAudio.Add(fAudioData);
                                                 lock(listAudioPts)
-                                                {
+                                                { 
+													lock(listAudioPtsTime)
+                                                    {
+														//Debug.Log(pDecodedAudioFrame->pkt_pts % pDecodedAudioFrame->pkt_duration + " " + iDataSize2);
+														//listAudioPts.Add(iSoundCount++ * iDataSize2 / 4 / pDecodedAudioFrame->channels );
 
-                                                    if(m_strFileName.Contains(".m3u8") || m_strFileName.StartsWith("rtmp",StringComparison.OrdinalIgnoreCase) )
-                                                    {
-                                                        listAudioPts.Add(pts);
-                                                        listAudioPtsTime.Add(pts);
-                                                        
-                                                    }
-                                                    else
-                                                    {
-                                                        listAudioPts.Add(pDecodedAudioFrame->pkt_pts);
+														/*if( m_strFileName.Contains(".m3u8") )
+														{
+															listAudioPts.Add(pDecodedAudioFrame->pkt_pts / pDecodedAudioFrame->pkt_duration *iDataSize2 / 4 / pDecodedAudioFrame->channels   );
+														}
+														else*/
+														{
+															listAudioPts.Add(iSoundCount++ * iDataSize2 / 4 / pDecodedAudioFrame->channels );
+														}
+														
                                                         listAudioPtsTime.Add(pts);
                                                     }
                                                        
@@ -2277,7 +2394,7 @@ private  bool Call_Load(string strFileName, int iSeek)
                                    
                                             
 
-                                            //Debug.Log ( iDataSize + " "+ pts + " " + pAudioCodecContext->sample_rate + " " + pDecodedAudioFrame->sample_rate + " "+ pDecodedAudioFrame->nb_samples + " " + pDecodedAudioFrame->pkt_pts + " " + pDecodedAudioFrame->pkt_pos);
+                                           //Debug.Log ( iDataSize + " "+ pts + " " + pAudioCodecContext->sample_rate + " " + pDecodedAudioFrame->sample_rate + " "+ pDecodedAudioFrame->nb_samples + " " + pDecodedAudioFrame->pkt_pts + " " + pDecodedAudioFrame->pkt_pos);
                                             //Debug.Log ("sound decode time " + pts);
                                             //audioClip.SetData(fAudioData,(int)(pAudioCodecContext->sample_rate * pts )   );
                                             //audioClip.SetData(fAudioData,(int)(pDecodedAudioFrame->pkt_pts )   );
@@ -2326,8 +2443,11 @@ private  bool Call_Load(string strFileName, int iSeek)
                                             listAudio.Add(fAudioData);
                                             lock(listAudioPts)
                                             {
-                                                listAudioPts.Add(pts);
-                                                listAudioPtsTime.Add(pts);
+												lock(listAudioPts)
+												{
+                                                	listAudioPts.Add(pts);
+                                                	listAudioPtsTime.Add(pts);
+												}
                                                 
                                             }
                                         }
@@ -2338,16 +2458,6 @@ private  bool Call_Load(string strFileName, int iSeek)
                                         
                                     }
 
-									
-                                    
-									//  fLastAudioFrameTime = (float)pts;
-
-									
-									
-									
-									
-
-									
 								}
 							}
 						}
@@ -2367,27 +2477,102 @@ private  bool Call_Load(string strFileName, int iSeek)
 			
 
 	}
+	
+	int  iSoundBufferCount = 0;
+
+	/*void OnAudioSetPosition(int newPosition)
+	{
+	//Debug.Log (newPosition);
+
+	//Debug.Log("Pts" +  listAudioPtsTime[0]);
+	}*/
+
+	void OnAudioRead(float[] data)
+	{
+		//Debug.Log (listAudio.Count);
+
+		if (listAudio.Count < 3)
+		{
+				return;
+		}
+	//Debug.Log (data.Length + " " + listAudio[1].Length);
+
+		if (iSoundBufferCount == 0) {
+			iSoundBufferCount = listAudio[0].Length;
+		}
+
+
+		if (iSoundBufferCount < data.Length) {
+			Array.Copy (listAudio [0],  listAudio [0].Length - iSoundBufferCount, data, 0, iSoundBufferCount);
+			
+
+		//Debug.Log (iSoundBufferCount + " " + data.Length + " " + listAudio [1].Length);
+			if ((data.Length - iSoundBufferCount) > listAudio [1].Length) {
+				Array.Copy (listAudio [1], 0, data, 0, listAudio [1].Length);
+				Array.Copy (listAudio [2], 0, data, iSoundBufferCount + listAudio [1].Length, data.Length - iSoundBufferCount - listAudio [1].Length);
+				iSoundBufferCount = listAudio[2].Length - (data.Length - iSoundBufferCount  - listAudio [1].Length);
+				listAudio.RemoveAt (0);
+				listAudioPts.RemoveAt (0);
+				listAudioPtsTime.RemoveAt (0);
+
+			} else {
+				Array.Copy (listAudio [1], 0, data, iSoundBufferCount, data.Length - iSoundBufferCount);
+				iSoundBufferCount = listAudio[1].Length - (data.Length - iSoundBufferCount);
+			}
+			
+			
+			listAudio.RemoveAt (0);
+			listAudioPts.RemoveAt (0);
+			listAudioPtsTime.RemoveAt (0);
+
+
+
+		} else {
+			Array.Copy (listAudio [0], listAudio [0].Length - iSoundBufferCount, data,0, data.Length);
+			iSoundBufferCount -= data.Length;
+		}
+
+		if (iSoundBufferCount == 0) {
+			listAudio.RemoveAt (0);
+			listAudioPts.RemoveAt (0);
+			listAudioPtsTime.RemoveAt (0);
+
+			iSoundBufferCount = listAudio[0].Length;
+		}
+		
+	}
+
+
     
 	
 	private void Call_UpdateVideoTexture()
 	{
 
-		if (bEnd == true)
+		if (bEnd == true && listVideo.Count == 0 )
 		{
-			bEnd = false;
+			
 			m_CurrentState = MEDIAPLAYER_STATE.END;
 
 			if (OnEnd != null)
 			{
 				OnEnd();
+				
 				//return;
 			}
 
+
 			if (m_bLoop == true)
 			{
+				Destroy (audioClip);
+				audioClip = null;
 				Call_Play(0);
+				bEnd = false;
 				return;
 			}
+
+			bEnd = false;
+
+
 
 			return;
 		}
@@ -2404,7 +2589,7 @@ private  bool Call_Load(string strFileName, int iSeek)
         {
 			if (audioSource != null && m_CurrentState == MEDIAPLAYER_STATE.PLAYING)
             {
-                if( audioSource.isPlaying == false)
+				if( audioSource.isPlaying == false/* && audioSource.time > 0.02f*/)
                     audioSource.Play();
             }
         }
@@ -2416,16 +2601,88 @@ private  bool Call_Load(string strFileName, int iSeek)
 				OnVideoFirstFrameReady ();
 				bVideoFirstFrameReady = false;
 			}
-		}
+			
+			for (int i = 0; i < listAudio.Count; i++) {
+
+
+				if(audioSource == null /*&& (int)((float)pAudioCodecContext->sample_rate * ((float)listAudioPtsTime[i] + ((float)Call_GetDuration() / 1000.0f))) > 0*/)
+				{
+					audioSource = gameObject.AddComponent<AudioSource>();
+				}
+
+				if(audioClip == null && audioSource != null )
+				{
+
+					/*if ((float)Call_GetDuration() <= 0)
+					{
+						audioClip = AudioClip.Create("videoAudio",(int)((float)pAudioCodecContext->sample_rate * ((float)listAudioPtsTime[i] + 600.0f)),pAudioCodecContext->channels,pAudioCodecContext->sample_rate,true,OnAudioRead);
+					}
+					else*/
+					{
+						/*if (Call_GetDuration () > 1500000) {
+							audioClip = AudioClip.Create("videoAudio",(int)((float)pAudioCodecContext->sample_rate * ((float)listAudioPtsTime[i] + 10.0f)),pAudioCodecContext->channels,pAudioCodecContext->sample_rate,false);
+						}
+						else{
+							audioClip = AudioClip.Create("videoAudio",(int)((float)pAudioCodecContext->sample_rate * ((float)listAudioPtsTime[i] + 600.0f)),pAudioCodecContext->channels,pAudioCodecContext->sample_rate,false);
+						}*/
+
+						audioClip = AudioClip.Create("videoAudio",(int)((float)pAudioCodecContext->sample_rate * 600.0f),pAudioCodecContext->channels,pAudioCodecContext->sample_rate,false);
+						//
+					}
+
+
+
+
+					audioSource.clip = audioClip;
+					//audioSource.Play();
+
+					//AudioSource.PlayClipAtPoint(audioClip,new Vector3(0,0,0));
+				}
+
+			if (audioSource != null && Call_GetDuration() >0 ) {
+
+
+					if (listAudioPts.Count > i) {
+						if (listAudioPts [i] >= 0) {
+
+							{
+								/*if (listAudioPts [i] > (int)((float)pAudioCodecContext->sample_rate * ((float)listAudioPtsTime [i] + ((float)Call_GetDuration () / 1000.0f)))) {
+									audioClip.SetData (listAudio [i], (int)(((double)pAudioCodecContext->sample_rate) * listAudioPtsTime [i]));
+								} else*/ {
+									//Debug.Log(audioSource.time  + " " + (float)listAudioPtsTime[i]  + " " +listAudioPts [i]   +" " +  fLastFrameTime);
+									if (audioSource.time > (float)listAudioPtsTime [i]) {
+										//	audioSource.time = (float)listAudioPtsTime [i];
+									}
+								audioClip.SetData(listAudio[i],(int)(listAudioPts[i] %  (pAudioCodecContext->sample_rate * 600.0f))  );
+
+								}
+							}
+						}
+					}
+
+				//if(audioSource.isPlaying == false)
+					//audioSource.Play();
+				}
+
+
+
+			}
+
+
+
+		} 
      
         
 		
         if( m_CurrentState == MEDIAPLAYER_STATE.PLAYING && m_bIsFirstFrameReady == true && bInterrupt == false)
-			fCurrentSeekTime += Time.deltaTime;
+		{
+			if( listVideo.Count > 0)
+				fCurrentSeekTime += Time.deltaTime;
+		}
 		
 
 
-    //Debug.Log("last " + fLastFrameTime + " " + fCurrentSeekTime + " " + listVideo.Count);
+    	//Debug.Log("last " + fLastFrameTime + " " + fCurrentSeekTime + " " + listVideo.Count);
 
 		if (threadVideo == null && m_CurrentState != MEDIAPLAYER_STATE.END && m_CurrentState != MEDIAPLAYER_STATE.NOT_READY)
         {
@@ -2454,53 +2711,67 @@ private  bool Call_Load(string strFileName, int iSeek)
                 if(audioClip == null && audioSource != null )
                 {
 
-                    if ((float)Call_GetDuration() == 0)
+                    /*if ((float)Call_GetDuration() <= 0)
                     {
-                        audioClip = AudioClip.Create("videoAudio",(int)((float)pAudioCodecContext->sample_rate * ((float)listAudioPtsTime[i] + 600.0f)),pAudioCodecContext->channels,pAudioCodecContext->sample_rate,false);
+						audioClip = AudioClip.Create("videoAudio",(int)((float)pAudioCodecContext->sample_rate * ((float)listAudioPtsTime[i] + 600.0f)),pAudioCodecContext->channels,pAudioCodecContext->sample_rate,true,OnAudioRead);
                     }
-                    else
+                    else*/
                     {
-                        audioClip = AudioClip.Create("videoAudio",(int)((float)pAudioCodecContext->sample_rate * ((float)listAudioPtsTime[i] + ((float)Call_GetDuration() / 1000.0f))),pAudioCodecContext->channels,pAudioCodecContext->sample_rate,false);
+						 
+						/*if (Call_GetDuration () > 1500000) {
+							audioClip = AudioClip.Create("videoAudio",(int)((float)pAudioCodecContext->sample_rate * ((float)listAudioPtsTime[i] + 10.0f)),pAudioCodecContext->channels,pAudioCodecContext->sample_rate,false);
+						}
+						else{
+							audioClip = AudioClip.Create("videoAudio",(int)((float)pAudioCodecContext->sample_rate * ((float)listAudioPtsTime[i] + ((float)Call_GetDuration() / 1000.0f)+10.0f)),pAudioCodecContext->channels,pAudioCodecContext->sample_rate,false);
+						}*/
 
+						audioClip = AudioClip.Create("videoAudio",(int)((float)pAudioCodecContext->sample_rate * + 600.0f),pAudioCodecContext->channels,pAudioCodecContext->sample_rate,false);
                     }
 
-                    
+				 
+
+
                     audioSource.clip = audioClip;
-                    audioSource.Play();
-                    //AudioSource.PlayClipAtPoint(audioClip,new Vector3(0,0,0));
                 }
 
-                if (audioSource != null)
+				if (audioSource != null  && Call_GetDuration() >0)
                 {
+				
 
-				if (listAudioPts!= null && listAudioPts.Count > i && listAudioPts [i] >= 0) {
-						if(m_strFileName.Contains(".m3u8") || m_strFileName.StartsWith("rtmp",StringComparison.OrdinalIgnoreCase) )
-						{
+					if( listAudioPts.Count > i)
+					{
+						if (listAudioPts [i] >= 0) {
 
-							audioClip.SetData(listAudio[i],(int)(((double)pAudioCodecContext->sample_rate) * listAudioPts[i]  )   );
-						}
-						else
-						{
-							if( listAudioPts[i] > (int)((float)pAudioCodecContext->sample_rate * ((float)listAudioPtsTime[i] + ((float)Call_GetDuration() / 1000.0f))))
 							{
-								audioClip.SetData(listAudio[i],(int)(((double)pAudioCodecContext->sample_rate) * listAudioPtsTime[i]  )   );
-							}
-							else
-							{
-								//Debug.Log(pAudioCodecContext->sample_rate + " " +listAudioPts [i]  );
-								audioClip.SetData(listAudio[i],(int)(listAudioPts[i]  )  );
+								/*if( listAudioPts[i] > (int)((float)pAudioCodecContext->sample_rate * ((float)listAudioPtsTime[i] + ((float)Call_GetDuration() / 1000.0f))))
+								{
+									audioClip.SetData(listAudio[i],(int)(((double)pAudioCodecContext->sample_rate) * listAudioPtsTime[i]  )   );
+								}
+								else*/
+								{
+									//Debug.Log(audioSource.time  + " " + (float)listAudioPtsTime[i]  + " " +listAudioPts [i]   +" " +  fLastFrameTime);
+									
+									audioClip.SetData(listAudio[i],(int)(listAudioPts[i] %  (pAudioCodecContext->sample_rate * 600.0f))  );
+									
+								}
 							}
 						}
 					}
+					
+					
                     
                 }
 
 
 
             }
-            listAudio.Clear();
-            listAudioPts.Clear();
-            listAudioPtsTime.Clear();
+
+			if (audioSource != null && audioSource.isPlaying  && Call_GetDuration() >0) {
+				listAudio.Clear();
+				listAudioPts.Clear();
+				listAudioPtsTime.Clear();
+			}
+            
 
 			
 		}
@@ -2514,7 +2785,7 @@ private  bool Call_Load(string strFileName, int iSeek)
           
             if( listVideo.Count > 0)
             {
-                
+				
                 SetTextureFromUnity (m_VideoTexture.GetNativeTexturePtr (), m_iWidth, m_iHeight, listVideo.Dequeue());
                 GL.IssuePluginEvent (GetRenderEventFunc (), 7000);
 
@@ -2526,37 +2797,56 @@ private  bool Call_Load(string strFileName, int iSeek)
 
                 if(fLastFrameTime == 0)
                 {
+					
                   /*  if( fpts > fCurrentSeekTime)
                     {
                         fLastFrameTime = fCurrentSeekTime;
                     }
                     else*/
                     {
-                        fCurrentSeekTime = fpts;
-                        fLastFrameTime = fpts;
-                        if( audioSource != null)
-                            audioSource.time = fLastFrameTime;
+						if(fpts<0)
+						{
+							fLastFrameTime = 0;
+
+						}
+						else
+						{
+							fCurrentSeekTime = fpts;
+							fLastFrameTime = fpts;
+						}
+						
+                        
+						if( audioSource != null && Call_GetDuration() >0 )
+						{
+							audioSource.time = fLastFrameTime%600.0f;
+
+						}
                     }
                 }
                 else
                 {
-                    fLastFrameTime = fpts;
+					if(fpts<0)
+						fLastFrameTime = 0;
+					else
+                    	fLastFrameTime = fpts;
                 }
 
             }
 
-            if( audioSource != null)
+			if( audioSource != null &&  Call_GetDuration() > 0)
             {
-                if( audioSource.time - fLastFrameTime > 0)
+                if( audioSource.time - fLastFrameTime%600.0f > 0.2f)
                 {
                     //Debug.Log("sync1 " + audioSource.time + " " + fLastFrameTime);
-                    audioSource.time = fLastFrameTime;
+					audioSource.time = fLastFrameTime%600.0f;
                 }
-                else if( audioSource.time - fLastFrameTime < -0.2f)
+				else if( audioSource.time - fLastFrameTime%600.0f < -0.2f)
                 {
                     //Debug.Log("sync2");
-                    audioSource.time = fLastFrameTime;
+					audioSource.time = fLastFrameTime%600.0f;
                 }
+
+
             }
 
             #else
@@ -2587,16 +2877,16 @@ private  bool Call_Load(string strFileName, int iSeek)
 
             if( audioSource != null)
             {
-                if( audioSource.time - fLastFrameTime > 0)
+                /*if( audioSource.time - fLastFrameTime > 0)
                 {
-                //Debug.Log("sync1");
+               		 //Debug.Log("sync1");
                     audioSource.time = fLastFrameTime;
                 }
                 else if( audioSource.time - fLastFrameTime < -0.2f)
                 {
-                //Debug.Log("sync2");
+                	//Debug.Log("sync2");
                     audioSource.time = fLastFrameTime;
-                }
+                }*/
             }
             #endif
 
@@ -2630,63 +2920,8 @@ private  bool Call_Load(string strFileName, int iSeek)
 				}//while(fLastFrameTime < fCurrentSeekTime );
 
 
-        for (int i = 0; i < listAudio.Count; i++)
-        {
-
-
-            if(audioSource == null && (int)((float)pAudioCodecContext->sample_rate * ((float)listAudioPtsTime[i] + ((float)Call_GetDuration() / 1000.0f))) > 0)
-            {
-                audioSource = gameObject.AddComponent<AudioSource>();
-            }
-
-            if(audioClip == null && audioSource != null )
-            {
-                if ((float)Call_GetDuration() == 0)
-                {
-                    audioClip = AudioClip.Create("videoAudio",(int)((float)pAudioCodecContext->sample_rate * ((float)listAudioPtsTime[i] + 600.0f)),pAudioCodecContext->channels,pAudioCodecContext->sample_rate,false);
-                }
-                else
-                {
-                    audioClip = AudioClip.Create("videoAudio",(int)((float)pAudioCodecContext->sample_rate * ((float)listAudioPtsTime[i] + ((float)Call_GetDuration() / 1000.0f))),pAudioCodecContext->channels,pAudioCodecContext->sample_rate,false);
-
-                }
-
-                audioSource.clip = audioClip;
-                audioSource.Play();
-                //AudioSource.PlayClipAtPoint(audioClip,new Vector3(0,0,0));
-            }
-
-            if (audioSource != null)
-           {
-				if (listAudioPts != null  &&  listAudioPts [i] >= 0) {
-					if(m_strFileName.Contains(".m3u8") || m_strFileName.StartsWith("rtmp",StringComparison.OrdinalIgnoreCase) )
-					{
-
-						audioClip.SetData(listAudio[i],(int)(((double)pAudioCodecContext->sample_rate) * listAudioPts[i]  )   );
-					}
-					else
-					{
-						if( listAudioPts[i] > (int)((float)pAudioCodecContext->sample_rate * ((float)listAudioPtsTime[i] + ((float)Call_GetDuration() / 1000.0f))))
-						{
-							audioClip.SetData(listAudio[i],(int)(((double)pAudioCodecContext->sample_rate) * listAudioPtsTime[i]  )   );
-						}
-						else
-						{
-							//Debug.Log(pAudioCodecContext->sample_rate + " " +listAudioPts [i]  );
-							audioClip.SetData(listAudio[i],(int)(listAudioPts[i]  )  );
-						}
-					}
-				}
-
-
-
-			}
-
-        }
-
-                listAudio.Clear();
-                listAudioPts.Clear();
-                listAudioPtsTime.Clear();
+        
+                
 
 
             //Debug.Log(listAudio.Count);
@@ -2711,9 +2946,12 @@ private  bool Call_Load(string strFileName, int iSeek)
 	}
 	
 
+	bool bSeekTo = false;
+
 
 	private void Call_SetSeekPosition(int iSeek)
 	{
+		
 
         if( threadVideo != null)
         {
@@ -2725,16 +2963,13 @@ private  bool Call_Load(string strFileName, int iSeek)
             threadVideo = null;
         }
 
+		bSeekTo = true;
+		iInitCount = 0;
 
-		//int stream_index= -1;
+
 		long seek_target = (long)iSeek * 1000;
 
 
-		/*AVRational k;
-		k.num = 1;
-		k.den = ffmpeg.AV_TIME_BASE;
-*/
-		
 
 		Debug.Log (seek_target);
 		seek_target= ffmpeg.av_rescale_q(seek_target, ffmpeg.av_get_time_base_q() ,
@@ -2767,12 +3002,6 @@ private  bool Call_Load(string strFileName, int iSeek)
 		ffmpeg.avcodec_flush_buffers (pCodecContext);
 
 
-		/*if (audioSource != null) {
-            
-		}
-  */      
-
-        
 
         
 		//Debug.Log (fLastFrameTime + " " + fCurrentSeekTime);
@@ -2790,7 +3019,8 @@ private  bool Call_Load(string strFileName, int iSeek)
 		if (m_CurrentState == MEDIAPLAYER_STATE.READY || m_CurrentState == MEDIAPLAYER_STATE.STOPPED || m_CurrentState == MEDIAPLAYER_STATE.END  || m_CurrentState == MEDIAPLAYER_STATE.PAUSED) {
 			SeekTo (iSeek);
 			if (audioSource != null) {
-				audioSource.Play();
+				if( audioSource.isPlaying == false)
+					audioSource.Play();
 				audioSource.time = (float) iSeek / 1000.0f;
 			}
 			m_CurrentState = MEDIAPLAYER_STATE.PLAYING;
@@ -2818,7 +3048,8 @@ private  bool Call_Load(string strFileName, int iSeek)
 	{
 		if (audioSource != null) {
 			//audioSource.time =fLastAudioFrameTime;
-			audioSource.Play();
+			if( audioSource.isPlaying == false)
+				audioSource.Play();
 			
 		}
 
@@ -2887,9 +3118,10 @@ private  bool Call_Load(string strFileName, int iSeek)
 	
 	private int Call_GetDuration()
 	{
+	//Debug.Log ((int)(pFormatContext->duration / 1000));
 
 		if (pFormatContext != null)
-			return (int)pFormatContext->duration / 1000;
+		return (int)(pFormatContext->duration / 1000);
 
 		return 0;
 	}
@@ -3036,4 +3268,47 @@ private  bool Call_Load(string strFileName, int iSeek)
 
     }
 #endif
+
+
+
+#region UnityMainThread adapter
+
+	private List<Action> unityMainThreadActionList = new List<Action>();
+	private bool checkNewActions = false;
+	private object thisLock = new object();
+
+	/// <summary>
+	/// Execute UnityMainThread operations from unityMainThreadActionList List
+	/// </summary>
+	void CheckThreading()
+	{
+		lock (thisLock)
+		{
+			if (unityMainThreadActionList.Count > 0)
+			{
+				foreach(var a in unityMainThreadActionList)	
+				{
+					a();
+				}
+				unityMainThreadActionList.Clear ();
+			}
+		}
+	}
+
+	/// <summary>
+	/// Add a sequence of Code enclosed into the Action (a). It triggers checkNewActions to execute code into the Unity Thread Update
+	/// </summary>
+	/// <param name="a">The alpha component.</param>
+	void AddActionForUnityMainThread(Action a)
+	{
+		lock (thisLock)
+		{
+			unityMainThreadActionList.Add(a);
+		}
+		checkNewActions = true;
+	}
+
+#endregion
+
+
 }

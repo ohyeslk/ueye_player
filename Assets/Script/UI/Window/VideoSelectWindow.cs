@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 
-public class VideoSelectWindow : UIWindow  {
+public class VideoSelectWindow : VRUIWindow  {
 	/// <summary>
 	/// The prefabe of the unit in the window
 	/// </summary>

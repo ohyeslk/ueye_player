@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using DG.Tweening;
 
 
-public class VideoPlayWindow : UIWindow {
+public class VideoPlayWindow : VRUIWindow {
 
 	[SerializeField] GameObject screenPrefab;
 	[SerializeField] GameObject liveScreenPrefab;

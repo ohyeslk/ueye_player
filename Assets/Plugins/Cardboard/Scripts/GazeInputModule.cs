@@ -240,7 +240,6 @@ public class GazeInputModule : BaseInputModule {
     if (pointerData.pointerDrag != null && pointerData.dragging) {
       ExecuteEvents.Execute(pointerData.pointerDrag, pointerData, ExecuteEvents.endDragHandler);
     }
-
     // Clear the click state.
     pointerData.pointerPress = null;
     pointerData.rawPointerPress = null;

@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 using DG.Tweening;
 
-public class DetailWindow : UIWindow {
+public class DetailWindow : VRUIWindow {
 
 	[SerializeField] Image img;
 	[SerializeField] Text title;

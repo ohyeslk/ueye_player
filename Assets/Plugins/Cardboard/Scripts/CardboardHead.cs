@@ -36,6 +36,23 @@ using DG.Tweening;
 /// #trackRotation and #trackPosition properties in this case.
 [AddComponentMenu("Cardboard/CardboardHead")]
 public class CardboardHead : MonoBehaviour {
+
+	private static CardboardHead instance;
+	public static CardboardHead Instance
+	{
+		get
+		{
+			if (instance == null)
+			{
+				instance = FindObjectOfType(typeof(CardboardHead)) as CardboardHead;
+				if (instance == null)
+				{
+					instance = new GameObject("LogicManager").AddComponent<CardboardHead>();
+				}
+			}
+			return instance;
+		}
+	}
   /// Determines whether to apply the user's head rotation to this gameobject's
   /// orientation.  True means to update the gameobject's orientation with the
   /// user's head rotation, and false means don't modify the gameobject's orientation.
@@ -120,14 +137,13 @@ public class CardboardHead : MonoBehaviour {
     UpdateHead();
   }
 
+	public static void ResetCenter()
+	{
+		Instance.ResetCenterHand();
+	}
 	public void ResetCenterHand()
 	{
 		DOTween.To( ()=>  handDelta , x=> handDelta = x , Vector3.zero , 0.5f );
-	}
-
-	public void ResetCenterSDK()
-	{
-		
 	}
 
   // Compute new head pose.
