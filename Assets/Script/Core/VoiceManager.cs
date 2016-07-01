@@ -74,9 +74,13 @@ public class VoiceManager : MonoBehaviour {
 			sentence = sentence.Substring(2,sentence.Length-4);
 		}
 
-		Message msgSend = new Message(this);
-		msgSend.AddMessage("data" , sentence);
-		VREvents.FirePostChatMessage(msgSend);
+//		Message msgSend = new Message(this);
+//		msgSend.AddMessage("data" , sentence);
+//		VREvents.FireReciveTranslatedMessage(msgSend);
+
+		ChatArg chatMsg = new ChatArg(this);
+		chatMsg.message = sentence;
+		VREvents.FireReciveTranslatedMessage( chatMsg );
 	}
 
 	void onBaiduYuyinToken (URLRequestMessage msg)

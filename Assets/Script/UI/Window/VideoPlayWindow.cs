@@ -68,6 +68,7 @@ public class VideoPlayWindow : VRUIWindow {
 		base.OnDisable();
 		VREvents.PlayVideo -= OnPlayVideoEvent;
 		VREvents.VoiceRecord -= OnVoiceRecord;
+		VREvents.ReciveTranslatedMessage -= OnRecieveTranslatedMessage;
 		VREvents.ChatMessageRecieve -= OnChatMessageRecieve;
 	}
 
@@ -76,10 +77,16 @@ public class VideoPlayWindow : VRUIWindow {
 		base.OnEnable();
 		VREvents.PlayVideo += OnPlayVideoEvent;
 		VREvents.VoiceRecord += OnVoiceRecord;
+		VREvents.ReciveTranslatedMessage += OnRecieveTranslatedMessage;
 		VREvents.ChatMessageRecieve += OnChatMessageRecieve;
 	}
 
 	void OnChatMessageRecieve (ChatArg msg)
+	{
+		VREvents.FireChatMessage( msg );
+	}
+
+	void OnRecieveTranslatedMessage (ChatArg msg)
 	{
 		isWaittingForMessage = false;
 
@@ -88,6 +95,7 @@ public class VideoPlayWindow : VRUIWindow {
 		m_voiceInteraction.cancleButton.OnBecomeVisible(dur,true);
 		m_voiceInteraction.voiceText.text = msg.message;
 		temMsg = msg;
+
 	}
 
 	void OnVoiceRecord (Message msg)
@@ -126,7 +134,8 @@ public class VideoPlayWindow : VRUIWindow {
 	{
 		if ( temMsg != null )
 		{
-			VREvents.FireChatMessage( temMsg );
+			temMsg.cameraForward = Camera.main.transform.forward;
+			VREvents.FirePostChatMessageToServer( temMsg );
 		}
 
 		OnVoiceCancle();

@@ -7,29 +7,25 @@ using SocketIO;
 
 public class SocketManager : MonoBehaviour {
 //	static string url = "http://balala-dev.us-west-1.elasticbeanstalk.com";
-	public string url = "http://54.183.94.108";
+//	public string url = "http://54.183.94.108";
 
 	public SocketIOComponent socketIO;
 	//	public Player	playerGameObj;
 
 	void OnEnable()
 	{
-		VREvents.PostChatMessage += OnPostChatMessage;
+		VREvents.PostChatMessageToServer += OnPostChatMessageToServer;
 	}
 
-	void OnPostChatMessage (Message msg)
+	void OnPostChatMessageToServer (ChatArg msg)
 	{
-		string data="";
-		if ( msg.ContainMessage("data") )
-			data = msg.GetMessage("data").ToString();
-
-		postMessage( data );
-
+		Debug.Log("Message To Server");
+		postMessage( msg );
 	}
 
 	void OnDisable()
 	{
-		VREvents.PostChatMessage -= OnPostChatMessage;
+		VREvents.PostChatMessageToServer -= OnPostChatMessageToServer;
 	}
 
 	void Awake()
@@ -40,13 +36,12 @@ public class SocketManager : MonoBehaviour {
 			socketIO.autoConnect = true;
 		}
 
-		socketIO.url = url;
+		socketIO.url = Global.ChatSocketURL;
 	}
 
 	void Start () {
 		socketIO.On( "response" , OnResponse );
 		socketIO.On( "message" , OnMessage );
-
 	}
 
 	public void EnterChanel( string id )
@@ -57,20 +52,36 @@ public class SocketManager : MonoBehaviour {
 		socketIO.Emit("enterChannel" , data );
 	}
 
-	public void postMessage( string msgData )
+//	public void postMessage( string msgData )
+//	{
+//		JSONObject data = new JSONObject();
+//		data.AddField("data" , msgData );
+//		data.AddField("userid" , UserManager.UserName.ToString() );
+//		socketIO.Emit("sendmessage" , data );
+//	}
+
+	public void postMessage( ChatArg msgChatArg )
 	{
 		JSONObject data = new JSONObject();
-		data.AddField("data" , msgData );
+		data.AddField("data" , msgChatArg.message );
+		data.AddField("directionX" , msgChatArg.cameraForward.x );
+		data.AddField("directionY" , msgChatArg.cameraForward.y );
+		data.AddField("directionZ" , msgChatArg.cameraForward.z );
 		data.AddField("userid" , UserManager.UserName.ToString() );
-		socketIO.Emit("sendmessage" , data );
+
+		JSONObject send = new JSONObject();
+		send.AddField("payload" , data );
+
+		socketIO.Emit("sendmessage" , send );
 	}
 
 	void OnMessage( SocketIOEvent obj )
 	{
-		Debug.Log("On Message " + obj.data.GetField("data").str);
 		ChatArg chatMessage = new ChatArg(this);
-		chatMessage.message = obj.data.GetField("data").str;
-		chatMessage.userName = obj.data.GetField("userid").str;
+		JSONObject payload = obj.data.GetField("payload");
+		chatMessage.message = payload.GetField("data").str;
+		chatMessage.userName = payload.GetField("userid").str;
+		chatMessage.cameraForward = new Vector3( payload.GetField("directionX").f , payload.GetField("directionY").f ,payload.GetField("directionZ").f );
 		VREvents.FireChatMessageRecieve(chatMessage);
 	}
 
@@ -92,10 +103,10 @@ public class SocketManager : MonoBehaviour {
 			EnterChanel("r");
 		}
 
-		if ( Input.GetKeyDown( KeyCode.M ) && Input.GetKey( KeyCode.LeftControl ) )
-		{
-			postMessage("hahaha");
-		}
+//		if ( Input.GetKeyDown( KeyCode.M ) && Input.GetKey( KeyCode.LeftControl ) )
+//		{
+//			postMessage("hahaha");
+//		}
 
 	}
 

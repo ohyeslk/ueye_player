@@ -40,8 +40,6 @@ public class VREvents
 	public static event MessageEventHandler VoiceRecord;
 	public static void FireVoiceRecord(Message arg){if ( VoiceRecord != null ) VoiceRecord(arg); }
 
-	public static event MessageEventHandler PostChatMessage;
-	public static void FirePostChatMessage(Message arg){if ( PostChatMessage != null ) PostChatMessage(arg); }
 
 	/// <summary>
 	/// URL event handler. handle with the URL related events
@@ -113,16 +111,24 @@ public class VREvents
 	public static void FireUIConfirm(UISensorArg arg){if ( UIConfirm != null ) UIConfirm(arg) ; }
 
 
+
 	/// <summary>
 	/// For the chat system
 	/// </summary>
 	public delegate void ChatEventHandler(ChatArg msg); 
+
+	public static event ChatEventHandler PostChatMessageToServer;
+	public static void FirePostChatMessageToServer(ChatArg arg){if ( PostChatMessageToServer != null ) PostChatMessageToServer(arg) ; }
+
 
 	public static event ChatEventHandler ChatMessage;
 	public static void FireChatMessage(ChatArg arg){if ( ChatMessage != null ) ChatMessage(arg) ; }
 
 	public static event ChatEventHandler ChatMessageRecieve;
 	public static void FireChatMessageRecieve(ChatArg arg){if ( ChatMessageRecieve != null ) ChatMessageRecieve(arg) ; }
+
+	public static event ChatEventHandler ReciveTranslatedMessage;
+	public static void FireReciveTranslatedMessage(ChatArg arg){if ( ReciveTranslatedMessage != null ) ReciveTranslatedMessage(arg); }
 
 
 }
@@ -195,5 +201,6 @@ public class ChatArg : BasicArg
 	public ChatArg( object _this ):base(_this){}
 	public string message;
 	public string userName;
+	public Vector3 cameraForward;
 	public Color color;
 }

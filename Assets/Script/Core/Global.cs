@@ -30,6 +30,7 @@ public class Global {
 	public static string CategoryRequstURL = "http://balala-dev-beta.us-west-1.elasticbeanstalk.com/api/v1/channels/category/";
 	public static string CategoryVideoRequestURL = "http://balala-dev-beta.us-west-1.elasticbeanstalk.com/api/v1/channels/category/CATEGORY";
 	public static string LiveVideoRequestURL = "http://balala-dev-beta.us-west-1.elasticbeanstalk.com/api/v1/channels/livestreams?index=0&days=NUMBER";
+	public static string ChatSocketURL = "ws://balala-dev.us-west-1.elasticbeanstalk.com/socket.io/?EIO=3&transport=websocket";
 	public static string LoginURL = "http://balala-dev.us-west-1.elasticbeanstalk.com/login";
 	public static string BaiduYuyinURL = "https://openapi.baidu.com/oauth/2.0/token?grant_type=client_credentials" +
 		"&client_id=" +
