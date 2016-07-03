@@ -10,28 +10,28 @@ public class VoteWindow : MonoBehaviour {
 	[SerializeField] Text VoteTitle;
 	List<VoteButton> voteButtons = new List<VoteButton>();
 
-
-
 	public void Init( VoteArg msg )
 	{
 		VoteTitle.text = msg.title ;
 
-		int totalVote = 0;
-		for( int i = 0 ; i < msg.options.Length ; ++ i ) totalVote += msg.options[i].number;
-
 		int voteNumber = msg.options.Length;
 
-
-		for( int i = 0 ; i < voteNumber ; ++ i )
+		for( int i = voteButtons.Count ; i < voteNumber ; ++ i )
 		{
 			GameObject voteButton = Instantiate( voteButtonPrefab ) as GameObject;
 			voteButton.transform.SetParent( voteButtonPanel );
+			voteButton.transform.localScale = Vector3.one;
+			voteButton.transform.localPosition = Vector3.zero;
+			voteButton.transform.localRotation = Quaternion.identity;
 
 			VoteButton vbCom = voteButton.GetComponent<VoteButton>();
-			vbCom.Init( msg.options[i] , totalVote ,  i );
 			voteButtons.Add( vbCom );
 		}
-	}
 
+		for( int i = 0 ; i < voteNumber ; ++ i )
+		{
+			voteButtons[i].Init( msg ,  i );
+		}
+	}
 	
 }

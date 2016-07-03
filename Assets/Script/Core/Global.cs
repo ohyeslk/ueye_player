@@ -26,6 +26,8 @@ public class Global {
 	public static string MSG_BAIDU_YYIN_TRANSLATE_JSON = "json";
 	public static string MSG_BAIDU_YYIN_TRANSLATE_RESULT = "result";
 
+	public static string MSG_USER_VOTE_OPTION = "option";
+
 	public static string VideoRequestURL = "http://balala-dev-beta.us-west-1.elasticbeanstalk.com/api/v1/channels/recordedstreams?days=NUMBER";
 	public static string CategoryRequstURL = "http://balala-dev-beta.us-west-1.elasticbeanstalk.com/api/v1/channels/category/";
 	public static string CategoryVideoRequestURL = "http://balala-dev-beta.us-west-1.elasticbeanstalk.com/api/v1/channels/category/CATEGORY";

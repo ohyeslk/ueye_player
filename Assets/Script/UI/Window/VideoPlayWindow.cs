@@ -72,7 +72,7 @@ public class VideoPlayWindow : VRUIWindow {
 		VREvents.VoiceRecord -= OnVoiceRecord;
 		VREvents.ReciveTranslatedMessage -= OnRecieveTranslatedMessage;
 		VREvents.ChatMessageRecieve -= OnChatMessageRecieve;
-		VREvents.NewVoteCreated -= OnNewVoteCreated;
+		VREvents.VoteCreated -= OnVoteCreated;
 
 	}
 
@@ -83,11 +83,12 @@ public class VideoPlayWindow : VRUIWindow {
 		VREvents.VoiceRecord += OnVoiceRecord;
 		VREvents.ReciveTranslatedMessage += OnRecieveTranslatedMessage;
 		VREvents.ChatMessageRecieve += OnChatMessageRecieve;
-		VREvents.NewVoteCreated += OnNewVoteCreated;
+		VREvents.VoteCreated += OnVoteCreated;
 	}
 
-	void OnNewVoteCreated (VoteArg msg)
+	void OnVoteCreated (VoteArg msg)
 	{
+		voteWindow.gameObject.SetActive( true );
 		voteWindow.Init( msg );
 	}
 

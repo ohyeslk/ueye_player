@@ -9,21 +9,45 @@ public class VoteButton : MonoBehaviour {
 	[SerializeField] Text detail;
 	[SerializeField] Image numberBar;
 
-	public void Init( VoteOption _option , int totalVote , int index )
+
+	public void OnEnable()
 	{
-		option = _option;
-		detail.text = option.detail;
-		numberBar.fillAmount = _option.number / ( totalVote + 10 );
+		VREvents.VoteUpdate += OnVoteUpdate;
 	}
 
-	public void UpdateUI( VoteOption _option )
+	public void OnDisable()
 	{
-		
+		VREvents.VoteUpdate -= OnVoteUpdate;
+	}
+
+	public void Init( VoteArg msg , int index )
+	{
+		option = msg.options[index];
+		detail.text = option.detail;
+		numberBar.fillAmount = 1.0f * msg.options[index].number / ( msg.TotalVote + 10 );
+	}
+
+	void OnVoteUpdate (VoteArg msg)
+	{
+		foreach( VoteOption opt in msg.options )
+		{
+			if ( opt.detail == option.detail )
+			{
+				UpdateUI( opt , msg.TotalVote );
+
+			}
+		}
+	}
+
+	public void UpdateUI( VoteOption option , long totalNumber )
+	{
+		numberBar.fillAmount = 1.0f * option.number / ( totalNumber + 10 );
 	}
 
 	public void OnVote()
 	{
 		Message msg = new Message(this);
+		msg.AddMessage( Global.MSG_USER_VOTE_OPTION , option );
 		VREvents.FireUserVote( msg );
 	}
 }

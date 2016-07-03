@@ -135,11 +135,11 @@ public class VREvents
 	/// </summary>
 	public delegate void VoteEventHandler( VoteArg msg );
 
-	public static event VoteEventHandler NewVoteCreated;
-	public static void FireNewVoteCreated( VoteArg arg) { if ( NewVoteCreated != null ) NewVoteCreated(arg);}
+	public static event VoteEventHandler VoteCreated;
+	public static void FireVoteCreated( VoteArg arg) { if ( VoteCreated != null ) VoteCreated(arg);}
 
-	public static event VoteEventHandler NewVoteUpdate;
-	public static void FireNewVoteUpdate( VoteArg arg) { if ( NewVoteUpdate != null ) NewVoteUpdate(arg);}
+	public static event VoteEventHandler VoteUpdate;
+	public static void FireNewVoteUpdate( VoteArg arg) { if ( VoteUpdate != null ) VoteUpdate(arg);}
 
 	public static event MessageEventHandler UserVote;
 	public static void FireUserVote( Message arg) { if ( UserVote != null ) UserVote(arg);}
@@ -223,12 +223,40 @@ public class ChatArg : BasicArg
 public class VoteArg : BasicArg
 {
 	public VoteArg( object _this ):base(_this){}
+	public VoteArg( object _this, JSONObject data ):base(_this){
+		voteID = data.GetField("vote-id").str;
+		title = data.GetField("vote-title").str;
+		JSONObject voteList = data.GetField("count");
+		if ( voteList.IsArray )
+		{
+			options = new VoteOption[voteList.list.Count];
+			for( int i = 0 ; i < voteList.list.Count ; ++i )
+			{
+				options[i] = new VoteOption();
+				options[i].voteID = voteID;
+				options[i].number = voteList.list[i].GetField("number").i;
+				options[i].detail = voteList.list[i].GetField("option").str;
+			}
+		}
+	}
+	public string voteID;
 	public string title;
 	public VoteOption[] options;
+
+	public long TotalVote
+	{
+		get {
+			long total = 0;
+			foreach( VoteOption option in options )
+				total += option.number;
+			return total;
+		}
+	}
 }
 
 public struct VoteOption
 {
+	public string voteID;
 	public string detail;
-	public int number;
+	public long number;
 }

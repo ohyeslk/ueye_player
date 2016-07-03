@@ -8,7 +8,6 @@ using SocketIO;
 public class SocketManager : MonoBehaviour {
 //	static string url = "http://balala-dev.us-west-1.elasticbeanstalk.com";
 //	public string url = "http://54.183.94.108";
-
 	public SocketIOComponent socketIO;
 	//	public Player	playerGameObj;
 
@@ -21,6 +20,8 @@ public class SocketManager : MonoBehaviour {
 	void OnUserVote (Message msg)
 	{
 		Debug.Log("On UserVote");
+		VoteOption option = (VoteOption)msg.GetMessage(Global.MSG_USER_VOTE_OPTION );
+		UserVote( option );
 	}
 
 	void OnPostChatMessageToServer (ChatArg msg)
@@ -49,8 +50,47 @@ public class SocketManager : MonoBehaviour {
 	void Start () {
 		socketIO.On( "response" , OnResponse );
 		socketIO.On( "message" , OnMessage );
-		socketIO.On( "newVoteCreated" , OnVoteCreated );
+		socketIO.On( "voteCreated" , OnVoteCreated );
 		socketIO.On( "voteUpdate" , OnVoteUpdate );
+	}
+
+	public void UserVote( VoteOption option )
+	{
+		//TODO : WHAT'S IN VOTE
+		JSONObject data = new JSONObject();
+		data.AddField("voteOption" , option.detail );
+		data.AddField("userID" , UserManager.TOKEN );
+		data.AddField("voteID" , option.voteID );
+		socketIO.Emit("sendVoteEvent",data );
+	}
+
+
+	void OnVoteCreated( SocketIOEvent obj )
+	{
+		// TODO : WHAT'S IN VOTE CREATED
+		VoteArg msg = new VoteArg( this , obj.data);
+
+//		msg.voteID = data.GetField("vote-id").str;
+//		msg.title = data.GetField("vote-title").str;
+//		JSONObject voteList = data.GetField("count");
+//		if ( voteList.IsArray )
+//		{
+//			msg.options = new VoteOption[voteList.list.Count];
+//			for( int i = 0 ; i < voteList.list.Count ; ++i )
+//			{
+//				msg.options[i] = new VoteOption();
+//				msg.options[i].voteID = msg.voteID;
+//				msg.options[i].number = voteList.list[i].GetField("number").i;
+//				msg.options[i].detail = voteList.list[i].GetField("option").str;
+//			}
+//		}
+		VREvents.FireVoteCreated( msg );
+	}
+
+	void OnVoteUpdate( SocketIOEvent obj )
+	{
+		VoteArg msg = new VoteArg( this , obj.data );
+		VREvents.FireNewVoteUpdate( msg );
 	}
 
 	public void EnterChanel( string id )
@@ -68,7 +108,6 @@ public class SocketManager : MonoBehaviour {
 //		data.AddField("userid" , UserManager.UserName.ToString() );
 //		socketIO.Emit("sendmessage" , data );
 //	}
-
 	public void postMessage( ChatArg msgChatArg )
 	{
 		JSONObject data = new JSONObject();
@@ -84,22 +123,7 @@ public class SocketManager : MonoBehaviour {
 		socketIO.Emit("sendmessage" , send );
 	}
 
-	void OnVoteCreated( SocketIOEvent obj )
-	{
-		JSONObject data = new JSONObject();
-
-		VoteArg msg = new VoteArg( this );
-		VREvents.FireNewVoteCreated( msg );
-	}
-
-	void OnVoteUpdate( SocketIOEvent obj )
-	{
-
-		VoteArg msg = new VoteArg( this );
-		VREvents.FireNewVoteUpdate( msg );
-	}
-
-
+		
 	void OnMessage( SocketIOEvent obj )
 	{
 		ChatArg chatMessage = new ChatArg(this);
