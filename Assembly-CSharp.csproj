@@ -71,6 +71,7 @@
      <Compile Include="Assets\Script\UI\Button\VRFunctionButton.cs" />
      <Compile Include="Assets\Script\UI\Button\VideoInfoUnit.cs" />
      <Compile Include="Assets\Script\UI\Button\VoiceButton.cs" />
+     <Compile Include="Assets\Script\UI\Button\VoteButton.cs" />
      <Compile Include="Assets\Script\UI\Other\SidePattern.cs" />
      <Compile Include="Assets\Script\UI\Other\SpinAround.cs" />
      <Compile Include="Assets\Script\UI\Reticle\UIReticle.cs" />
@@ -80,6 +81,7 @@
      <Compile Include="Assets\Script\UI\Window\VRUIWindow.cs" />
      <Compile Include="Assets\Script\UI\Window\VideoPlayWindow.cs" />
      <Compile Include="Assets\Script\UI\Window\VideoSelectWindow.cs" />
+     <Compile Include="Assets\Script\UI\Window\VoteWindow.cs" />
      <Compile Include="Assets\Script\comment.cs" />
      <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BlendOneOne.shader" />
@@ -99,6 +101,7 @@
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_Antialiasing\NFAA.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ScreenSpaceRaytrace.cginc" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_DepthOfField\TiltShiftHdrLensBlur.shader" />
+     <None Include="Assets\Shader\VideoBetween2.shader" />
      <None Include="Assets\Plugins\FingerGestures\Readme.txt" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\VignetteShader.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_DepthOfField\DepthOfFieldScatter.shader" />
@@ -125,6 +128,7 @@
      <None Include="Assets\EasyMovieTexture\readme.txt" />
      <None Include="Assets\Plugins\Catlike Coding\SDF Toolkit\Shaders\SDF Forward.cginc" />
      <None Include="Assets\Plugins\DOTween\DOTween50.xml" />
+     <None Include="Assets\Shader\SPhere1.shader" />
      <None Include="Assets\Plugins\Catlike Coding\SDF Toolkit\Shaders\SDF Meta.cginc" />
      <None Include="Assets\Shader\MovieShader.shader" />
      <None Include="Assets\Standard Assets\Effects\ToonShading\Shaders\ToonBasicOutline.shader" />
@@ -138,6 +142,7 @@
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\NoiseEffectShaderYUV.shader" />
      <None Include="Assets\Plugins\SocketIO\readme.txt" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\CreaseApply.shader" />
+     <None Include="Assets\Shader\VideoBetween.shader" />
      <None Include="Assets\Plugins\Catlike Coding\SDF Toolkit\Shaders\SDF Unlit.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ChromaticAberrationShader.shader" />
      <None Include="Assets\Plugins\Android\AndroidManifest.xml" />

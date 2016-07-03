@@ -8,6 +8,7 @@ public class VideoPlayWindow : VRUIWindow {
 
 	[SerializeField] GameObject screenPrefab;
 	[SerializeField] GameObject liveScreenPrefab;
+	[SerializeField] VoteWindow voteWindow;
 	MediaPlayerCtrl videoPlayer;
 
 	[SerializeField] VRBasicButton playButton;
@@ -29,6 +30,7 @@ public class VideoPlayWindow : VRUIWindow {
 	[SerializeField] float ShowPanelDegree = 80f;
 	[SerializeField] float ButtonShowTime = 1f;
 	[SerializeField] float ButtonHideTime = 0.5f;
+
 
 	[System.Serializable]
 	public struct VoiceInteraction
@@ -70,6 +72,8 @@ public class VideoPlayWindow : VRUIWindow {
 		VREvents.VoiceRecord -= OnVoiceRecord;
 		VREvents.ReciveTranslatedMessage -= OnRecieveTranslatedMessage;
 		VREvents.ChatMessageRecieve -= OnChatMessageRecieve;
+		VREvents.NewVoteCreated -= OnNewVoteCreated;
+
 	}
 
 	override protected void OnEnable()
@@ -79,6 +83,12 @@ public class VideoPlayWindow : VRUIWindow {
 		VREvents.VoiceRecord += OnVoiceRecord;
 		VREvents.ReciveTranslatedMessage += OnRecieveTranslatedMessage;
 		VREvents.ChatMessageRecieve += OnChatMessageRecieve;
+		VREvents.NewVoteCreated += OnNewVoteCreated;
+	}
+
+	void OnNewVoteCreated (VoteArg msg)
+	{
+		voteWindow.Init( msg );
 	}
 
 	void OnChatMessageRecieve (ChatArg msg)
@@ -162,8 +172,8 @@ public class VideoPlayWindow : VRUIWindow {
 		VideoInfo info = (VideoInfo)msg.GetMessage(Global.MSG_VIDEO_INFO_KEY);
 		Debug.Log("Play Video " + info.title + " " + info.playUrl );
 
-		StartCoroutine( PlayVideoFake( info , 3f ));
-		UpdateScreen(info);
+		StartCoroutine( PlayVideoFake( info , 3f ) );
+//		UpdateScreen(info);
 
 	}
 
@@ -239,11 +249,12 @@ public class VideoPlayWindow : VRUIWindow {
 
 //		videoPlayer.DownloadStreamingVideoAndLoad( info.playUrl );
 //		videoPlayer.m_strFileName = info.playUrl;
+
 		videoPlayer.Load( info.playUrl );
 
 		yield return new WaitForSeconds( 1f );
 
-		videoPlayer.Play();
+		OnPlayVideo();
 
 		while( videoPlayer.GetCurrentState() == MediaPlayerCtrl.MEDIAPLAYER_STATE.NOT_READY )
 		{
@@ -251,7 +262,6 @@ public class VideoPlayWindow : VRUIWindow {
 		}
 
 		HideLoadAnimation();
-		OnPlayVideo();
 	}
 
 	public void OnPauseVideo()
@@ -314,13 +324,11 @@ public class VideoPlayWindow : VRUIWindow {
 	}
 
 	public void ShowLoadAnimation() {
-
 		m_loadAnimation.EyeIcon.DOFade( 1f , m_loadAnimation.fadeDuration );
 		m_loadAnimation.IconFrame.DOFade( 1f , m_loadAnimation.fadeDuration );
 	}
 
 	public void HideLoadAnimation() {
-
 		m_loadAnimation.EyeIcon.DOFade( 0 , m_loadAnimation.fadeDuration );
 		m_loadAnimation.IconFrame.DOFade( 0 , m_loadAnimation.fadeDuration );
 	}

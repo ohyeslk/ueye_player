@@ -69,7 +69,6 @@ public class LogicManager : MonoBehaviour {
 
 	static public void SetVRMode(VRMode to)
 	{
-//		Debug.Log("Set VRMode to " + to + " Cardboard " + CardBoard );
 		m_vr_mode = to;
 		if ( to == VRMode.VR_2D )
 		{
@@ -93,6 +92,8 @@ public class LogicManager : MonoBehaviour {
 			gameObject.AddComponent<SocketManager>();
 		if ( gameObject.GetComponent<VoiceManager>() == null )
 			gameObject.AddComponent<VoiceManager>();
+
+
 
 		// for test
 		// TODO remove this codes

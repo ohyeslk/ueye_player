@@ -130,6 +130,21 @@ public class VREvents
 	public static event ChatEventHandler ReciveTranslatedMessage;
 	public static void FireReciveTranslatedMessage(ChatArg arg){if ( ReciveTranslatedMessage != null ) ReciveTranslatedMessage(arg); }
 
+	/// <summary>
+	/// event for voting
+	/// </summary>
+	public delegate void VoteEventHandler( VoteArg msg );
+
+	public static event VoteEventHandler NewVoteCreated;
+	public static void FireNewVoteCreated( VoteArg arg) { if ( NewVoteCreated != null ) NewVoteCreated(arg);}
+
+	public static event VoteEventHandler NewVoteUpdate;
+	public static void FireNewVoteUpdate( VoteArg arg) { if ( NewVoteUpdate != null ) NewVoteUpdate(arg);}
+
+	public static event MessageEventHandler UserVote;
+	public static void FireUserVote( Message arg) { if ( UserVote != null ) UserVote(arg);}
+
+
 
 }
 
@@ -203,4 +218,17 @@ public class ChatArg : BasicArg
 	public string userName;
 	public Vector3 cameraForward;
 	public Color color;
+}
+
+public class VoteArg : BasicArg
+{
+	public VoteArg( object _this ):base(_this){}
+	public string title;
+	public VoteOption[] options;
+}
+
+public struct VoteOption
+{
+	public string detail;
+	public int number;
 }

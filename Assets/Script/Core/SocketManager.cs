@@ -15,6 +15,12 @@ public class SocketManager : MonoBehaviour {
 	void OnEnable()
 	{
 		VREvents.PostChatMessageToServer += OnPostChatMessageToServer;
+		VREvents.UserVote += OnUserVote;
+	}
+
+	void OnUserVote (Message msg)
+	{
+		Debug.Log("On UserVote");
 	}
 
 	void OnPostChatMessageToServer (ChatArg msg)
@@ -26,6 +32,7 @@ public class SocketManager : MonoBehaviour {
 	void OnDisable()
 	{
 		VREvents.PostChatMessageToServer -= OnPostChatMessageToServer;
+		VREvents.UserVote -= OnUserVote;
 	}
 
 	void Awake()
@@ -42,6 +49,8 @@ public class SocketManager : MonoBehaviour {
 	void Start () {
 		socketIO.On( "response" , OnResponse );
 		socketIO.On( "message" , OnMessage );
+		socketIO.On( "newVoteCreated" , OnVoteCreated );
+		socketIO.On( "voteUpdate" , OnVoteUpdate );
 	}
 
 	public void EnterChanel( string id )
@@ -74,6 +83,22 @@ public class SocketManager : MonoBehaviour {
 
 		socketIO.Emit("sendmessage" , send );
 	}
+
+	void OnVoteCreated( SocketIOEvent obj )
+	{
+		JSONObject data = new JSONObject();
+
+		VoteArg msg = new VoteArg( this );
+		VREvents.FireNewVoteCreated( msg );
+	}
+
+	void OnVoteUpdate( SocketIOEvent obj )
+	{
+
+		VoteArg msg = new VoteArg( this );
+		VREvents.FireNewVoteUpdate( msg );
+	}
+
 
 	void OnMessage( SocketIOEvent obj )
 	{
