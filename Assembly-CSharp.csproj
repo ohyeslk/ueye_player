@@ -103,6 +103,7 @@
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_DepthOfField\TiltShiftHdrLensBlur.shader" />
      <None Include="Assets\Shader\VideoBetween2.shader" />
      <None Include="Assets\Plugins\FingerGestures\Readme.txt" />
+     <None Include="Assets\Shader\MovieShader-left-right.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\VignetteShader.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_DepthOfField\DepthOfFieldScatter.shader" />
      <None Include="Assets\Plugins\Catlike Coding\SDF Toolkit\Shaders\SDF Metallic.shader" />
