@@ -70,7 +70,6 @@ public class CategoryButton : VRBasicButton {
 		{
 			img.sprite = (Sprite)msg.GetMessage(Global.MSG_REQUEST_TEXTURE_SPRITE_KEY);
 		}
-
 	}
 
 	public void Init( CategoryInfo info , int index , CategoryWindow p )

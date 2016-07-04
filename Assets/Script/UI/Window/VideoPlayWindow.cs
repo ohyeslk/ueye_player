@@ -42,6 +42,7 @@ public class VideoPlayWindow : VRUIWindow {
 		public Image backImage;
 		public float fadeInDuration;
 		public float fadeOutDuration;
+		public float maxWaitTime;
 	}
 	[SerializeField] VoiceInteraction m_voiceInteraction;
 	ChatArg temMsg;
@@ -60,7 +61,7 @@ public class VideoPlayWindow : VRUIWindow {
 	{
 		FollowView.gameObject.SetActive ( false );
 //		panelButtons = FollowView.gameObject.GetComponentsInChildren<VRBasicButton>();
-		HidePlayPanelButtons(0);
+		HidePlayPanel(0);
 		HideLoadAnimation();
 		HideVoiceComponents(0);
 	}
@@ -100,14 +101,21 @@ public class VideoPlayWindow : VRUIWindow {
 
 	void OnRecieveTranslatedMessage (ChatArg msg)
 	{
-		isWaittingForMessage = false;
-
-		float dur = m_voiceInteraction.fadeInDuration;
-		m_voiceInteraction.confirmButton.OnBecomeVisible(dur,true);
-		m_voiceInteraction.cancleButton.OnBecomeVisible(dur,true);
-		m_voiceInteraction.voiceText.text = msg.message;
+		ShowChatMessageResult( msg.message );
 		temMsg = msg;
+	}
 
+	void ShowChatMessageResult( string str )
+	{
+		if ( isWaittingForMessage == true )
+		{
+			isWaittingForMessage = false;
+
+			float dur = m_voiceInteraction.fadeInDuration;
+			m_voiceInteraction.confirmButton.OnBecomeVisible(dur,true);
+			m_voiceInteraction.cancleButton.OnBecomeVisible(dur,true);
+			m_voiceInteraction.voiceText.text = str;
+		}
 	}
 
 	void OnVoiceRecord (Message msg)
@@ -119,19 +127,26 @@ public class VideoPlayWindow : VRUIWindow {
 			m_voiceInteraction.backImage.DOFade( 0.5f , dur );
 			m_voiceInteraction.voiceText.DOFade( 1f , dur );
 
-			StartCoroutine ( WaitForMessage() );
+			if ( waitForMesage != null )
+			{
+				StopCoroutine( waitForMesage );
+			}
+
+			waitForMesage = StartCoroutine ( WaitForMessage() );
 		}
 	}
 
+	Coroutine waitForMesage = null;
 	bool isWaittingForMessage = false;
 	IEnumerator WaitForMessage()
 	{
 		isWaittingForMessage = true;
 		m_voiceInteraction.voiceText.text = "。";
+		float startTime = Time.time;
 
-		while( true  )
+		while( true )
 		{
-			yield return new WaitForSeconds(1f);
+			yield return new WaitForSeconds(0.66f);
 
 			if ( !isWaittingForMessage ) 
 				yield break;
@@ -139,6 +154,11 @@ public class VideoPlayWindow : VRUIWindow {
 			m_voiceInteraction.voiceText.text = m_voiceInteraction.voiceText.text + "。";
 			if ( m_voiceInteraction.voiceText.text.Length > 3 )
 				m_voiceInteraction.voiceText.text = "。";
+
+			if ( Time.time - startTime > m_voiceInteraction.maxWaitTime )
+			{
+				ShowChatMessageResult( "我不懂你在说什么" );
+			}
 		}
 	}
 
@@ -148,6 +168,7 @@ public class VideoPlayWindow : VRUIWindow {
 		{
 			temMsg.cameraForward = Camera.main.transform.forward;
 			VREvents.FirePostChatMessageToServer( temMsg );
+			temMsg = null;
 		}
 
 		OnVoiceCancle();
@@ -167,6 +188,7 @@ public class VideoPlayWindow : VRUIWindow {
 		m_voiceInteraction.confirmButton.OnBecomeInvisible(dur,true);
 		m_voiceInteraction.backImage.DOFade(0,dur);
 		m_voiceInteraction.voiceText.DOFade(0,dur);
+		m_voiceInteraction.voiceButton.Reset();
 	}
 
 	void OnPlayVideoEvent (Message msg)
@@ -201,12 +223,11 @@ public class VideoPlayWindow : VRUIWindow {
 		if ( videoPlayer != null )
 			videoPlayer.gameObject.SetActive(true);
 		ShouldUpdate = true;
-
 		FollowView.enabled = true;
 
 		FollowView.gameObject.SetActive( true );
 		lastDegree = 90f;
-		HideVoiceComponents(0);
+		HidePlayPanel( 0 );
 	}
 
 	protected override void OnBecomeInvsible ( float time )
@@ -220,6 +241,8 @@ public class VideoPlayWindow : VRUIWindow {
 		FollowView.enabled = false;
 
 		PlayPanelBack.DOFade( 0 , time ).OnComplete( DisablePlayPanel );
+
+		HidePlayPanel( ButtonShowTime );
 
 		// all buttons become invisible
 		VRBasicButton[] buttons = FollowView.GetComponentsInChildren<VRBasicButton>();
@@ -293,16 +316,16 @@ public class VideoPlayWindow : VRUIWindow {
 			float degree = Vector3.Angle( Camera.main.transform.forward , Vector3.down );
 			//if ( !PlayPanelExpanded )
 			{
-				// update teh color of the PlayPanelBack
+				// TODO : update all button's alpha on the PlayPanelBack
 				if ( degree < ShowPanelDegree ) {
-					{
-						Color col = PlayPanelBack.color;
-						col.a = Mathf.Clamp01( ( ShowPanelDegree - degree ) / ( ShowPanelDegree - ShowButtonDegree )) * 0.33f;
-						PlayPanelBack.color = col;
-					}
+//					{
+//						Color col = PlayPanelBack.color;
+//						col.a = Mathf.Clamp01( ( ShowPanelDegree - degree ) / ( ShowPanelDegree - ShowButtonDegree )) * 0.33f + 0.2f ;
+//						PlayPanelBack.color = col;
+//					}
 					{
 						Color col = ExpandButton.subButtonAnimation.subButton.color;
-						col.a = Mathf.Clamp01( ( ShowPanelDegree - degree ) / ( ShowPanelDegree - ShowButtonDegree ));
+						col.a = Mathf.Clamp01( ( ShowPanelDegree - degree ) / ( ShowPanelDegree - ShowButtonDegree )) + 0.2f ;
 						ExpandButton.subButtonAnimation.subButton.color = col;
 					}
 				}
@@ -316,12 +339,10 @@ public class VideoPlayWindow : VRUIWindow {
 	{
 		if( PlayPanelExpanded )
 		{
-			HidePlayPanelButtons( ButtonHideTime );
-			FollowView.enabled = true;
+			HidePlayPanel( ButtonHideTime );
 		}else
 		{
-			ShowPlayPanelButtons( ButtonShowTime );
-			FollowView.enabled = false;
+			ShowPlayPanel( ButtonShowTime );
 		}
 	}
 
@@ -340,12 +361,13 @@ public class VideoPlayWindow : VRUIWindow {
 	/// Play the Show Planel Buttons Animation and set PlayPanelExpanded to true
 	/// </summary>
 	/// <param name="time">Show duration.</param>
-	public void ShowPlayPanelButtons( float duration )
+	public void ShowPlayPanel( float duration )
 	{
 		{
 			StartCoroutine( ShowPlayPanelButtonsDo(duration) );
 			PlayPanelExpanded = true;
 		}
+		FollowView.enabled = false;
 	}
 
 	IEnumerator ShowPlayPanelButtonsDo(float duration)
@@ -356,6 +378,7 @@ public class VideoPlayWindow : VRUIWindow {
 			PlayPanelBack.transform.DOKill();
 			ExpandButton.transform.DOKill();
 			seq.Append( PlayPanelBack.transform.DOScaleX( 1f , duration * 0.5f ));
+			seq.Join ( PlayPanelBack.DOFade( 0.5f , duration * 0.5f ));
 			seq.Join( ExpandButton.transform.DOLocalMoveY( -300f , duration * 0.5f ));
 			seq.Join( ExpandButton.transform.DOLocalRotate( new Vector3( 0 , 0 , 90f ) , duration * 0.5f ));
 	
@@ -365,7 +388,7 @@ public class VideoPlayWindow : VRUIWindow {
 			{
 				if ( btn != ExpandButton )
 				{
-					btn.OnBecomeVisible(duration * 0.5f);
+					btn.OnBecomeVisible(duration * 0.5f , true );
 				}
 			}
 		}
@@ -376,12 +399,16 @@ public class VideoPlayWindow : VRUIWindow {
 	/// Play the Hide Planel Buttons Animation and set PlayPanelExpanded to false
 	/// </summary>
 	/// <param name="time">Show duration.</param>
-	public void HidePlayPanelButtons( float duration )
+	public void HidePlayPanel( float duration )
 	{
 		{
 			StartCoroutine( HidePlayPanelButtonsDo(duration) );
 			PlayPanelExpanded = false;
 		}
+
+		HideVoiceComponents( duration );
+
+		FollowView.enabled = true;
 	}
 
 	IEnumerator HidePlayPanelButtonsDo(float duration)
@@ -391,7 +418,8 @@ public class VideoPlayWindow : VRUIWindow {
 			{
 				if ( btn != ExpandButton )
 				{
-					btn.OnBecomeInvisible(duration * 0.5f );
+					btn.OnBecomeInvisible(duration * 0.5f , false);
+
 				}
 			}
 
