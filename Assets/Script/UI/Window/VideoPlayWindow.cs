@@ -88,8 +88,9 @@ public class VideoPlayWindow : VRUIWindow {
 
 	void OnVoteCreated (VoteArg msg)
 	{
-		voteWindow.gameObject.SetActive( true );
-		voteWindow.Init( msg );
+		//TODO : donot create the vote window
+//		voteWindow.gameObject.SetActive( true );
+//		voteWindow.Init( msg );
 	}
 
 	void OnChatMessageRecieve (ChatArg msg)
