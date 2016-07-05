@@ -147,6 +147,7 @@
      <None Include="Assets\Plugins\Catlike Coding\SDF Toolkit\Shaders\SDF Unlit.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ChromaticAberrationShader.shader" />
      <None Include="Assets\Plugins\Android\AndroidManifest.xml" />
+     <None Include="Assets\JsonDotNet\link.xml" />
      <None Include="Assets\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
      <None Include="Assets\Plugins\Catlike Coding\SDF Toolkit\Documentation\SDF Toolkit Readme.txt" />
      <None Include="Assets\Plugins\Catlike Coding\SDF Toolkit\Shaders\SDF Unlit.cginc" />
@@ -209,6 +210,9 @@
  <Reference Include="UnityEngine.Networking">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
  </Reference>
+ <Reference Include="Newtonsoft.Json">
+ <HintPath>/Users/atwood/tem/ueye_player/Assets/JsonDotNet/Assemblies/Standalone/Newtonsoft.Json.dll</HintPath>
+ </Reference>
  <Reference Include="DOTween">
  <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/DOTween/DOTween.dll</HintPath>
  </Reference>
@@ -220,9 +224,6 @@
  </Reference>
  <Reference Include="DOTween50">
  <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/DOTween/DOTween50.dll</HintPath>
- </Reference>
- <Reference Include="Newtonsoft.Json">
- <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/newtonsoftJSON/Newtonsoft.Json.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>

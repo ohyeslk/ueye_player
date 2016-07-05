@@ -49,6 +49,7 @@ public class HTTPManager : MonoBehaviour {
 		request.Headers.Add("apikey", "9scx4TOCR18A2EZNlXkOYjUK");
 		request.ContentType = "application/json";
 
+		Debug.Log( "Send Post " );
 		byte[] payload;
 
 		payload = System.Text.Encoding.UTF8.GetBytes(strJson);
@@ -58,6 +59,7 @@ public class HTTPManager : MonoBehaviour {
 		writer.Write(payload, 0, payload.Length);
 		writer.Close();
 
+		Debug.Log("set write stream");
 		StartCoroutine( ReadStream( msg , request ));
 
 	}
@@ -67,9 +69,14 @@ public class HTTPManager : MonoBehaviour {
 		HttpHelperStream helper = new HttpHelperStream(request );
 		helper.AsyBegin();
 
+		Debug.Log("Begin Ask Asy");
+
 		while( !helper.Done ) { yield return null ; }
 
+		Debug.Log("Get reply from BDY");
+
 		string strValue = helper.Result;
+		Debug.Log("Get Result " + strValue );
 		msg.AddMessage( Global.MSG_BAIDU_YYIN_TRANSLATE_RESULT , strValue );
 		VREvents.FirePostBaiduYuyinTranslate( msg );
 

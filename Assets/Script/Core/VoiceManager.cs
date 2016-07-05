@@ -64,7 +64,7 @@ public class VoiceManager : MonoBehaviour {
 		string res = msg.GetMessage(Global.MSG_BAIDU_YYIN_TRANSLATE_RESULT).ToString();
 
 		JSONObject resJSON = new JSONObject(res );
-		Debug.Log("Json " + resJSON.ToString());
+//		Debug.Log("Json " + resJSON.ToString());
 
 		string sentence = "请问你在说什么？";
 
@@ -104,6 +104,7 @@ public class VoiceManager : MonoBehaviour {
 
 	void BeginRecord( Message msg )
 	{
+		Debug.Log("Begin Record");
 		if ( !IsRecording )
 		{
 			m_isRecording = true;
@@ -120,14 +121,16 @@ public class VoiceManager : MonoBehaviour {
 
 	void EndRecord( Message msg )
 	{
+		Debug.Log("End Record");
 		if ( IsRecording )
 		{
 			m_isRecording = false;
 
 			int pos = Microphone.GetPosition(audioDeviceName);
 
+			Debug.Log("Get Microphone Position");
 			Microphone.End(Microphone.devices[0]);
-
+			Debug.Log("end microphone");
 			if ( pos > 1 )
 			{
 				float[] talk = new float[pos - 1];
@@ -142,7 +145,7 @@ public class VoiceManager : MonoBehaviour {
 	private int recStart;
 
 
-	public class postObj
+	public struct postObj
 	{
 		public string format { get; set; }
 		public int rate { get; set; }
@@ -157,7 +160,6 @@ public class VoiceManager : MonoBehaviour {
 	public void play(float[] audios)
 	{
 		Int16[] intData = new Int16[audios.Length];
-
 		Byte[] bytesData = new Byte[audios.Length * 2];
 		float sumf = 0;
 
@@ -173,20 +175,25 @@ public class VoiceManager : MonoBehaviour {
 		}
 		sumf /= audios.Length;
 
+		Debug.Log("Begin Stream write");
 		Stream fileStream = CreateEmpty();
 		fileStream.Write(bytesData, 0, bytesData.Length);
 		WriteHeader(fileStream, m_audio.clip);
 		byte[] lastbyte = new byte[fileStream.Length];
 		fileStream.Read(lastbyte, 0, lastbyte.Length);
 
+		Debug.Log("audio byte length " + lastbyte.Length );
+
 		string base64str = System.Convert.ToBase64String(lastbyte);
 
 		request("http://vop.baidu.com/server_api", base64str, lastbyte.Length);
-
 	}
 
 	public void request(string url, string base64audio, int length)
 	{
+		if ( base64audio.Length > 100 )
+			Debug.Log("Request to load " + base64audio.Substring( 0  , 1000 ));
+				
 		postObj jsonObj = new postObj()
 		{
 			format = "wav",
@@ -199,11 +206,17 @@ public class VoiceManager : MonoBehaviour {
 			len=length,
 			speech = base64audio
 		};
+		Debug.Log("Json Obj " + jsonObj);
+
 		string strJson= JsonConvert.SerializeObject(jsonObj, Formatting.Indented);
+		Debug.Log("Success Serialize " );
 
 		URLRequestMessage msg = new URLRequestMessage(this);
 		msg.AddMessage(Global.MSG_BAIDU_YYIN_TRANSLATE_JSON,strJson );
 		msg.url = url;
+
+		if ( strJson != null )
+			Debug.Log("Requst BDY " );
 
 		VREvents.FireRequestBaiduYuyinTranslate( msg );
 

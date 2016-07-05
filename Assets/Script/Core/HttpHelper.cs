@@ -252,6 +252,7 @@ public class HttpHelperStream
 
 	private void GetRequestStreamCallback(IAsyncResult asynchronousResult)
 	{
+		Debug.Log("On Get Request Stream Call Back " );
 		HttpWebRequest request = (HttpWebRequest)asynchronousResult.AsyncState;
 
 		HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asynchronousResult);
