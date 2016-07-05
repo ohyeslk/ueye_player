@@ -10,10 +10,12 @@ public class VideoPlayWindow : VRUIWindow {
 	[SerializeField] GameObject liveScreenPrefab;
 	[SerializeField] VoteWindow voteWindow;
 	MediaPlayerCtrl videoPlayer;
+	VideoInfo tempInfo;
 
 	[SerializeField] VRBasicButton playButton;
 	[SerializeField] VRBasicButton pauseButton;
 	[SerializeField] VRBasicButton ExpandButton;
+	[SerializeField] VRBasicButton refreshButton;
 
 	[SerializeField] FollowView FollowView;
 	[SerializeField] Image PlayPanelBack;
@@ -30,6 +32,7 @@ public class VideoPlayWindow : VRUIWindow {
 	[SerializeField] float ShowPanelDegree = 80f;
 	[SerializeField] float ButtonShowTime = 1f;
 	[SerializeField] float ButtonHideTime = 0.5f;
+
 
 
 	[System.Serializable]
@@ -193,13 +196,42 @@ public class VideoPlayWindow : VRUIWindow {
 
 	void OnPlayVideoEvent (Message msg)
 	{
-		VideoInfo info = (VideoInfo)msg.GetMessage(Global.MSG_VIDEO_INFO_KEY);
-		Debug.Log("Play Video " + info.title + " " + info.playUrl );
+		tempInfo = (VideoInfo)msg.GetMessage(Global.MSG_VIDEO_INFO_KEY);
+		Debug.Log("Play Video " + tempInfo.title + " " + tempInfo.playUrl );
 
-		StartCoroutine( PlayVideoFake( info , 3f ) );
-//		UpdateScreen(info);
+		StartCoroutine( PlayVideoFake( tempInfo , 1f ) );
 
 	}
+
+	IEnumerator PlayVideoFake( VideoInfo info , float delay )
+	{
+		UpdateScreen(info);
+
+		if ( videoPlayer == null )
+			yield break;
+
+		videoPlayer.UnLoad();
+
+		ShowLoadAnimation();
+
+		yield return new WaitForSeconds( delay );
+
+		//		videoPlayer.DownloadStreamingVideoAndLoad( info.playUrl );
+		//		videoPlayer.m_strFileName = info.playUrl;
+
+		videoPlayer.Load( info.playUrl );
+
+		OnPlayVideo();
+
+		while( videoPlayer.GetCurrentState() == MediaPlayerCtrl.MEDIAPLAYER_STATE.NOT_READY )
+		{
+
+			yield return null;
+		}
+
+		HideLoadAnimation();
+	}
+
 
 	void UpdateScreen( VideoInfo info )
 	{
@@ -214,6 +246,26 @@ public class VideoPlayWindow : VRUIWindow {
 		screen.transform.position = Vector3.zero;
 
 		videoPlayer = screen.GetComponent<MediaPlayerCtrl>();
+
+		// update the play buttons
+		UpdatePlayButtonActive( );
+	}
+
+	void UpdatePlayButtonActive( )
+	{
+		Debug.Log("Update Play Button "  );
+		if ( tempInfo.isLive )
+		{
+			playButton.gameObject.SetActive( false );
+			pauseButton.gameObject.SetActive( false );
+			refreshButton.gameObject.SetActive( true );
+		}else
+		{
+			refreshButton.gameObject.SetActive( false );
+			bool isPaused = videoPlayer.GetCurrentState() == MediaPlayerCtrl.MEDIAPLAYER_STATE.PAUSED;
+			playButton.gameObject.SetActive( isPaused );
+			pauseButton.gameObject.SetActive( !isPaused );
+		}
 	}
 
 	protected override void OnBecomeVisible ( float time )
@@ -257,44 +309,30 @@ public class VideoPlayWindow : VRUIWindow {
 		FollowView.gameObject.SetActive( false );
 	}
 
+	public void OnRefresh()
+	{
+		StartCoroutine( PlayVideoFake( tempInfo , 1f ) );
+	}
+
 	public void OnPlayVideo()
 	{
 		if ( videoPlayer != null )
 			videoPlayer.Play();
-		playButton.gameObject.SetActive(false);
-		pauseButton.gameObject.SetActive(true);
-	}
 
-	IEnumerator PlayVideoFake( VideoInfo info , float delay )
-	{
-		UpdateScreen(info);
-		ShowLoadAnimation();
-
-		yield return new WaitForSeconds( 1f );
-
-//		videoPlayer.DownloadStreamingVideoAndLoad( info.playUrl );
-//		videoPlayer.m_strFileName = info.playUrl;
-
-		videoPlayer.Load( info.playUrl );
-
-		yield return new WaitForSeconds( 1f );
-
-		OnPlayVideo();
-
-		while( videoPlayer.GetCurrentState() == MediaPlayerCtrl.MEDIAPLAYER_STATE.NOT_READY )
-		{
-			yield return null;
-		}
-
-		HideLoadAnimation();
+		UpdatePlayButtonActive();
+//		playButton.gameObject.SetActive(false);
+//		pauseButton.gameObject.SetActive(true);
 	}
 
 	public void OnPauseVideo()
 	{
 		if ( videoPlayer != null )
 			videoPlayer.Pause();
-		playButton.gameObject.SetActive(true);
-		pauseButton.gameObject.SetActive(false);
+		
+		UpdatePlayButtonActive();
+
+//		playButton.gameObject.SetActive(true);
+//		pauseButton.gameObject.SetActive(false);
 	}
 
 	public void OnReturn()
