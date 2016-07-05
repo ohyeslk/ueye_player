@@ -48,6 +48,33 @@
 
 				uv.x = 1 - uv.x;
 				fixed4 col = tex2D(_MainTex, uv);
+				float4 black = float4(0, 0, 0, 1);
+
+				float fadeOutEdge = 0.02;
+				if (uv.y > 1 || uv.y < 0)
+				{
+					float process = 0;
+					if (uv.y > 0.5) {
+						process = clamp((uv.y - 1) / fadeOutEdge, 0, 1);
+					}
+					else {
+						process = clamp((0 - uv.y) / fadeOutEdge, 0, 1);
+					}
+					col = lerp(col, black, process);  
+				}
+
+				/*if (uv.x > 1 - fadeOutEdge || uv.x < fadeOutEdge)
+				{
+					float process = 0;
+					if (uv.x > 0.5 ) {
+						process = clamp((uv.x - ( 1 - fadeOutEdge) ) / fadeOutEdge, 0, 1);
+					}
+					else {
+						process = clamp(( fadeOutEdge - uv.x ) / fadeOutEdge, 0, 1);
+					}
+					col = lerp(col, black, process);
+				}*/
+
 				return col;
 			}
 
