@@ -8,7 +8,6 @@ public class VoiceButton : VRBasicButton {
 	[SerializeField] Sprite ListenSprite;
 	[SerializeField] Sprite ScanSprite;
 
-
 	public void Reset()
 	{
 		img.sprite = normalSprite;

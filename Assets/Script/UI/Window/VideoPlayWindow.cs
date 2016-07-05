@@ -493,4 +493,24 @@ public class VideoPlayWindow : VRUIWindow {
 		
 	}
 
+	public void OnMoveOut()
+	{
+		Vector3 pos = videoPlayer.transform.position;
+		pos += Vector3.forward * 0.5f ;
+		videoPlayer.transform.position = pos;
+	}
+
+	public void OnMoveIn()
+	{
+		Vector3 pos = videoPlayer.transform.position;
+		pos += Vector3.back * 0.5f ;
+		videoPlayer.transform.position = pos;
+	}
+
+	void OnGUI()
+	{
+		if ( videoPlayer != null )
+			GUILayout.TextField( videoPlayer.transform.position.ToString() );
+	}
+
 }
