@@ -104,7 +104,6 @@ public class VoiceManager : MonoBehaviour {
 
 	void BeginRecord( Message msg )
 	{
-		Debug.Log("Begin Record");
 		if ( !IsRecording )
 		{
 			m_isRecording = true;
@@ -121,7 +120,6 @@ public class VoiceManager : MonoBehaviour {
 
 	void EndRecord( Message msg )
 	{
-		Debug.Log("End Record");
 		if ( IsRecording )
 		{
 			m_isRecording = false;
@@ -175,14 +173,13 @@ public class VoiceManager : MonoBehaviour {
 		}
 		sumf /= audios.Length;
 
-		Debug.Log("Begin Stream write");
 		Stream fileStream = CreateEmpty();
 		fileStream.Write(bytesData, 0, bytesData.Length);
 		WriteHeader(fileStream, m_audio.clip);
 		byte[] lastbyte = new byte[fileStream.Length];
 		fileStream.Read(lastbyte, 0, lastbyte.Length);
 
-		Debug.Log("audio byte length " + lastbyte.Length );
+//		Debug.Log("audio byte length " + lastbyte.Length );
 
 		string base64str = System.Convert.ToBase64String(lastbyte);
 
@@ -191,8 +188,8 @@ public class VoiceManager : MonoBehaviour {
 
 	public void request(string url, string base64audio, int length)
 	{
-		if ( base64audio.Length > 100 )
-			Debug.Log("Request to load " + base64audio.Substring( 0  , 1000 ));
+//		if ( base64audio.Length > 100 )
+//			Debug.Log("Request to load " + base64audio.Substring( 0  , 1000 ));
 				
 		postObj jsonObj = new postObj()
 		{
@@ -206,10 +203,8 @@ public class VoiceManager : MonoBehaviour {
 			len=length,
 			speech = base64audio
 		};
-		Debug.Log("Json Obj " + jsonObj);
 
 		string strJson= JsonConvert.SerializeObject(jsonObj, Formatting.Indented);
-		Debug.Log("Success Serialize " );
 
 		URLRequestMessage msg = new URLRequestMessage(this);
 		msg.AddMessage(Global.MSG_BAIDU_YYIN_TRANSLATE_JSON,strJson );

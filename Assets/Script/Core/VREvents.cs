@@ -121,8 +121,8 @@ public class VREvents
 	public static void FirePostChatMessageToServer(ChatArg arg){if ( PostChatMessageToServer != null ) PostChatMessageToServer(arg) ; }
 
 
-	public static event ChatEventHandler ChatMessage;
-	public static void FireChatMessage(ChatArg arg){if ( ChatMessage != null ) ChatMessage(arg) ; }
+	public static event ChatEventHandler ShowChatMessage;
+	public static void FireShowChatMessage(ChatArg arg){if ( ShowChatMessage != null ) ShowChatMessage(arg) ; }
 
 	public static event ChatEventHandler ChatMessageRecieve;
 	public static void FireChatMessageRecieve(ChatArg arg){if ( ChatMessageRecieve != null ) ChatMessageRecieve(arg) ; }

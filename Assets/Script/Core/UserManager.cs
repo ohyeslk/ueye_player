@@ -11,15 +11,29 @@ public class UserManager : MonoBehaviour {
 	}
 	static string m_token = "";
 
+	static public string m_userName = "";
 	static public string UserName
 	{
 		get {
-			return "custom";
+			return m_userName;
 		}
 	}
 
+	string[] userNames=
+	{
+		"一地尘埃",
+		"蓝猫不到6",
+		"傻萌",
+		"龙宝宝",
+		"ShinningStar",
+		"Sucklord",
+		"FatFatFat",
+		"香香香香菜",
+	};
+
 	void Start()
 	{
+		m_userName = userNames[Random.Range(0,userNames.Length)] + Random.Range(0,10).ToString();
 		Login();
 	}
 

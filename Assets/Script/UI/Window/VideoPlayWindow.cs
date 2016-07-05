@@ -97,16 +97,16 @@ public class VideoPlayWindow : VRUIWindow {
 
 	void OnChatMessageRecieve (ChatArg msg)
 	{
-		VREvents.FireChatMessage( msg );
+		VREvents.FireShowChatMessage( msg );
 	}
 
 	void OnRecieveTranslatedMessage (ChatArg msg)
 	{
-		ShowChatMessageResult( msg.message );
 		temMsg = msg;
+		ShowChatMessageResult( msg );
 	}
 
-	void ShowChatMessageResult( string str )
+	void ShowChatMessageResult( ChatArg msg )
 	{
 		if ( isWaittingForMessage == true )
 		{
@@ -115,7 +115,7 @@ public class VideoPlayWindow : VRUIWindow {
 			float dur = m_voiceInteraction.fadeInDuration;
 			m_voiceInteraction.confirmButton.OnBecomeVisible(dur,true);
 			m_voiceInteraction.cancleButton.OnBecomeVisible(dur,true);
-			m_voiceInteraction.voiceText.text = str;
+			m_voiceInteraction.voiceText.text = msg.message;
 		}
 	}
 
@@ -158,7 +158,14 @@ public class VideoPlayWindow : VRUIWindow {
 
 			if ( Time.time - startTime > m_voiceInteraction.maxWaitTime )
 			{
-				ShowChatMessageResult( "我不懂你在说什么" );
+				ChatArg msg = new ChatArg(this);
+				msg.message = "我不懂你在说什么";
+				msg.userName = UserManager.UserName;
+				msg.cameraForward = Camera.main.transform.forward;
+
+				ShowChatMessageResult( msg );
+
+				temMsg = msg;
 			}
 		}
 	}
@@ -169,7 +176,9 @@ public class VideoPlayWindow : VRUIWindow {
 		{
 			temMsg.cameraForward = Camera.main.transform.forward;
 			VREvents.FirePostChatMessageToServer( temMsg );
+			Debug.Log("Tem Msg " + temMsg.message );
 			temMsg = null;
+
 		}
 
 		OnVoiceCancle();
@@ -496,21 +505,15 @@ public class VideoPlayWindow : VRUIWindow {
 	public void OnMoveOut()
 	{
 		Vector3 pos = videoPlayer.transform.position;
-		pos += Vector3.forward * 0.5f ;
+		pos += Vector3.forward * 1f ;
 		videoPlayer.transform.position = pos;
 	}
 
 	public void OnMoveIn()
 	{
 		Vector3 pos = videoPlayer.transform.position;
-		pos += Vector3.back * 0.5f ;
+		pos += Vector3.back * 1f ;
 		videoPlayer.transform.position = pos;
-	}
-
-	void OnGUI()
-	{
-		if ( videoPlayer != null )
-			GUILayout.TextField( videoPlayer.transform.position.ToString() );
 	}
 
 }

@@ -50,19 +50,18 @@ public class Comment_Manager : MonoBehaviour
 
         CustomList<GameObject>.OnEnqueue += EnqueueListener;
         CustomList<GameObject>.OnFull += FullListener;
-        VREvents.ChatMessage += addComment; 
+        VREvents.ShowChatMessage += addComment; 
 
     }
 
 	void OnDisable()
 	{
-		VREvents.ChatMessage -= addComment;
+		VREvents.ShowChatMessage -= addComment;
 	}
 
     // Update is called once per frame
     void Update()
     {
-
         //test comment
         if (Input.GetKeyDown(KeyCode.A))
         {
@@ -75,29 +74,19 @@ public class Comment_Manager : MonoBehaviour
 
     public void addComment(ChatArg chatMessage)
     {
-        GameObject temp = GameObject.Instantiate(prefab, transform.position, Quaternion.identity) as GameObject;
-        temp.GetComponent<Text>().text = chatMessage.userName + ": " + chatMessage.message;
-        temp.GetComponent<Text>().fontSize = 67;
-       // temp.GetComponent<Text>().fontSize = ;
-        Comments.Add(temp);
+		addCommentDirection( chatMessage );
     }
 
     //add comment with commentstructure
     public void addComment(CommentStructure CS)
     {
-        GameObject temp = GameObject.Instantiate(prefab, transform.position, Quaternion.identity) as GameObject;
-        temp.GetComponent<Text>().text = CS._userName + ": " + CS._content;
-        temp.GetComponent<Text>().fontSize = CS._fontSize;
-        Comments.Add(temp);
+		addComment( CS._userName + ": " + CS._content ,  CS._fontSize );
     }
 
     //add comment with cotent
     public void addComment(string content)
     {
-        GameObject temp = GameObject.Instantiate(prefab, transform.position, Quaternion.identity) as GameObject;
-        temp.GetComponent<Text>().text = content;
-        temp.GetComponent<Text>().fontSize = 67;
-        Comments.Add(temp);
+		addComment( content , 85 );
     }
     public void addComment(string content, int fontSize)
     {
@@ -107,12 +96,40 @@ public class Comment_Manager : MonoBehaviour
         Comments.Add(temp);
     }
 
+	public void addCommentDirection( ChatArg msg )
+	{
+		addCommentDirection( msg.userName + ": " + msg.message , 85 , msg.cameraForward );
+	}
+
+
+	public void addCommentDirection( string content, int fontSize , Vector3 direction )
+	{
+		float distance = ( newCommentPosition.transform.position - Camera.main.transform.position ).magnitude;
+		Vector3 newPosition = direction.normalized * distance + Camera.main.transform.position + Vector3.up * Random.Range( 0.2f , 0.5f );
+
+		GameObject temp = GameObject.Instantiate(prefab) as GameObject;
+		temp.GetComponent<Text>().text = content;
+		temp.GetComponent<Text>().fontSize = fontSize;
+		temp.transform.SetParent( newCommentPosition.transform );
+		temp.transform.localScale = Vector3.one;
+		temp.transform.position = newPosition;
+		Vector3 lookDirection = direction;
+		lookDirection.y = 0;
+		temp.transform.localRotation = Quaternion.LookRotation(lookDirection);
+
+		Text text = temp.GetComponent<Text>();
+		if ( text != null )
+		{
+			text.DOFade( 0 , 4f ).SetDelay ( 8f );
+			text.transform.DOMoveY ( 3.5f , 12f ).SetRelative( true ).SetEase( Ease.InCubic );
+		}
+	}
+
 
     void EnqueueListener()
     {
         if (Comments.Count != 1)
-        {
-
+		{
             moveUpForAll();
         }
         setNewComment(Comments[Comments.Count - 1]);
