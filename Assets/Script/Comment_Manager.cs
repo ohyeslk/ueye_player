@@ -105,7 +105,7 @@ public class Comment_Manager : MonoBehaviour
 	public void addCommentDirection( string content, int fontSize , Vector3 direction )
 	{
 		float distance = ( newCommentPosition.transform.position - Camera.main.transform.position ).magnitude;
-		Vector3 newPosition = direction.normalized * distance + Camera.main.transform.position + Vector3.up * Random.Range( 0.2f , 0.5f );
+		Vector3 newPosition = direction.normalized * distance + Camera.main.transform.position + Vector3.up * Random.Range( 0.4f , 0.7f );
 
 		GameObject temp = GameObject.Instantiate(prefab) as GameObject;
 		temp.GetComponent<Text>().text = content;

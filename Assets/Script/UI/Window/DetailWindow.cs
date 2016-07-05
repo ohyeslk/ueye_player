@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 using DG.Tweening;
+using UnityEngine.SceneManagement;
 
 public class DetailWindow : VRUIWindow {
 
@@ -138,7 +139,17 @@ public class DetailWindow : VRUIWindow {
 	/// </summary>
 	public void OnPlayVideo()
 	{
-		Debug.Log("Play video " + m_info.playUrl );
+//		Debug.Log("Play video " + m_info.playUrl );
+
+		//TODO remove the test code
+		if ( m_info.id == 3 )
+		{
+			SceneManager.LoadScene("DepthVideo");
+		}
+
+		//TODO
+
+
 		Message msg = new Message(this);
 		msg.AddMessage( Global.MSG_VIDEO_INFO_KEY , m_info );
 		VREvents.FirePlayVideo( msg );

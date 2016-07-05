@@ -63,6 +63,7 @@ public struct VideoInfo
 	public string coverUrl;
 	public string description;
 	public bool isLive;
+	public long id;
 }
 
 [System.Serializable]

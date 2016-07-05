@@ -72,10 +72,12 @@
      <Compile Include="Assets\Script\UI\Button\VideoInfoUnit.cs" />
      <Compile Include="Assets\Script\UI\Button\VoiceButton.cs" />
      <Compile Include="Assets\Script\UI\Button\VoteButton.cs" />
+     <Compile Include="Assets\Script\UI\Depth\ScreenResize.cs" />
      <Compile Include="Assets\Script\UI\Other\SidePattern.cs" />
      <Compile Include="Assets\Script\UI\Other\SpinAround.cs" />
      <Compile Include="Assets\Script\UI\Reticle\UIReticle.cs" />
      <Compile Include="Assets\Script\UI\Window\CategoryWindow.cs" />
+     <Compile Include="Assets\Script\UI\Window\DepthPanelWindow.cs" />
      <Compile Include="Assets\Script\UI\Window\DetailWindow.cs" />
      <Compile Include="Assets\Script\UI\Window\ModeSwitchButton.cs" />
      <Compile Include="Assets\Script\UI\Window\VRUIWindow.cs" />
