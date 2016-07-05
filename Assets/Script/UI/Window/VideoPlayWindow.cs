@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.UI;
 using DG.Tweening;
 
@@ -32,8 +33,6 @@ public class VideoPlayWindow : VRUIWindow {
 	[SerializeField] float ButtonShowTime = 1f;
 	[SerializeField] float ButtonHideTime = 0.5f;
 
-
-
 	[System.Serializable]
 	public struct VoiceInteraction
 	{
@@ -57,7 +56,7 @@ public class VideoPlayWindow : VRUIWindow {
 		public float fadeDuration;
 	}
 	[SerializeField] LoadAnimation m_loadAnimation;
-	[SerializeField] VRBasicButton[] panelButtons;
+	[SerializeField] List<VRBasicButton> panelButtons;
 
 	void Start()
 	{
@@ -231,7 +230,6 @@ public class VideoPlayWindow : VRUIWindow {
 		HideLoadAnimation();
 	}
 
-
 	void UpdateScreen( VideoInfo info )
 	{
 		if ( videoPlayer != null )
@@ -252,19 +250,33 @@ public class VideoPlayWindow : VRUIWindow {
 
 	void UpdatePlayButtonActive( )
 	{
-		Debug.Log("Update Play Button "  );
+		Debug.Log("Update Play Button ");
+
+		if ( panelButtons.Contains( playButton ) )
+			panelButtons.Remove( playButton );
+		if ( panelButtons.Contains( pauseButton ) )
+			panelButtons.Remove( pauseButton );
+		if ( panelButtons.Contains( refreshButton ) )
+			panelButtons.Remove( refreshButton );
+		
+		VRBasicButton target = null;
 		if ( tempInfo.isLive )
 		{
 			playButton.gameObject.SetActive( false );
 			pauseButton.gameObject.SetActive( false );
 			refreshButton.gameObject.SetActive( true );
+			panelButtons.Add( refreshButton );
 		}else
 		{
 			refreshButton.gameObject.SetActive( false );
 			bool isPaused = videoPlayer.GetCurrentState() == MediaPlayerCtrl.MEDIAPLAYER_STATE.PAUSED;
 			playButton.gameObject.SetActive( isPaused );
 			pauseButton.gameObject.SetActive( !isPaused );
+
+			panelButtons.Add( playButton );
+			panelButtons.Add ( pauseButton );
 		}
+
 	}
 
 	protected override void OnBecomeVisible ( float time )
@@ -421,6 +433,8 @@ public class VideoPlayWindow : VRUIWindow {
 	
 			yield return new WaitForSeconds( duration * 0.5f );
 
+			UpdatePlayButtonActive();
+
 			foreach( VRBasicButton btn in panelButtons )
 			{
 				if ( btn != ExpandButton )
@@ -472,6 +486,11 @@ public class VideoPlayWindow : VRUIWindow {
 			seq.Join( ExpandButton.transform.DOLocalRotate( new Vector3( 0 , 0 , -90f ) , duration * 0.5f ));
 		}
 		yield break;
+	}
+
+	public void OnSwitch()
+	{
+		
 	}
 
 }
