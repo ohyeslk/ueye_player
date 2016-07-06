@@ -85,21 +85,30 @@ public class LogicManager : MonoBehaviour {
 
 	void Start()
 	{
-		SetVRMode(Global.initMode);
-		if ( gameObject.GetComponent<UserManager>() == null )
-			gameObject.AddComponent<UserManager>();
-		if ( gameObject.GetComponent<SocketManager>() == null )
-			gameObject.AddComponent<SocketManager>();
-		if ( gameObject.GetComponent<VoiceManager>() == null )
-			gameObject.AddComponent<VoiceManager>();
+		if ( Instance != this )
+		{
+			Destroy( this.gameObject );
+		}else
+		{
+			
+			SetVRMode(Global.initMode);
+			if ( gameObject.GetComponent<UserManager>() == null )
+				gameObject.AddComponent<UserManager>();
+			if ( gameObject.GetComponent<SocketManager>() == null )
+				gameObject.AddComponent<SocketManager>();
+			if ( gameObject.GetComponent<VoiceManager>() == null )
+				gameObject.AddComponent<VoiceManager>();
+			if ( gameObject.GetComponent<HTTPManager>() == null )
+				gameObject.AddComponent<HTTPManager>();
 
-
-
+			DontDestroyOnLoad(this.gameObject);
+		}
 		// for test
 		// TODO remove this codes
 //		WindowArg arg = new WindowArg(this);
 //		arg.type = WindowArg.Type.PLAY_WINDOW;
 //		VREvents.FireActiveWindow( arg );
+	
 	}
 
 	void OnEnable()

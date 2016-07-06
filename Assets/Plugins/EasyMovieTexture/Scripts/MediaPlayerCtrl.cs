@@ -444,12 +444,7 @@ public class MediaPlayerCtrl : MonoBehaviour
 
             m_iCurrentSeekPosition = Call_GetSeekPosition();
 
-
-
-
         }
-
-
 
         if (m_CurrentState != Call_GetStatus())
         {
@@ -1655,13 +1650,9 @@ public class MediaPlayerCtrl : MonoBehaviour
 	int iSoundCount = 0;
 	int iInitCount = 0;
 
-
 	double pts;
 
 	bool bVideoFirstFrameReady = false;
-
-	
-
 	
 	private void Call_Destroy()
 	{
@@ -1688,14 +1679,9 @@ public class MediaPlayerCtrl : MonoBehaviour
             while(threadVideo.IsAlive == true)
             {
                 threadVideo.Abort();
-            }
-
-
-
+			}
             threadVideo = null;
         }
-
-
 
         if (listAudio != null)
         {
@@ -1798,9 +1784,6 @@ public class MediaPlayerCtrl : MonoBehaviour
 			Destroy (audioClip);
 			audioClip = null;
 		}
-
-
-
 	}
 	
 	private unsafe bool Call_Load(string strFileName, int iSeek)

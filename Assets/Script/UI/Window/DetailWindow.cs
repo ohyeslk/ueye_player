@@ -144,6 +144,7 @@ public class DetailWindow : VRUIWindow {
 		//TODO remove the test code
 		if ( m_info.id == 3 )
 		{
+			DepthPanelWindow.m_url = m_info.playUrl;
 			SceneManager.LoadScene("DepthVideo");
 		}
 

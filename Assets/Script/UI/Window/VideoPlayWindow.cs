@@ -78,6 +78,7 @@ public class VideoPlayWindow : VRUIWindow {
 
 	}
 
+
 	override protected void OnEnable()
 	{
 		base.OnEnable();
@@ -249,7 +250,7 @@ public class VideoPlayWindow : VRUIWindow {
 			
 		GameObject screen = Instantiate( info.isLive ? liveScreenPrefab : screenPrefab ) as GameObject;
 		screen.transform.SetParent( transform , true );
-		screen.transform.position = ( info.isLive ? Vector3.back * 20f : Vector3.zero);
+		screen.transform.position = ( info.isLive ? Vector3.back * 14f : Vector3.zero);
 
 		videoPlayer = screen.GetComponent<MediaPlayerCtrl>();
 
