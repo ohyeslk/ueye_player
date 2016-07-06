@@ -38,6 +38,7 @@ public class Comment_Manager : MonoBehaviour
     public GameObject newCommentPosition;
     public int limit = 7;
     CustomList<GameObject> Comments;
+	List<CommentLine> commentList = new List<CommentLine>();
 
     // Use this for initialization
     void Start()
@@ -51,12 +52,28 @@ public class Comment_Manager : MonoBehaviour
         CustomList<GameObject>.OnEnqueue += EnqueueListener;
         CustomList<GameObject>.OnFull += FullListener;
         VREvents.ShowChatMessage += addComment; 
-
+		VREvents.ActiveWindow += OnActiveWindow;
     }
+
+    void OnActiveWindow (WindowArg arg)
+    {
+		if (arg.type != WindowArg.Type.PLAY_WINDOW) {
+			OnBecomeInvisible ();
+		}
+    }
+
+	void OnBecomeInvisible()
+	{
+		for (int i = commentList.Count - 1; i >= 0; --i) {
+			commentList [i].OnBecomeInvisible ();
+			commentList.RemoveAt (i);
+		}
+	}
 
 	void OnDisable()
 	{
 		VREvents.ShowChatMessage -= addComment;
+		VREvents.ActiveWindow -= OnActiveWindow;
 	}
 
     // Update is called once per frame
@@ -123,6 +140,11 @@ public class Comment_Manager : MonoBehaviour
 			text.DOFade( 0 , 4f ).SetDelay ( 8f );
 			text.transform.DOMoveY ( 3.5f , 12f ).SetRelative( true ).SetEase( Ease.InCubic );
 		}
+
+		CommentLine commentLine = temp.GetComponent<CommentLine> ();
+
+		commentList.Add (commentLine);
+
 	}
 
 
@@ -146,7 +168,7 @@ public class Comment_Manager : MonoBehaviour
     {
         for (int i = 0; i < Comments.Count - 1; i++)
         {
-            Comments[i].GetComponent<comment>().moveUp();
+            Comments[i].GetComponent<CommentLine>().moveUp();
 
         }
 

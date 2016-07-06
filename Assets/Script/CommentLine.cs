@@ -1,9 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 using DG.Tweening;
+using UnityEngine.UI;
 
-public class comment : MonoBehaviour
+public class CommentLine : MonoBehaviour
 {
+	public Text text;
+	[SerializeField]float fadeOutTime;
 
     // Use this for initialization
     void Start()
@@ -16,6 +19,12 @@ public class comment : MonoBehaviour
     {
 
     }
+
+	public void OnBecomeInvisible()
+	{
+		text.DOKill ();
+		text.DOFade (0, fadeOutTime);
+	}
 
     public void moveUp()
     {

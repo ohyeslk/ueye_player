@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\EasyMovieTexture\Scripts\SeekBarCtrl.cs" />
+     <Compile Include="Assets\Script\CommentLine.cs" />
      <Compile Include="Assets\Script\Comment_Manager.cs" />
      <Compile Include="Assets\Script\Core\EffectManager.cs" />
      <Compile Include="Assets\Script\Core\Global.cs" />
@@ -84,7 +85,6 @@
      <Compile Include="Assets\Script\UI\Window\VideoPlayWindow.cs" />
      <Compile Include="Assets\Script\UI\Window\VideoSelectWindow.cs" />
      <Compile Include="Assets\Script\UI\Window\VoteWindow.cs" />
-     <Compile Include="Assets\Script\comment.cs" />
      <None Include="Assets\Standard Assets\Effects\GlassRefraction\Shaders\GlassStainedBumpDistort.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\_BloomAndFlares\BlendOneOne.shader" />
      <None Include="Assets\Plugins\Cardboard\Resources\SkyboxMesh.shader" />
