@@ -144,8 +144,6 @@ public class VREvents
 	public static event MessageEventHandler UserVote;
 	public static void FireUserVote( Message arg) { if ( UserVote != null ) UserVote(arg);}
 
-
-
 }
 
 public class BasicArg : EventArgs
