@@ -213,19 +213,19 @@
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
  </Reference>
  <Reference Include="Newtonsoft.Json">
- <HintPath>/Users/atwood/tem/ueye_player/Assets/JsonDotNet/Assemblies/Standalone/Newtonsoft.Json.dll</HintPath>
+ <HintPath>/Users/yo/git/balala.chong/ueye_player/Assets/JsonDotNet/Assemblies/Standalone/Newtonsoft.Json.dll</HintPath>
  </Reference>
  <Reference Include="DOTween">
- <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/DOTween/DOTween.dll</HintPath>
+ <HintPath>/Users/yo/git/balala.chong/ueye_player/Assets/Plugins/DOTween/DOTween.dll</HintPath>
  </Reference>
  <Reference Include="DOTween43">
- <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/DOTween/DOTween43.dll</HintPath>
+ <HintPath>/Users/yo/git/balala.chong/ueye_player/Assets/Plugins/DOTween/DOTween43.dll</HintPath>
  </Reference>
  <Reference Include="DOTween46">
- <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/DOTween/DOTween46.dll</HintPath>
+ <HintPath>/Users/yo/git/balala.chong/ueye_player/Assets/Plugins/DOTween/DOTween46.dll</HintPath>
  </Reference>
  <Reference Include="DOTween50">
- <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/DOTween/DOTween50.dll</HintPath>
+ <HintPath>/Users/yo/git/balala.chong/ueye_player/Assets/Plugins/DOTween/DOTween50.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>
