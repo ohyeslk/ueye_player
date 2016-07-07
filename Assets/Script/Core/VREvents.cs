@@ -40,6 +40,9 @@ public class VREvents
 	public static event MessageEventHandler VoiceRecord;
 	public static void FireVoiceRecord(Message arg){if ( VoiceRecord != null ) VoiceRecord(arg); }
 
+	public static event MessageEventHandler GroupButtonConfirm;
+	public static void FireGroupButtonConfirm(Message arg){if ( GroupButtonConfirm != null ) GroupButtonConfirm(arg); }
+
 
 	/// <summary>
 	/// URL event handler. handle with the URL related events
@@ -109,8 +112,6 @@ public class VREvents
 
 	public static event UISensorEventHandler UIConfirm;
 	public static void FireUIConfirm(UISensorArg arg){if ( UIConfirm != null ) UIConfirm(arg) ; }
-
-
 
 	/// <summary>
 	/// For the chat system

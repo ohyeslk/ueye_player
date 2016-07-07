@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>Temp\bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;UNITY_5_3_OR_NEWER;UNITY_5_3_4;UNITY_5_3;UNITY_5;ENABLE_NEW_BUGREPORTER;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_FRAME_DEBUGGER;ENABLE_GENERICS;ENABLE_HOME_SCREEN;ENABLE_IMAGEEFFECTS;ENABLE_LIGHT_PROBES_LEGACY;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_PLUGIN_INSPECTOR;ENABLE_SHADOWS;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;ENABLE_SPRITERENDERER_FLIPPING;ENABLE_SPRITES;ENABLE_SPRITE_POLYGON;ENABLE_TERRAIN;ENABLE_RAKNET;ENABLE_UNET;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_HUB;ENABLE_CLOUD_PROJECT_ID;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_METRICS;ENABLE_EDITOR_METRICS_CACHING;INCLUDE_DYNAMIC_GI;INCLUDE_GI;INCLUDE_IL2CPP;INCLUDE_DIRECTX12;PLATFORM_SUPPORTS_MONO;ENABLE_LOCALIZATION;ENABLE_ANDROID_ATLAS_ETC1_COMPRESSION;ENABLE_EDITOR_TESTS_RUNNER;ENABLE_RUNTIME_GI;ENABLE_SUBSTANCE;ENABLE_GAMECENTER;ENABLE_NETWORK;ENABLE_LOG_MIXED_STACKTRACE;ENABLE_UNITYWEBREQUEST;ENABLE_TEXTUREID_MAP;PLAYERCONNECTION_LISTENS_FIXED_PORT;DEBUGGER_LISTENS_FIXED_PORT;PLATFORM_SUPPORTS_ADS_ID;SUPPORT_ENVIRONMENT_VARIABLES;PLATFORM_SUPPORTS_PROFILER;PLATFORM_HAS_NO_SUPPORT_FOR_BUCKET_ALLOCATOR;STRICTCPP_NEW_DELETE_SIGNATURES;WWW_USE_CURL;HAS_NEON_SKINNIG;UNITY_INPUT_SIMULATE_EVENTS;PLATFORM_ALWAYS_USES_STDOUT_FOR_LOG;ENABLE_UNITYADS_RUNTIME;UNITY_UNITYADS_API;UNITY_IOS;UNITY_IPHONE;UNITY_IPHONE_API;SUPPORT_MULTIPLE_DISPLAYS;ENABLE_IL2CPP;ENABLE_PROFILER;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_OSX;UNITY_TEAM_LICENSE;UNITY_PRO_LICENSE;CROSS_PLATFORM_INPUT;MOBILE_INPUT;ENABLE_IOS_ON_DEMAND_RESOURCES;ENABLE_IOS_APP_SLICING</DefineConstants>
+    <DefineConstants>DEBUG;TRACE;UNITY_5_3_OR_NEWER;UNITY_5_3_4;UNITY_5_3;UNITY_5;ENABLE_NEW_BUGREPORTER;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_FRAME_DEBUGGER;ENABLE_GENERICS;ENABLE_HOME_SCREEN;ENABLE_IMAGEEFFECTS;ENABLE_LIGHT_PROBES_LEGACY;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_PLUGIN_INSPECTOR;ENABLE_SHADOWS;ENABLE_SINGLE_INSTANCE_BUILD_SETTING;ENABLE_SPRITERENDERER_FLIPPING;ENABLE_SPRITES;ENABLE_SPRITE_POLYGON;ENABLE_TERRAIN;ENABLE_RAKNET;ENABLE_UNET;ENABLE_UNITYEVENTS;ENABLE_VR;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_HUB;ENABLE_CLOUD_PROJECT_ID;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_METRICS;ENABLE_EDITOR_METRICS_CACHING;INCLUDE_DYNAMIC_GI;INCLUDE_GI;INCLUDE_IL2CPP;INCLUDE_DIRECTX12;PLATFORM_SUPPORTS_MONO;ENABLE_LOCALIZATION;ENABLE_ANDROID_ATLAS_ETC1_COMPRESSION;ENABLE_EDITOR_TESTS_RUNNER;ENABLE_RUNTIME_GI;ENABLE_SUBSTANCE;ENABLE_GAMECENTER;ENABLE_NETWORK;ENABLE_LOG_MIXED_STACKTRACE;ENABLE_UNITYWEBREQUEST;ENABLE_TEXTUREID_MAP;PLAYERCONNECTION_LISTENS_FIXED_PORT;DEBUGGER_LISTENS_FIXED_PORT;PLATFORM_SUPPORTS_ADS_ID;SUPPORT_ENVIRONMENT_VARIABLES;PLATFORM_SUPPORTS_PROFILER;PLATFORM_HAS_NO_SUPPORT_FOR_BUCKET_ALLOCATOR;STRICTCPP_NEW_DELETE_SIGNATURES;WWW_USE_CURL;HAS_NEON_SKINNIG;UNITY_INPUT_SIMULATE_EVENTS;PLATFORM_ALWAYS_USES_STDOUT_FOR_LOG;ENABLE_UNITYADS_RUNTIME;UNITY_UNITYADS_API;UNITY_IOS;UNITY_IPHONE;UNITY_IPHONE_API;SUPPORT_MULTIPLE_DISPLAYS;ENABLE_IL2CPP;ENABLE_PROFILER;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_OSX;CROSS_PLATFORM_INPUT;MOBILE_INPUT;ENABLE_IOS_ON_DEMAND_RESOURCES;ENABLE_IOS_APP_SLICING</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>0169</NoWarn>
@@ -67,8 +67,10 @@
      <Compile Include="Assets\Script\UI\Basic\UIButton.cs" />
      <Compile Include="Assets\Script\UI\Basic\UISensor.cs" />
      <Compile Include="Assets\Script\UI\Button\CategoryButton.cs" />
+     <Compile Include="Assets\Script\UI\Button\GroupButton.cs" />
      <Compile Include="Assets\Script\UI\Button\TopButton.cs" />
      <Compile Include="Assets\Script\UI\Button\VRBasicButton.cs" />
+     <Compile Include="Assets\Script\UI\Button\VRFloatButton.cs" />
      <Compile Include="Assets\Script\UI\Button\VRFunctionButton.cs" />
      <Compile Include="Assets\Script\UI\Button\VideoInfoUnit.cs" />
      <Compile Include="Assets\Script\UI\Button\VoiceButton.cs" />
@@ -82,6 +84,7 @@
      <Compile Include="Assets\Script\UI\Window\DetailWindow.cs" />
      <Compile Include="Assets\Script\UI\Window\ModeSwitchButton.cs" />
      <Compile Include="Assets\Script\UI\Window\VRUIWindow.cs" />
+     <Compile Include="Assets\Script\UI\Window\VideoLoopSelectWindow.cs" />
      <Compile Include="Assets\Script\UI\Window\VideoPlayWindow.cs" />
      <Compile Include="Assets\Script\UI\Window\VideoSelectWindow.cs" />
      <Compile Include="Assets\Script\UI\Window\VoteWindow.cs" />
@@ -95,6 +98,7 @@
      <None Include="Assets\Plugins\Cardboard\Distortion\CardboardDistortion.cginc" />
      <None Include="Assets\Plugins\Catlike Coding\Catlike Coding Readme.txt" />
      <None Include="Assets\Plugins\EasyMovieTexture\Unlit_SphereInside.shader" />
+     <None Include="Assets\Plugins\CurvedUI\Demo Scenes\Demo Scenes Content\OverlayBlend.shader" />
      <None Include="Assets\Plugins\JSON\readme.txt" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\SunShaftsComposite.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ColorCorrectionCurves.shader" />
@@ -149,7 +153,7 @@
      <None Include="Assets\Plugins\Catlike Coding\SDF Toolkit\Shaders\SDF Unlit.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\ChromaticAberrationShader.shader" />
      <None Include="Assets\Plugins\Android\AndroidManifest.xml" />
-     <None Include="Assets\JsonDotNet\link.xml" />
+     <None Include="Assets\Plugins\JsonDotNet\link.xml" />
      <None Include="Assets\Standard Assets\CrossPlatformInput\CrossPlatformInputGuidelines.txt" />
      <None Include="Assets\Plugins\Catlike Coding\SDF Toolkit\Documentation\SDF Toolkit Readme.txt" />
      <None Include="Assets\Plugins\Catlike Coding\SDF Toolkit\Shaders\SDF Unlit.cginc" />
@@ -184,6 +188,7 @@
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\Contrast Stretch\Adaptation.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\NoiseAndGrain.shader" />
      <None Include="Assets\Standard Assets\Effects\Projectors\Shaders\ProjectorMultiply.shader" />
+     <None Include="Assets\Plugins\CurvedUI\Shaders and Materials\UIAlwaysOnTop.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\VignettingShader.shader" />
      <None Include="Assets\Plugins\Cardboard\Resources\UI\CardboardReticleShader.shader" />
      <None Include="Assets\Standard Assets\Effects\ImageEffects\Shaders\Tonemapper.shader" />
@@ -212,20 +217,20 @@
  <Reference Include="UnityEngine.Networking">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
  </Reference>
- <Reference Include="Newtonsoft.Json">
- <HintPath>/Users/yo/git/balala.chong/ueye_player/Assets/JsonDotNet/Assemblies/Standalone/Newtonsoft.Json.dll</HintPath>
- </Reference>
  <Reference Include="DOTween">
- <HintPath>/Users/yo/git/balala.chong/ueye_player/Assets/Plugins/DOTween/DOTween.dll</HintPath>
+ <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/DOTween/DOTween.dll</HintPath>
  </Reference>
  <Reference Include="DOTween43">
- <HintPath>/Users/yo/git/balala.chong/ueye_player/Assets/Plugins/DOTween/DOTween43.dll</HintPath>
+ <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/DOTween/DOTween43.dll</HintPath>
  </Reference>
  <Reference Include="DOTween46">
- <HintPath>/Users/yo/git/balala.chong/ueye_player/Assets/Plugins/DOTween/DOTween46.dll</HintPath>
+ <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/DOTween/DOTween46.dll</HintPath>
  </Reference>
  <Reference Include="DOTween50">
- <HintPath>/Users/yo/git/balala.chong/ueye_player/Assets/Plugins/DOTween/DOTween50.dll</HintPath>
+ <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/DOTween/DOTween50.dll</HintPath>
+ </Reference>
+ <Reference Include="Newtonsoft.Json">
+ <HintPath>/Users/atwood/tem/ueye_player/Assets/Plugins/JsonDotNet/Assemblies/Standalone/Newtonsoft.Json.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>
