@@ -126,6 +126,25 @@ public class LogicManager : MonoBehaviour {
 		m_window_type = arg.type;
 	}
 
+	public float sensity;
+	public float threshod;
+	public GUIStyle style;
+
+	void OnGUI()
+	{
+		CardboardHead.SetData( threshod , sensity );
+		GUILayout.Label(" ");
+		GUILayout.Label(" ");
+		sensity = GUILayout.HorizontalScrollbar( sensity * 100f  , 10.0f , 0 , 100.0f , GUILayout.Height(50f), GUILayout.ExpandHeight( true ) ) / 100f ;
+		threshod = GUILayout.HorizontalScrollbar( threshod * 100f  , 10.0f , 0 , 100.0f , GUILayout.MinHeight(50f) ,  GUILayout.ExpandHeight( true ) ) / 100f ;
+		GUILayout.Label( "Sensity " + CardboardHead.MoveSensity + " | threshod " + CardboardHead.FreeAngleThreshod , style );
+
+//		sensity = GUI.HorizontalScrollbar( new Rect(25, 25, 500, 150) , sensity * 100f  , 10.0f , 0 , 100.0f , style) / 100f ;
+//		threshod = GUI.HorizontalScrollbar( new Rect(25, 75, 500, 150) ,  threshod * 100f , 10.0f , 0 , 100.0f , style) / 100f ;
+//		CardboardHead.SetData( threshod , sensity );
+//		GUI.Label( new Rect(25, 125, 500, 150) ,  "Sensity " + CardboardHead.MoveSensity + " | threshod " + CardboardHead.FreeAngleThreshod , style);
+	}
+
 }
 
 

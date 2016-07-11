@@ -24,11 +24,19 @@ public class EffectManager : MonoBehaviour {
 	void OnActiveWindow (WindowArg arg)
 	{
 //		if ( arg.type == WindowArg.Type.DETAIL_WINDOWS || arg.type == WindowArg.Type.SELECT_WINDOW )
+		if ( rippleEffect == null )
+		{
+			rippleEffect = FindObjectOfType<RippleEffect>();
+		}
+
 		if ( LogicManager.VRMode == VRMode.VR_2D )
 		{
-			rippleEffect.enabled = true;
-			rippleEffect.EmitAll();
-			rippleEffect.waveSpeed = 1f / rippleEffectTime * 2.5f ;
+			if ( rippleEffect != null )
+			{
+				rippleEffect.enabled = true;
+				rippleEffect.EmitAll();
+				rippleEffect.waveSpeed = 1f / rippleEffectTime * 2.5f ;
+			}
 			Sequence seq = DOTween.Sequence();
 			seq.AppendInterval( rippleEffectTime );
 			seq.AppendCallback( DisableRippleEffect );

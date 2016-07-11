@@ -44,7 +44,6 @@ public class CategoryButton : VRBasicButton {
 
 	override public void OnConfirm ()
 	{
-//		Debug.Log("[On Confirm]" + name);
 		base.OnConfirm();
 		{
 			URLRequestMessage msg = new URLRequestMessage( this );
@@ -77,7 +76,7 @@ public class CategoryButton : VRBasicButton {
 		// initilize the sprite first
 		URLRequestMessage msg = new URLRequestMessage(this);
 		msg.url = info.bgUrl;
-//		Debug.Log("Category button texture " + msg.url );
+
 		VREvents.FireRequesTexture( msg );
 
 		parent = p;

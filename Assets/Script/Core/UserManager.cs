@@ -62,4 +62,5 @@ public class UserManager : MonoBehaviour {
 		msg.AddMessage(Global.MSG_LOGIN_PASSWORD , "balala");
 		VREvents.FireRequestLogin(msg);
 	}
+
 }

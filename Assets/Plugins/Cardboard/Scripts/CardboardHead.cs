@@ -77,6 +77,11 @@ public class CardboardHead : MonoBehaviour {
 	}
 
   [SerializeField] float verticalYThreshod = 0.7f;
+//	[SerializeField]float freeAngleThreshod = 3f;
+//	[SerializeField]float MoveSensity = 0.2f;
+
+	static public float FreeAngleThreshod = 0 ;
+	static public float MoveSensity = 0;
 
   /// Determines whether to apply ther user's head offset to this gameobject's
   /// position.  True means to update the gameobject's position with the user's head offset,
@@ -146,6 +151,13 @@ public class CardboardHead : MonoBehaviour {
 		DOTween.To( ()=>  handDelta , x=> handDelta = x , Vector3.zero , 0.5f );
 	}
 
+	static public void SetData( float threshod , float sensity )
+	{
+		MoveSensity = sensity;
+		FreeAngleThreshod = threshod;
+	}
+
+
   // Compute new head pose.
   private void UpdateHead() {
     if (updated) {  // Only one update per frame, please.
@@ -159,21 +171,27 @@ public class CardboardHead : MonoBehaviour {
 
 		if ( isLockVertical )
 		{
-				float temY = transform.localRotation.eulerAngles.y;
-				float toY = ( handDelta * rot ) .eulerAngles.y;
-				if ( Mathf.Abs( temY - toY ) > verticalYThreshod )
-				{
-					Vector3 toEular = Quaternion.Lerp( transform.localRotation , handDelta * rot  , 0.2f ).eulerAngles;
-					toEular.x = toEular.z = 0;
-					transform.localRotation = Quaternion.Euler( toEular );
-				}
+			float temY = transform.localRotation.eulerAngles.y;
+			float toY = ( handDelta * rot ) .eulerAngles.y;
+			if ( Mathf.Abs( temY - toY ) > verticalYThreshod )
+			{
+					Vector3 toEular = Quaternion.Lerp( transform.localRotation , handDelta * rot  , MoveSensity ).eulerAngles;
+				toEular.x = toEular.z = 0;
+				transform.localRotation = Quaternion.Euler( toEular );
+			}
 		}
 		else {
-		      if (target == null) {
-				transform.localRotation = handDelta * rot;
-		      } else {
-		        transform.rotation = target.rotation * rot;
-		      }
+			if (target == null) {
+					Vector3 temToward = transform.localRotation.eulerAngles;
+					Vector3 toToward = (handDelta * rot).eulerAngles;
+					if ( Vector3.Angle( temToward , toToward ) > FreeAngleThreshod )
+					{
+						Vector3 toEular = Quaternion.Lerp( transform.localRotation , handDelta * rot , MoveSensity ).eulerAngles;
+						transform.localRotation = Quaternion.Euler( toEular );
+					}
+		    } else {
+		      transform.rotation = target.rotation * rot;
+		    }
 		}
     }
 

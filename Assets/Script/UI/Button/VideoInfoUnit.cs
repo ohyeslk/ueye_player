@@ -11,8 +11,8 @@ public class VideoInfoUnit : VRBasicButton {
 	[SerializeField] protected Image img;
 	[SerializeField] protected Transform imgOutside;
 	[SerializeField] protected Text text;
-	[SerializeField] AudioSource initSound;
-	[SerializeField] AudioSource imageLoadSound;
+	[SerializeField] protected AudioSource initSound;
+	[SerializeField] protected AudioSource imageLoadSound;
 
 	[System.Serializable]
 	public struct HoverAnimation
@@ -36,7 +36,7 @@ public class VideoInfoUnit : VRBasicButton {
 	[SerializeField] ClearAnimation clearAnimation;
 
 	private VideoInfoUnitState inner_state = VideoInfoUnitState.Normal;
-	private VideoInfoUnitState m_state
+	protected VideoInfoUnitState m_state
 	{
 		get {
 			return inner_state;
@@ -70,23 +70,24 @@ public class VideoInfoUnit : VRBasicButton {
 		public float FadeInTime;
 		public float fadeOutTime;
 	}
-	[SerializeField] VideoUnitSetting m_setting;
+	[SerializeField] protected VideoUnitSetting m_setting;
 
-	VideoInfo m_info = new VideoInfo();
 
-	[SerializeField] Image frame;
-	[SerializeField] Image help;
-	[SerializeField] Image blackCover;
-	[SerializeField] float blackCoverAlpha;
+
+	[SerializeField] protected Image frame;
+	[SerializeField] protected Image help;
+	[SerializeField] protected Image blackCover;
+	[SerializeField] protected float blackCoverAlpha;
 
 	/// <summary>
 	/// set to true when initilize and fade in; 
 	/// set to false when enter the detail/play window ( fade out ) or remove from selecet window (clear)
 	/// </summary>
-	bool isVisible = false;
+	protected bool isVisible = false;
 	Quaternion initRotation;
-	int m_index;
+	protected int m_index;
 
+	protected VideoInfo m_info = new VideoInfo();
 	public VideoInfo Info{
 		get { return m_info; }
 	}
@@ -106,12 +107,15 @@ public class VideoInfoUnit : VRBasicButton {
 	{
 		Debug.Log("[On Confirm]" + name);
 		base.OnConfirm();
-		parent.ShowVideoDetail( Info );
+		if ( parent != null )
+		{
+			parent.ShowVideoDetail( Info );
+		}
 	}
 
-	public override void OnFucus ()
+	public override void OnFocus ()
 	{
-		base.OnFucus ();
+		base.OnFocus ();
 		Debug.Log("On Focus");
 	}
 
@@ -201,7 +205,7 @@ public class VideoInfoUnit : VRBasicButton {
 		}
 	}
 
-	public void ResetAngleAndOffset()
+	virtual public void ResetAngleAndOffset()
 	{
 		// set angle and position offset 
 		float angle = m_setting.anglePerUnit * ( ( m_index % parent.VideoPerRow ) - ( parent.VideoPerRow - 1f ) / 2f ) ;
@@ -317,7 +321,7 @@ public class VideoInfoUnit : VRBasicButton {
 
 	}
 
-	void PlayInitAnimation()
+	virtual protected void PlayInitAnimation()
 	{
 		if ( gameObject.activeSelf )
 			initAnimCoroutine = StartCoroutine( DoInitAnimation() );
@@ -457,7 +461,6 @@ public class VideoInfoUnit : VRBasicButton {
 	{
 		transform.SetParent( null , true );
 		gameObject.SetActive( false );
-//		GameObject.Destroy( gameObject , 1f );
 	}
 
 	override public void OnBecomeVisible( float time )

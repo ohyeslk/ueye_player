@@ -34,7 +34,6 @@ public class HTTPManager : MonoBehaviour {
 		VREvents.RequestLogin += RequestLogin;
 		VREvents.RequestBaiduYuyinToken += RequestBaiduYuyin;
 		VREvents.RequestBaiduYuyinTranslate += RequestBaiduYuyinTranslate;
-
 	}
 
 	void RequestBaiduYuyinTranslate (URLRequestMessage msg)
@@ -117,7 +116,9 @@ public class HTTPManager : MonoBehaviour {
 		{
 			url = Global.LoginURL;
 		}
+
 		StartCoroutine( WaitForRequest ( url , LoginHandler , msg , form ));
+
 	}
 
 	void RequestCategory( URLRequestMessage msg )
@@ -127,6 +128,7 @@ public class HTTPManager : MonoBehaviour {
 		{
 			url = Global.CategoryRequstURL;
 		}
+
 		StartCoroutine( WaitForRequest ( url , CategoryHandler , msg ));
 
 	}
@@ -136,7 +138,7 @@ public class HTTPManager : MonoBehaviour {
 		string url = msg.url;
 		if ( string.IsNullOrEmpty(url) )
 		{
-			string category = msg.GetMessage(Global.MSG_REQUEST_CATEGORYVIDEO_CATEGORY_KEY ).ToString();
+			string category = msg.GetMessage( Global.MSG_REQUEST_CATEGORYVIDEO_CATEGORY_KEY ).ToString();
 			url = Global.CategoryVideoRequestURL.Replace("CATEGORY" , category );
 			msg.AddMessage( Global.MSG_POSTVIDEO_NAME_KEY , category );
 		}
@@ -190,7 +192,6 @@ public class HTTPManager : MonoBehaviour {
 				VREvents.FirePostTexture( msg );
 				return;
 			}
-				
 		}
 		StartCoroutine( WaitForRequestAsy( url , TextureHandler , msg));
 	}
@@ -258,8 +259,8 @@ public class HTTPManager : MonoBehaviour {
 				info.coverUrl = video.GetField("coverForFeed").str;
 				info.isLive = video.GetField("islive").i == 1;
 				info.id = video.GetField("id").i;
-				if ( info.isLive )
-					Debug.Log( info.title + " is live " + info.isLive );
+//				if ( info.isLive )
+//					Debug.Log( info.title + " is live " + info.isLive );
 				res.Add( info );
 			}
 		}
@@ -355,7 +356,7 @@ public class HTTPManager : MonoBehaviour {
 		if ( string.IsNullOrEmpty(www.error) ){
 			handler(www, postMsg);
 		} else {
-			Debug.Log("WWW Error" + www.error );
+			Debug.Log( "WWW Error" + www.error + " " + url );
 		}
 
 		www.Dispose();

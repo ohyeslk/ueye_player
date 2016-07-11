@@ -40,13 +40,6 @@ public class Global {
 		"&client_secret=" +
 		"87f007189f2b686e7b40b2a140d585b5";
 
-
-
-
-
-
-
-
 	public static VRMode initMode = VRMode.VR_2D;
 
 	public static Vector3 ONHOVERV3_PHASE_EXIT = Vector3.zero;

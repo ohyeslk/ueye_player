@@ -71,7 +71,7 @@ public class VideoPlayWindow : VRUIWindow {
 	{
 		base.OnDisable();
 		VREvents.PlayVideo -= OnPlayVideoEvent;
-		VREvents.GroupButtonConfirm -= OnGroupButtonConfirm;
+		VREvents.VoiceRecord -= OnVoiceRecord;
 		VREvents.ReciveTranslatedMessage -= OnRecieveTranslatedMessage;
 		VREvents.ChatMessageRecieve -= OnChatMessageRecieve;
 		VREvents.VoteCreated -= OnVoteCreated;
@@ -83,7 +83,7 @@ public class VideoPlayWindow : VRUIWindow {
 	{
 		base.OnEnable();
 		VREvents.PlayVideo += OnPlayVideoEvent;
-		VREvents.GroupButtonConfirm += OnGroupButtonConfirm;
+		VREvents.VoiceRecord += OnVoiceRecord;
 		VREvents.ReciveTranslatedMessage += OnRecieveTranslatedMessage;
 		VREvents.ChatMessageRecieve += OnChatMessageRecieve;
 		VREvents.VoteCreated += OnVoteCreated;
@@ -120,7 +120,7 @@ public class VideoPlayWindow : VRUIWindow {
 		}
 	}
 
-	void OnGroupButtonConfirm (Message msg)
+	void OnVoiceRecord (Message msg)
 	{
 		bool isOn = (bool)msg.GetMessage("isOn");
 		if ( isOn == false ) // end record

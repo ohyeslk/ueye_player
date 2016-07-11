@@ -37,7 +37,7 @@ public class VRBasicButton : MonoBehaviour {
 		}
 	}
 
-	virtual public void OnFucus( )
+	virtual public void OnFocus( )
 	{
 		if ( m_Enable )
 		{

@@ -120,13 +120,12 @@ public class HttpHelper {
 //		}
 //		return (hashCode);
 
-		var s1 = url.Substring(0, url.Length / 2);
-		var s2 = url.Substring( url.Length / 2);
+		var s1 = url.Substring( 0 , url.Length / 2 );
+		var s2 = url.Substring( url.Length / 2 );
 
 		var x = ((long)s1.GetHashCode()) << 0x20 | s2.GetHashCode();
 
 		return x;
-
 	}
 
 	/// <summary>

@@ -13,5 +13,6 @@ public class VRFunctionButton : VRBasicButton {
 		{
 			confirmFunc.Invoke();
 		}
+
 	}
 }

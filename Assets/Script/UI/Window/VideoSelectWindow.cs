@@ -133,9 +133,8 @@ public class VideoSelectWindow : VRUIWindow  {
 		{
 			type = Type.Live;
 		}
-
-
 	}
+
 	VideoListManager m_videoManager = new VideoListManager();
 
 	override protected void OnDisable()
@@ -271,6 +270,7 @@ public class VideoSelectWindow : VRUIWindow  {
 		RequestLatestVideoList( 50 );
 		RequestLiveVideoList( 50 );
 	}
+
 	public void RequestLatestVideoList ( int number )
 	{
 		URLRequestMessage msg = new URLRequestMessage(this);
@@ -369,7 +369,8 @@ public class VideoSelectWindow : VRUIWindow  {
 	{
 		Up,
 		Down,
-		Disapper
+		Disapper,
+		Side
 	}
 	public void ClearVideos( ClearType type )
 	{

@@ -47,7 +47,7 @@ public class VoiceManager : MonoBehaviour {
 	void OnEnable()
 	{
 		VREvents.PostBaiduYuyinToken += onBaiduYuyinToken;
-		VREvents.GroupButtonConfirm += onRecordVoice;
+		VREvents.VoiceRecord += onRecordVoice;
 		VREvents.PostBaiduYuyinTranslate += OnPostBaiduYuyinTranslate;
 	}
 
@@ -55,7 +55,7 @@ public class VoiceManager : MonoBehaviour {
 	void OnDisable()
 	{
 		VREvents.PostBaiduYuyinToken -= onBaiduYuyinToken;
-		VREvents.GroupButtonConfirm -= onRecordVoice;
+		VREvents.VoiceRecord -= onRecordVoice;
 		VREvents.PostBaiduYuyinTranslate -= OnPostBaiduYuyinTranslate;
 	}
 		
