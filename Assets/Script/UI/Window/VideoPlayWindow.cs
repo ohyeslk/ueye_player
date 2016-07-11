@@ -358,9 +358,16 @@ public class VideoPlayWindow : VRUIWindow {
 
 	public void OnReturn()
 	{
-		WindowArg arg = new WindowArg(this);
-		arg.type = WindowArg.Type.SELECT_WINDOW;
-		VREvents.FireActiveWindow( arg );
+		{
+			WindowArg arg = new WindowArg(this);
+			arg.type = WindowArg.Type.SELECT_WINDOW;
+			VREvents.FireActiveWindow( arg );
+		}
+
+		{
+			ChatArg msg = new ChatArg(this);
+			VREvents.FireExitChanel(msg);
+		}
 	}
 
 	float lastDegree = 90f;

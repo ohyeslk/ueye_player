@@ -15,6 +15,18 @@ public class SocketManager : MonoBehaviour {
 	{
 		VREvents.PostChatMessageToServer += OnPostChatMessageToServer;
 		VREvents.UserVote += OnUserVote;
+		VREvents.EnterChanel += OnEnterChannel;
+		VREvents.ExitChanel += OnExitChannel;
+	}
+
+	void OnExitChannel (ChatArg msg)
+	{
+		ExitChannel();
+	}
+
+	void OnEnterChannel (ChatArg msg)
+	{
+		EnterChannel( msg.chanelID.ToString() );
 	}
 
 	void OnUserVote (Message msg)
@@ -34,6 +46,8 @@ public class SocketManager : MonoBehaviour {
 	{
 		VREvents.PostChatMessageToServer -= OnPostChatMessageToServer;
 		VREvents.UserVote -= OnUserVote;
+		VREvents.EnterChanel -= OnEnterChannel;
+		VREvents.ExitChanel -= OnExitChannel;
 	}
 
 	void Awake()
@@ -93,12 +107,21 @@ public class SocketManager : MonoBehaviour {
 		VREvents.FireNewVoteUpdate( msg );
 	}
 
-	public void EnterChanel( string id )
+	public void EnterChannel( string id )
 	{
 		JSONObject data = new JSONObject();
 		data.AddField("id" , id );
 		Debug.Log("Enter Channel " + data["id"].ToString());
 		socketIO.Emit("enterChannel" , data );
+	}
+
+	public void ExitChannel()
+	{
+		JSONObject data = new JSONObject();
+//		data.AddField("id" , id );
+//		Debug.Log("Enter Channel " + data["id"].ToString());
+		socketIO.Emit("exitChannel" , data );
+		
 	}
 
 //	public void postMessage( string msgData )
@@ -139,24 +162,9 @@ public class SocketManager : MonoBehaviour {
 		string message = obj.data.GetField("message").str;
 		if ( message == "I got you!")
 		{
-			EnterChanel("r");
 		}
 
 		Debug.Log("On Response " + obj.data.GetField("message").str );
-	}
-
-	void Update()
-	{
-		if ( Input.GetKeyDown( KeyCode.C ) && Input.GetKey( KeyCode.LeftControl ) )
-		{
-			EnterChanel("r");
-		}
-
-//		if ( Input.GetKeyDown( KeyCode.M ) && Input.GetKey( KeyCode.LeftControl ) )
-//		{
-//			postMessage("hahaha");
-//		}
-
 	}
 
 ///////////////////////////////

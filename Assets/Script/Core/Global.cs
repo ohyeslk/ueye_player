@@ -45,6 +45,18 @@ public class Global {
 	public static Vector3 ONHOVERV3_PHASE_EXIT = Vector3.zero;
 
 	public static string LIVE_VIDEOLIST_NAME = "Live";
+
+	public static ulong GetHashFromString( string str )
+	{
+		ulong hash = 8731;
+		int i = str.Length;
+
+		while ( i > 0 )
+		{
+			hash = ( hash * 33 ) ^ (ulong)str[--i];
+		}
+		return hash >> 0 ;
+	}
 }
 
 [System.Serializable]

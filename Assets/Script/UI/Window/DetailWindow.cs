@@ -142,22 +142,29 @@ public class DetailWindow : VRUIWindow {
 //		Debug.Log("Play video " + m_info.playUrl );
 
 		//TODO remove the test code
-		if ( m_info.id == 3 )
+//		if ( m_info.id == 3 )
+//		{
+//			DepthPanelWindow.m_url = m_info.playUrl;
+//			SceneManager.LoadScene("DepthVideo");
+//		}
+
 		{
-			DepthPanelWindow.m_url = m_info.playUrl;
-			SceneManager.LoadScene("DepthVideo");
+			ChatArg msg = new ChatArg(this);
+			msg.chanelID = Global.GetHashFromString( m_info.playUrl );
+			VREvents.FireEnterChanel( msg );
 		}
 
-		//TODO
+		{
+			Message msg = new Message(this);
+			msg.AddMessage( Global.MSG_VIDEO_INFO_KEY , m_info );
+			VREvents.FirePlayVideo( msg );
+		}
 
-
-		Message msg = new Message(this);
-		msg.AddMessage( Global.MSG_VIDEO_INFO_KEY , m_info );
-		VREvents.FirePlayVideo( msg );
-
-		WindowArg arg = new WindowArg(this);
-		arg.type = WindowArg.Type.PLAY_WINDOW;
-		VREvents.FireActiveWindow( arg );
+		{
+			WindowArg arg = new WindowArg(this);
+			arg.type = WindowArg.Type.PLAY_WINDOW;
+			VREvents.FireActiveWindow( arg );
+		}
 	}
 
 	/// <summary>

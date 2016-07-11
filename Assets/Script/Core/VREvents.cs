@@ -131,6 +131,12 @@ public class VREvents
 	public static event ChatEventHandler ReciveTranslatedMessage;
 	public static void FireReciveTranslatedMessage(ChatArg arg){if ( ReciveTranslatedMessage != null ) ReciveTranslatedMessage(arg); }
 
+	public static event ChatEventHandler EnterChanel;
+	public static void FireEnterChanel(ChatArg arg){if ( EnterChanel != null ) EnterChanel(arg); }
+
+	public static event ChatEventHandler ExitChanel;
+	public static void FireExitChanel(ChatArg arg){if ( ExitChanel != null ) ExitChanel(arg); }
+
 	/// <summary>
 	/// event for voting
 	/// </summary>
@@ -216,6 +222,7 @@ public class ChatArg : BasicArg
 	public string message;
 	public string userName;
 	public Vector3 cameraForward;
+	public ulong chanelID;
 	public Color color;
 }
 

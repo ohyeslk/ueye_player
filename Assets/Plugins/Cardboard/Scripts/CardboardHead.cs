@@ -68,6 +68,7 @@ public class CardboardHead : MonoBehaviour {
 		if ( deltaPos.magnitude > 0 )
 		{
 			Vector2 center = new Vector2( Screen.width / 2f , Screen.height / 2f );
+
 			Vector3 to = Camera.main.ScreenPointToRay( center - deltaPos ).direction;
 			var rot = Cardboard.SDK.HeadPose.Orientation;
 
@@ -77,11 +78,11 @@ public class CardboardHead : MonoBehaviour {
 	}
 
   [SerializeField] float verticalYThreshod = 0.7f;
-//	[SerializeField]float freeAngleThreshod = 3f;
-//	[SerializeField]float MoveSensity = 0.2f;
+	[SerializeField]float FreeAngleThreshod = 0.4f;
+	[SerializeField]float MoveSensity = 0.2f;
 
-	static public float FreeAngleThreshod = 0 ;
-	static public float MoveSensity = 0;
+//	static public float FreeAngleThreshod = 0 ;
+//	static public float MoveSensity = 0;
 
   /// Determines whether to apply ther user's head offset to this gameobject's
   /// position.  True means to update the gameobject's position with the user's head offset,
@@ -150,13 +151,6 @@ public class CardboardHead : MonoBehaviour {
 	{
 		DOTween.To( ()=>  handDelta , x=> handDelta = x , Vector3.zero , 0.5f );
 	}
-
-	static public void SetData( float threshod , float sensity )
-	{
-		MoveSensity = sensity;
-		FreeAngleThreshod = threshod;
-	}
-
 
   // Compute new head pose.
   private void UpdateHead() {
