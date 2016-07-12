@@ -11,6 +11,11 @@ public class EffectManager : MonoBehaviour {
 	[SerializeField] Color BGPFadeToColor;
 	[SerializeField] float BGPFadeTime;
 
+	void Start()
+	{
+		rippleEffect = FindObjectOfType<RippleEffect>();
+	}
+
 	void OnEnable()
 	{
 		VREvents.ActiveWindow += OnActiveWindow;

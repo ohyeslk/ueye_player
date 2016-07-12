@@ -19,7 +19,7 @@ public class VoiceButton : VRBasicButton {
 
 		Message msg = new Message(this);
 		msg.AddMessage("isOn" , true);
-		VREvents.FireGroupButtonConfirm(msg);
+		VREvents.FireVoiceRecord(msg);
 
 		img.sprite = ListenSprite;
 	}
@@ -35,7 +35,7 @@ public class VoiceButton : VRBasicButton {
 	{
 		Message msg = new Message(this);
 		msg.AddMessage("isOn" , false);
-		VREvents.FireGroupButtonConfirm(msg);
+		VREvents.FireVoiceRecord(msg);
 	
 		img.sprite = ScanSprite;
 

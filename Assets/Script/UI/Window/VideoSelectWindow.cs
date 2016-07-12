@@ -419,8 +419,8 @@ public class VideoSelectWindow : VRUIWindow  {
 
 	public void OnTopLive()
 	{
+		RequestLiveVideoList(50);
 		m_videoManager.ToLive();
-		RefreshAndShowVideo();
 		videoTopButton.SetHighlighted( false );
 		liveTopButton.SetHighlighted( true );
 	}

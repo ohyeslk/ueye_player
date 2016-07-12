@@ -28,12 +28,15 @@ public class Global {
 
 	public static string MSG_USER_VOTE_OPTION = "option";
 
-	public static string VideoRequestURL = "http://balala-dev-beta.us-west-1.elasticbeanstalk.com/api/v1/channels/recordedstreams?days=NUMBER";
-	public static string CategoryRequstURL = "http://balala-dev-beta.us-west-1.elasticbeanstalk.com/api/v1/channels/category/";
-	public static string CategoryVideoRequestURL = "http://balala-dev-beta.us-west-1.elasticbeanstalk.com/api/v1/channels/category/CATEGORY";
-	public static string LiveVideoRequestURL = "http://balala-dev-beta.us-west-1.elasticbeanstalk.com/api/v1/channels/livestreams?index=0&days=NUMBER";
-	public static string ChatSocketURL = "ws://balala-dev.us-west-1.elasticbeanstalk.com/socket.io/?EIO=3&transport=websocket";
-	public static string LoginURL = "http://balala-dev.us-west-1.elasticbeanstalk.com/login";
+	public static string RootHTTP = "http://balaladev.dbetfcnmgm.us-west-1.elasticbeanstalk.com";
+	public static string RootWS = "ws://balaladev.dbetfcnmgm.us-west-1.elasticbeanstalk.com";
+
+	public static string VideoRequestURL = RootHTTP + "/api/v1/channels/recordedstreams?days=NUMBER";
+	public static string CategoryRequstURL = RootHTTP + "/api/v1/channels/category/";
+	public static string CategoryVideoRequestURL = RootHTTP + "/api/v1/channels/category/CATEGORY";
+	public static string LiveVideoRequestURL = RootHTTP + "/api/v1/channels/livestreams?index=0&days=NUMBER";
+	public static string ChatSocketURL = RootWS + "/socket.io/?EIO=3&transport=websocket";
+	public static string LoginURL = RootHTTP + "/login";
 	public static string BaiduYuyinURL = "https://openapi.baidu.com/oauth/2.0/token?grant_type=client_credentials" +
 		"&client_id=" +
 		"9scx4TOCR18A2EZNlXkOYjUK" +
@@ -46,16 +49,16 @@ public class Global {
 
 	public static string LIVE_VIDEOLIST_NAME = "Live";
 
-	public static ulong GetHashFromString( string str )
+	public static int GetHashFromString( string str )
 	{
-		ulong hash = 8731;
+		int hash = 8731;
 		int i = str.Length;
 
-		while ( i > 0 )
-		{
-			hash = ( hash * 33 ) ^ (ulong)str[--i];
+		while ( i > 0 ) {
+			hash = ( hash * 33 ) ^ (int)str[--i];
 		}
-		return hash >> 0 ;
+
+		return hash;
 	}
 }
 
@@ -69,6 +72,7 @@ public struct VideoInfo
 	public string description;
 	public bool isLive;
 	public long id;
+	public string channelID; // an independent ID for the chat room
 }
 
 [System.Serializable]
