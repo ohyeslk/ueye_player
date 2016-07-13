@@ -77,10 +77,6 @@ public class CameraHolder : MonoBehaviour {
 		if ( e.Phase == FingerMotionPhase.Updated )
 		{
 			Vector2 delta = e.Finger.DeltaPosition;
-			if ( LogicManager.isLockVerticle )
-			{
-				delta.y = 0;
-			}
 
 			head.UpdateHead( delta );
 		}

@@ -67,13 +67,24 @@ public class CardboardHead : MonoBehaviour {
 	{
 		if ( deltaPos.magnitude > 0 )
 		{
+			deltaPos *= 4.7f; // to make the movement more sensible
+			if ( isLockVertical )
+			{
+				deltaPos.y = 0;
+			}
+
 			Vector2 center = new Vector2( Screen.width / 2f , Screen.height / 2f );
 
 			Vector3 to = Camera.main.ScreenPointToRay( center - deltaPos ).direction;
 			var rot = Cardboard.SDK.HeadPose.Orientation;
 
-			transform.forward = to;
-			handDelta = transform.localRotation * Quaternion.Inverse( rot );
+//			transform.forward = to;
+//			handDelta = transform.localRotation * Quaternion.Inverse( rot );
+
+			Quaternion towardRotation = Quaternion.LookRotation( to );
+			handDelta = towardRotation * Quaternion.Inverse( rot );
+			Debug.Log("set hand Delta " + handDelta );
+
 		}
 	}
 
@@ -169,22 +180,23 @@ public class CardboardHead : MonoBehaviour {
 			float toY = ( handDelta * rot ) .eulerAngles.y;
 			if ( Mathf.Abs( temY - toY ) > verticalYThreshod )
 			{
-					Vector3 toEular = Quaternion.Lerp( transform.localRotation , handDelta * rot  , MoveSensity ).eulerAngles;
+				Vector3 toEular = Quaternion.Lerp( transform.rotation , handDelta * rot  , MoveSensity ).eulerAngles;
 				toEular.x = toEular.z = 0;
-				transform.localRotation = Quaternion.Euler( toEular );
+				transform.rotation = Quaternion.Euler( toEular );
 			}
 		}
 		else {
+				
 			if (target == null) {
-					Vector3 temToward = transform.localRotation.eulerAngles;
-					Vector3 toToward = (handDelta * rot).eulerAngles;
-					if ( Vector3.Angle( temToward , toToward ) > FreeAngleThreshod )
-					{
-						Vector3 toEular = Quaternion.Lerp( transform.localRotation , handDelta * rot , MoveSensity ).eulerAngles;
-						transform.localRotation = Quaternion.Euler( toEular );
-					}
+				Debug.Log("Update in non lock ");
+				Vector3 temToward = transform.localRotation.eulerAngles;
+				Vector3 toToward = (handDelta * rot).eulerAngles;
+				if ( Vector3.Angle( temToward , toToward ) > FreeAngleThreshod )
+				{
+					transform.rotation = Quaternion.Lerp( transform.rotation , handDelta * rot , MoveSensity );
+				}
 		    } else {
-		      transform.rotation = target.rotation * rot;
+		    	transform.rotation = target.rotation * rot;
 		    }
 		}
     }

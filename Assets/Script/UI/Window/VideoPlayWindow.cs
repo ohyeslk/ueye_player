@@ -177,7 +177,6 @@ public class VideoPlayWindow : VRUIWindow {
 		{
 			temMsg.cameraForward = Camera.main.transform.forward;
 			VREvents.FirePostChatMessageToServer( temMsg );
-			Debug.Log("Tem Msg " + temMsg.message );
 			temMsg = null;
 
 		}

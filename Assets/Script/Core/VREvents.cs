@@ -43,6 +43,9 @@ public class VREvents
 	public static event MessageEventHandler GroupButtonConfirm;
 	public static void FireGroupButtonConfirm(Message arg){if ( GroupButtonConfirm != null ) GroupButtonConfirm(arg); }
 
+	public static event MessageEventHandler OpenLiveChannel;
+	public static void FireOpenLiveChannel(Message arg){if ( OpenLiveChannel != null ) OpenLiveChannel(arg); }
+
 
 	/// <summary>
 	/// URL event handler. handle with the URL related events
