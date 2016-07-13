@@ -34,8 +34,11 @@ public class PresentUnit : MonoBehaviour {
 		{
 			Vector3 screenPos = Camera.main.WorldToScreenPoint( transform.position );
 			Vector3 newScreenPos = screenPos + new Vector3( e.Position.x , e.Position.y , 0 );
+			Vector3 toward = Camera.main.ScreenPointToRay( newScreenPos ).direction;
 
 			float distance = ( transform.position - Camera.main.transform.position ).magnitude;
+			transform.position = Camera.main.transform.position + distance * toward;
+
 		}
 		else if ( e.Phase == FingerMotionPhase.Updated )
 		{

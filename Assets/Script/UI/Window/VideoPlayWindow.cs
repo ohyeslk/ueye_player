@@ -206,7 +206,7 @@ public class VideoPlayWindow : VRUIWindow {
 	void OnPlayVideoEvent (Message msg)
 	{
 		tempInfo = (VideoInfo)msg.GetMessage(Global.MSG_VIDEO_INFO_KEY);
-		Debug.Log("Play Video " + tempInfo.title + " " + tempInfo.playUrl );
+//		Debug.Log("Play Video " + tempInfo.title + " " + tempInfo.playUrl );
 
 		StartCoroutine( PlayVideoFake( tempInfo , 1f ) );
 
@@ -257,6 +257,11 @@ public class VideoPlayWindow : VRUIWindow {
 
 		// update the play buttons
 		UpdatePlayButtonActive( );
+
+		if ( info.isLive )
+		{
+			AdsPanel.SetActive( true );
+		}
 	}
 
 	void UpdatePlayButtonActive( )
@@ -303,7 +308,7 @@ public class VideoPlayWindow : VRUIWindow {
 		lastDegree = 90f;
 		HidePlayPanel( 0 );
 
-		AdsPanel.SetActive( true );
+
 	}
 
 	protected override void OnBecomeInvsible ( float time )
@@ -346,6 +351,7 @@ public class VideoPlayWindow : VRUIWindow {
 			videoPlayer.Play();
 
 		UpdatePlayButtonActive();
+
 
 	}
 
