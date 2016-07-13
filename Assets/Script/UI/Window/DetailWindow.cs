@@ -140,7 +140,6 @@ public class DetailWindow : VRUIWindow {
 	public void OnPlayVideo()
 	{
 //		Debug.Log("Play video " + m_info.playUrl );
-
 		//TODO remove the test code
 //		if ( m_info.id == 3 )
 //		{
@@ -150,7 +149,7 @@ public class DetailWindow : VRUIWindow {
 
 		{
 			ChatArg msg = new ChatArg(this);
-			msg.chanelID = Global.GetHashFromString( m_info.playUrl );
+			msg.chanelID = m_info.channelID;
 			VREvents.FireEnterChanel( msg );
 		}
 

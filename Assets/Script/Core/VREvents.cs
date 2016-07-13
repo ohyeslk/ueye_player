@@ -222,7 +222,7 @@ public class ChatArg : BasicArg
 	public string message;
 	public string userName;
 	public Vector3 cameraForward;
-	public ulong chanelID;
+	public string chanelID;
 	public Color color;
 }
 
