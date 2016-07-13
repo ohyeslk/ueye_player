@@ -33,20 +33,20 @@ public class TBOrbit : MonoBehaviour
     /// <summary>
     /// Maximum distance between camera and target
     /// </summary>
-    public float maxDistance = 20.0f;
+    public float maxDistance = 30.0f;
 
     /// <summary>
-    /// Affects horizontal rotation speed
+    /// Affects horizontal rotation speed (in degrees per cm)
     /// </summary>
-    public float yawSensitivity = 80.0f;
+    public float yawSensitivity = 45.0f;
 
     /// <summary>
-    /// Affects vertical rotation speed
+    /// Affects vertical rotation speed (in degrees per cm)
     /// </summary>
-    public float pitchSensitivity = 80.0f;
+    public float pitchSensitivity = 45.0f;
 
     /// <summary>
-    /// Keep yaw angle value between minPitch and maxPitch?
+    /// Keep yaw angle value between minYaw and maxYaw?
     /// </summary>
     public bool clampYawAngle = false;
     public float minYaw = -75;
@@ -67,14 +67,14 @@ public class TBOrbit : MonoBehaviour
     /// <summary>
     /// Affects pinch zoom speed
     /// </summary>
-    public float pinchZoomSensitivity = 2.0f;
+    public float pinchZoomSensitivity = 5.0f;
 
     /// <summary>
     /// Use smooth camera motions?
     /// </summary>
     public bool smoothMotion = true;
-    public float smoothZoomSpeed = 3.0f;
-    public float smoothOrbitSpeed = 4.0f;
+    public float smoothZoomSpeed = 5.0f;
+    public float smoothOrbitSpeed = 10.0f;
 
     /// <summary>
     /// Two-Finger camera panning.
@@ -85,7 +85,10 @@ public class TBOrbit : MonoBehaviour
     public float panningSensitivity = 1.0f;
     public Transform panningPlane;  // reference transform used to apply the panning translation (using panningPlane.right and panningPlane.up vectors)
     public bool smoothPanning = true;
-    public float smoothPanningSpeed = 8.0f;
+    public float smoothPanningSpeed = 12.0f;
+
+    // collision test
+    public LayerMask collisionLayerMask;
 
     float distance = 10.0f;
     float yaw = 0;
@@ -97,6 +100,8 @@ public class TBOrbit : MonoBehaviour
 
     Vector3 idealPanOffset = Vector3.zero;
     Vector3 panOffset = Vector3.zero;
+
+    PinchRecognizer pinchRecognizer;
 
     public float Distance
     {
@@ -149,6 +154,15 @@ public class TBOrbit : MonoBehaviour
         DragRecognizer twoFingerDrag = recogniers.Find( r => r.EventMessageName == "OnTwoFingerDrag" ) as DragRecognizer;
         PinchRecognizer pinch = recogniers.Find( r => r.EventMessageName == "OnPinch" ) as PinchRecognizer;
 
+        // check if we need to automatically add a screenraycaster
+        if( OnlyRotateWhenDragStartsOnObject )
+        {
+            ScreenRaycaster raycaster = gameObject.GetComponent<ScreenRaycaster>();
+
+            if( !raycaster )
+                raycaster = gameObject.AddComponent<ScreenRaycaster>();
+        }
+
         if( !drag )
         {
             drag = gameObject.AddComponent<DragRecognizer>();
@@ -160,14 +174,14 @@ public class TBOrbit : MonoBehaviour
 
         if( !pinch )
             pinch = gameObject.AddComponent<PinchRecognizer>();
-        
+
         if( !twoFingerDrag )
         {
             twoFingerDrag = gameObject.AddComponent<DragRecognizer>();
             twoFingerDrag.RequiredFingerCount = 2;
             twoFingerDrag.IsExclusive = true;
             twoFingerDrag.MaxSimultaneousGestures = 1;
-            twoFingerDrag.ApplySameDirectionConstraint = false;
+            twoFingerDrag.ApplySameDirectionConstraint = true;
             twoFingerDrag.EventMessageName = "OnTwoFingerDrag";
         }
     }
@@ -175,7 +189,7 @@ public class TBOrbit : MonoBehaviour
     void Start()
     {
         InstallGestureRecognizers();
-        
+
         if( !panningPlane )
             panningPlane = this.transform;
 
@@ -194,14 +208,36 @@ public class TBOrbit : MonoBehaviour
 
     #region Gesture Event Messages
 
-    float nextDragTime;
+    float nextDragTime = 0;
+
+    public bool OnlyRotateWhenDragStartsOnObject = false;
 
     void OnDrag( DragGesture gesture )
     {
-        // dont apply drag rotation if more than one touch is on the screen
-        //if( FingerGestures.Touches.Count > 1 )
-        //    return;
-        
+        // don't rotate unless the drag started on our target object
+        if( OnlyRotateWhenDragStartsOnObject )
+        {
+            if( gesture.Phase == ContinuousGesturePhase.Started )
+            {
+                if( !gesture.Recognizer.Raycaster )
+                {
+                    Debug.LogWarning( "The drag recognizer on " + gesture.Recognizer.name + " has no ScreenRaycaster component set. This will prevent OnlyRotateWhenDragStartsOnObject flag from working." );
+                    OnlyRotateWhenDragStartsOnObject = false;
+                    return;
+                }
+
+                if( target && !target.GetComponent<Collider>() )
+                {
+                    Debug.LogWarning( "The target object has no collider set. OnlyRotateWhenDragStartsOnObject won't work." );
+                    OnlyRotateWhenDragStartsOnObject = false;
+                    return;
+                }
+            }
+
+            if( !target || gesture.StartSelection != target.gameObject )
+                return;
+        }
+
         // wait for drag cooldown timer to wear off
         //  used to avoid dragging right after a pinch or pan, when lifting off one finger but the other one is still on screen
         if( Time.time < nextDragTime )
@@ -209,8 +245,8 @@ public class TBOrbit : MonoBehaviour
 
         if( target )
         {
-            IdealYaw += gesture.DeltaMove.x * yawSensitivity * 0.02f;
-            IdealPitch -= gesture.DeltaMove.y * pitchSensitivity * 0.02f;
+            IdealYaw += gesture.DeltaMove.x.Centimeters() * yawSensitivity;
+            IdealPitch -= gesture.DeltaMove.y.Centimeters() * pitchSensitivity;
         }
     }
 
@@ -218,22 +254,19 @@ public class TBOrbit : MonoBehaviour
     {
         if( allowPinchZoom )
         {
-            IdealDistance -= gesture.Delta * pinchZoomSensitivity;
+            IdealDistance -= gesture.Delta.Centimeters() * pinchZoomSensitivity;
             nextDragTime = Time.time + 0.25f;
         }
     }
 
     void OnTwoFingerDrag( DragGesture gesture )
     {
-        //Debug.Log( "OnTwoFingerDrag " + e.Phase + " @ Frame " + Time.frameCount );
-
         if( allowPanning )
         {
-            Vector3 move = -0.02f * panningSensitivity * 
-				( panningPlane.right * gesture.DeltaMove.x + panningPlane.up * gesture.DeltaMove.y );
-            
+            Vector3 move = -panningSensitivity * ( panningPlane.right * gesture.DeltaMove.x.Centimeters() + panningPlane.up * gesture.DeltaMove.y.Centimeters() );
+
             if( invertPanningDirections )
-                IdealPanOffset -= move; 
+                IdealPanOffset -= move;
             else
                 IdealPanOffset += move;
 
@@ -264,7 +297,25 @@ public class TBOrbit : MonoBehaviour
             panOffset = idealPanOffset;
 
         transform.rotation = Quaternion.Euler( pitch, yaw, 0 );
-        transform.position = ( target.position + panOffset ) - distance * transform.forward;
+
+        Vector3 lookAtPos = ( target.position + panOffset );
+        Vector3 desiredPos = lookAtPos - distance * transform.forward;
+
+        if( collisionLayerMask != 0 )
+        {
+            Vector3 dir = desiredPos - lookAtPos; // from target to camera
+            float dist = dir.magnitude;
+            dir.Normalize();
+
+            RaycastHit hit;
+            if( Physics.Raycast( lookAtPos, dir, out hit, dist, collisionLayerMask ) )
+            {
+                desiredPos = hit.point - dir * 0.1f;
+                distance = hit.distance;
+            }
+        }
+
+        transform.position = desiredPos;
     }
 
     void LateUpdate()

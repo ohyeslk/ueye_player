@@ -17,6 +17,7 @@ public class FingerClusterManager : MonoBehaviour
         }
     }
 
+    public DistanceUnit DistanceUnit = DistanceUnit.Pixels;
     public float ClusterRadius = 250.0f; // spatial grouping
     public float TimeTolerance = 0.5f;  // temporal grouping
 
@@ -88,12 +89,14 @@ public class FingerClusterManager : MonoBehaviour
         }
 
         // remove fingers from clusters
-        foreach( FingerGestures.Finger finger in fingersRemoved )
+        for( int i = 0; i < fingersRemoved.Count; ++i )
         {
+            FingerGestures.Finger finger = fingersRemoved[i];
+
             // update active clusters
-            for( int i = clusters.Count - 1; i >= 0; --i )
+            for( int clusterIndex = clusters.Count - 1; clusterIndex >= 0; --clusterIndex )
             {
-                Cluster cluster = clusters[i];
+                Cluster cluster = clusters[clusterIndex];
 
                 if( cluster.Fingers.Remove( finger ) )
                 {
@@ -103,7 +106,7 @@ public class FingerClusterManager : MonoBehaviour
                         //Debug.Log( "Recycling cluster " + cluster.Id );
 
                         // remove from active clusters list
-                        clusters.RemoveAt( i );
+                        clusters.RemoveAt( clusterIndex );
 
                         // move back to pool
                         clusterPool.Add( cluster );
@@ -113,8 +116,10 @@ public class FingerClusterManager : MonoBehaviour
         }
 
         // add new fingers
-        foreach( FingerGestures.Finger finger in fingersAdded )
+        for( int i = 0; i < fingersAdded.Count; ++i )
         {
+            FingerGestures.Finger finger = fingersAdded[i];
+
             // try to add finger to existing cluster
             Cluster cluster = FindExistingCluster( finger );
 
@@ -172,11 +177,11 @@ public class FingerClusterManager : MonoBehaviour
         Cluster best = null;
         float bestSqrDist = float.MaxValue;
 
-        // account for higher pixel density touch screens
-        float adjustedClusterRadius = FingerGestures.GetAdjustedPixelDistance( ClusterRadius );
+        float sqrClusterRadiusInPixels = FingerGestures.Convert( ClusterRadius * ClusterRadius, DistanceUnit, DistanceUnit.Pixels );
 
-        foreach( Cluster cluster in clusters )
+        for( int i = 0; i < clusters.Count; ++i )
         {
+            Cluster cluster = clusters[i];
             float elapsedTime = finger.StarTime - cluster.StartTime;
 
             // temporal grouping criteria
@@ -186,7 +191,7 @@ public class FingerClusterManager : MonoBehaviour
             Vector2 centroid = cluster.Fingers.GetAveragePosition();
             float sqrDist = Vector2.SqrMagnitude( finger.Position - centroid );
 
-            if( sqrDist < bestSqrDist && sqrDist < ( adjustedClusterRadius * adjustedClusterRadius ) )
+            if( sqrDist < bestSqrDist && sqrDist < sqrClusterRadiusInPixels )
             {
                 best = cluster;
                 bestSqrDist = sqrDist;

@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class FGMouseInputProvider : FGInputProvider 
+public class FGMouseInputProvider : FGInputProvider
 {
     public int maxButtons = 3;
 
@@ -14,6 +14,9 @@ public class FGMouseInputProvider : FGInputProvider
     public float twistAxisScale = 100.0f;
     public KeyCode twistKey = KeyCode.LeftControl;
     public float twistResetTimeDelay = 0.15f;
+
+	public KeyCode pivotKey = KeyCode.A;
+    bool pivoting = false;
 
     // holding both Shift + Control will allow to pinch & twist at same time
     public KeyCode twistAndPinchKey = KeyCode.LeftShift;
@@ -36,12 +39,16 @@ public class FGMouseInputProvider : FGInputProvider
 
     void Update()
     {
+        bool wasPinchingOrTwisting = pinching || twisting;
+
         UpdatePinchEmulation();
         UpdateTwistEmulation();
 
         if( pinching || twisting )
         {
-            pivot = Input.mousePosition;
+            // dont move the pivot point after the start phase
+            if( !wasPinchingOrTwisting )
+                pivot = Input.mousePosition;
 
             float angle = 0;
             float radius = initialPinchDistance;
@@ -62,11 +69,35 @@ public class FGMouseInputProvider : FGInputProvider
 
             float cos = Mathf.Cos( angle );
             float sin = Mathf.Sin( angle );
-            
+
             pos[0].x = pivot.x - 0.5f * radius * cos;
             pos[0].y = pivot.y - 0.5f * radius * sin;
             pos[1].x = pivot.x + 0.5f * radius * cos;
             pos[1].y = pivot.y + 0.5f * radius * sin;
+        }
+
+        if( Input.GetKey( pivotKey ) )
+        {
+            if( Input.GetKeyDown( pivotKey ) )
+            {
+                pivot = Input.mousePosition;
+            }
+
+            if( !pivoting )
+            {
+                if( Vector2.Distance( Input.mousePosition, pivot ) > 50.0f )
+                    pivoting = true;
+            }
+
+            if( pivoting )
+            {
+                pos[0] = pivot;
+                pos[1] = Input.mousePosition;
+            }
+        }
+        else
+        {
+            pivoting = false;
         }
     }
 
@@ -129,7 +160,7 @@ public class FGMouseInputProvider : FGInputProvider
         down = Input.GetMouseButton( fingerIndex );
         position = Input.mousePosition;
 
-        if( ( pinching || twisting ) && ( fingerIndex == 0 || fingerIndex == 1 ) )
+        if( ( pivoting || pinching || twisting ) && ( fingerIndex == 0 || fingerIndex == 1 ) )
         {
             down = true;
             position = pos[fingerIndex];

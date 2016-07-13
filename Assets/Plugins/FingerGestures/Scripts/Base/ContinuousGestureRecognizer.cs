@@ -39,7 +39,7 @@ public abstract class ContinuousGesture : Gesture
 /// NOTE: continuous gestures are responsible for calling RaiseEvent() while State == InProgress in order to raise 
 /// an event with Phase.Updated
 /// </summary>
-public abstract class ContinuousGestureRecognizer<T> : GestureRecognizer<T> where T : ContinuousGesture, new()
+public abstract class ContinuousGestureRecognizer<T> : GestureRecognizerTS<T> where T : ContinuousGesture, new()
 {
     protected override void Reset( T gesture )
     {

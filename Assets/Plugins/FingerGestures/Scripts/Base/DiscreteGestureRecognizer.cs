@@ -3,7 +3,7 @@ using System.Collections;
 
 public class DiscreteGesture : Gesture { }
 
-public abstract class DiscreteGestureRecognizer<T> : GestureRecognizer<T> where T : DiscreteGesture, new()
+public abstract class DiscreteGestureRecognizer<T> : GestureRecognizerTS<T> where T : DiscreteGesture, new()
 {
     protected override void OnStateChanged( Gesture sender )
     {

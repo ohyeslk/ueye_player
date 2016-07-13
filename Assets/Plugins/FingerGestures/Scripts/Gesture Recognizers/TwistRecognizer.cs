@@ -3,26 +3,33 @@ using System.Collections;
 
 public class TwistGesture : ContinuousGesture
 {
-    float deltaRotation = 0;
-    float totalRotation = 0;
-
     /// <summary>
     /// Rotation angle change since last move (in degrees)
     /// </summary>
-    public float DeltaRotation
-    {
-        get { return deltaRotation; }
-        internal set { deltaRotation = value; }
-    }
+    public float DeltaRotation { get; internal set; }
 
     /// <summary>
     /// Total rotation angle since gesture started (in degrees)
     /// </summary>
-    public float TotalRotation
-    {
-        get { return totalRotation; }
-        internal set { totalRotation = value; }
-    }
+    public float TotalRotation { get; internal set; }
+
+    /// <summary>
+    /// The finger used as pivot (only valid when using TwistMethod.Pivot)
+    /// </summary>
+    public FingerGestures.Finger Pivot { get; internal set; }
+}
+
+public enum TwistMethod
+{
+    /// <summary>
+    /// Both fingers are rotating around a mid point
+    /// </summary>
+    Standard,
+
+    /// <summary>
+    /// One finger act as the pivot while the other one rotates around it
+    /// </summary>
+    Pivot,
 }
 
 /// <summary>
@@ -32,6 +39,11 @@ public class TwistGesture : ContinuousGesture
 [AddComponentMenu( "FingerGestures/Gestures/Twist Recognizer" )]
 public class TwistRecognizer : ContinuousGestureRecognizer<TwistGesture>
 {
+    /// <summary>
+    /// Used to select the desired twist interaction method
+    /// </summary>
+    public TwistMethod Method = TwistMethod.Standard;
+
     /// <summary>
     /// Rotation DOT product treshold - this controls how tolerant the twist gesture detector is to the two fingers
     /// moving in opposite directions.
@@ -44,6 +56,11 @@ public class TwistRecognizer : ContinuousGestureRecognizer<TwistGesture>
     /// Minimum amount of rotation required to start the rotation gesture (in degrees)
     /// </summary>
     public float MinRotation = 1.0f;
+
+    /// <summary>
+    /// How far the pivot finger is allowed to move away from its initial position without causing the recognition to fail
+    /// </summary>
+    public float PivotMoveTolerance = 0.5f; 
     
     public override string GetDefaultEventMessageName()
     {
@@ -54,7 +71,11 @@ public class TwistRecognizer : ContinuousGestureRecognizer<TwistGesture>
     public override int RequiredFingerCount
     {
         get { return 2; }
-        set { Debug.LogWarning( "Not Supported" ); }
+        set 
+        {
+            if( Application.isPlaying )
+                Debug.LogWarning( "Twist only supports 2 fingers" );
+        }
     }
 
     // TEMP: multi-gesture tracking is not supported for the Twist gesture yet
@@ -67,10 +88,38 @@ public class TwistRecognizer : ContinuousGestureRecognizer<TwistGesture>
     {
         return GestureResetMode.NextFrame;
     }
-
+    
     protected override GameObject GetDefaultSelectionForSendMessage( TwistGesture gesture )
     {
         return gesture.StartSelection;
+    }
+
+    protected override void Reset( TwistGesture gesture )
+    {
+        base.Reset( gesture );
+        gesture.Pivot = null;
+    }
+
+    FingerGestures.Finger GetTwistPivot( FingerGestures.Finger finger0, FingerGestures.Finger finger1 )
+    {
+        // exactly one finger must be moving
+        if( finger0.IsMoving == finger1.IsMoving ) // both are either moving or not moving
+        {
+            //Debug.LogWarning( "Not exactly one finger moving" );
+            return null;
+        }
+
+        // the pivot is the finger that's not moving
+        FingerGestures.Finger pivot = finger0.IsMoving ? finger1 : finger0;
+
+        // ensure the pivot has not moved away from its initial position beyond the move tolerance radius
+        if( pivot.DistanceFromStart > ToPixels( PivotMoveTolerance ) )
+        {
+            //Debug.LogWarning( "Pivot moved too far" );
+            return null;
+        }
+
+        return pivot;
     }
 
     protected override bool CanBegin( TwistGesture gesture, FingerGestures.IFingerList touches )
@@ -81,11 +130,19 @@ public class TwistRecognizer : ContinuousGestureRecognizer<TwistGesture>
         FingerGestures.Finger finger0 = touches[0];
         FingerGestures.Finger finger1 = touches[1];
 
-        if( !FingerGestures.AllFingersMoving( finger0, finger1 ) )
-            return false;
+        if( Method == TwistMethod.Pivot )
+        {
+            if( !GetTwistPivot( finger0, finger1 ) )
+                return false;
+        }
+        else // standard
+        {
+            if( !FingerGestures.AllFingersMoving( finger0, finger1 ) )
+                return false;
 
-        if( !FingersMovedInOppositeDirections( finger0, finger1 ) )
-            return false;
+            if( !FingersMovedInOppositeDirections( finger0, finger1 ) )
+                return false;
+        }
 
         // check if we went past the minimum rotation amount treshold
         float rotation = SignedAngularGap( finger0, finger1, finger0.StartPosition, finger1.StartPosition );
@@ -100,12 +157,20 @@ public class TwistRecognizer : ContinuousGestureRecognizer<TwistGesture>
         FingerGestures.Finger finger0 = touches[0];
         FingerGestures.Finger finger1 = touches[1];
 
-        gesture.StartPosition = 0.5f * ( finger0.Position + finger1.Position ); //( finger0.StartPosition + finger1.StartPosition );
-        gesture.Position = gesture.StartPosition; //0.5f * ( finger0.Position + finger1.Position );
-
-        //float angle = SignedAngularGap( finger0, finger1, finger0.StartPosition, finger1.StartPosition );
-        gesture.TotalRotation = 0; //angle; //Mathf.Sign( angle ) * MinRotation;
-        gesture.DeltaRotation = 0; //angle;
+        if( Method == TwistMethod.Pivot )
+        {
+            gesture.Pivot = GetTwistPivot( finger0, finger1 );
+            gesture.StartPosition = gesture.Pivot.StartPosition;
+        }
+        else
+        {
+            gesture.Pivot = null;
+            gesture.StartPosition = 0.5f * ( finger0.Position + finger1.Position ); //( finger0.StartPosition + finger1.StartPosition );
+        }
+        
+        gesture.Position = gesture.StartPosition;
+        gesture.TotalRotation = 0;
+        gesture.DeltaRotation = 0;
     }
 
     protected override GestureRecognitionState OnRecognize( TwistGesture gesture, FingerGestures.IFingerList touches )
@@ -124,15 +189,32 @@ public class TwistRecognizer : ContinuousGestureRecognizer<TwistGesture>
 
         FingerGestures.Finger finger0 = touches[0];
         FingerGestures.Finger finger1 = touches[1];
-
-        gesture.Position = 0.5f * ( finger0.Position + finger1.Position );
-
+        
         // dont do anything if both fingers arent moving
-        if( !FingerGestures.AllFingersMoving( finger0, finger1 ) )
-            return GestureRecognitionState.InProgress;
+        if( Method == TwistMethod.Pivot )
+        {
+            if( gesture.Pivot == null )
+            {
+                Debug.LogWarning( "Twist - pivot finger is null!", this );
+                return GestureRecognitionState.Failed;
+            }
+
+            if( gesture.Pivot != finger0 && gesture.Pivot != finger1 )
+            {
+                Debug.LogWarning( "Twist - lost track of pivot finger!", this );
+                return GestureRecognitionState.Failed;
+            }
+
+            gesture.Position = gesture.Pivot.Position;
+        }
+        else // standard twist
+        {
+            // mid point between finger0 and finger1
+            gesture.Position = 0.5f * ( finger0.Position + finger1.Position );
+        }
 
         gesture.DeltaRotation = SignedAngularGap( finger0, finger1, finger0.PreviousPosition, finger1.PreviousPosition );
-
+        
         // only raise event when the twist angle has changed
         if( Mathf.Abs( gesture.DeltaRotation ) > Mathf.Epsilon )
         {

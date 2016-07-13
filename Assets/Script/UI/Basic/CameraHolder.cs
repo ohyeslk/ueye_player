@@ -72,12 +72,30 @@ public class CameraHolder : MonoBehaviour {
 			transform.LookAt( selectionWindow.transform.position );
 	}
 
+	void OnFingerDown( FingerDownEvent e ) {
+		Debug.Log("Finger Down " + e.Finger );
+	}
+
+	void OnFingerUp( FingerUpEvent e ) {
+		Debug.Log("Finger Up " + e.Finger );
+	}
+
 	void OnFingerMove( FingerMotionEvent e ) {
+		if ( e.Phase == FingerMotionPhase.Started )
+		{
+			Debug.Log( "Start ");
+		}
+
+		if ( e.Phase == FingerMotionPhase.Ended )
+		{
+			Debug.Log("End ");
+		}
 
 		if ( e.Phase == FingerMotionPhase.Updated )
 		{
+			Debug.Log("Finger Move");
 			Vector2 delta = e.Finger.DeltaPosition;
-
+	
 			head.UpdateHead( delta );
 		}
 

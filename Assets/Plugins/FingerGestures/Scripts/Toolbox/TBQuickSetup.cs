@@ -9,38 +9,23 @@ public class TBQuickSetup : MonoBehaviour
     ScreenRaycaster screenRaycaster;
 
     // Finger Event Detectors
-    [HideInInspector] 
-    public FingerDownDetector FingerDown;
-    [HideInInspector] 
-    public FingerUpDetector FingerUp;
-    [HideInInspector] 
-    public FingerHoverDetector FingerHover;
-    [HideInInspector] 
-    public FingerMotionDetector FingerMotion;
+    public FingerDownDetector FingerDown { get; set; }
+    public FingerUpDetector FingerUp { get; set; }
+    public FingerHoverDetector FingerHover { get; set; }
+    public FingerMotionDetector FingerMotion { get; set; }
 
     // Gesture Recognizers
-    [HideInInspector]
-    public DragRecognizer Drag;
-    [HideInInspector]
-    public LongPressRecognizer LongPress;
-    [HideInInspector]
-    public SwipeRecognizer Swipe;
-    [HideInInspector] 
-    public TapRecognizer Tap;
-    [HideInInspector] 
-    public PinchRecognizer Pinch;
-    [HideInInspector] 
-    public TwistRecognizer Twist;
-    [HideInInspector] 
-    public TapRecognizer DoubleTap;
-    [HideInInspector] 
-    public DragRecognizer TwoFingerDrag;
-    [HideInInspector] 
-    public TapRecognizer TwoFingerTap;
-    [HideInInspector] 
-    public SwipeRecognizer TwoFingerSwipe;
-    [HideInInspector] 
-    public LongPressRecognizer TwoFingerLongPress;
+    public DragRecognizer Drag { get; set; }
+    public LongPressRecognizer LongPress { get; set; }
+    public SwipeRecognizer Swipe { get; set; }
+    public TapRecognizer Tap { get; set; }
+    public TapRecognizer DoubleTap { get; set; }
+    public PinchRecognizer Pinch { get; set; }
+    public TwistRecognizer Twist { get; set; }
+    public DragRecognizer TwoFingerDrag { get; set; }
+    public TapRecognizer TwoFingerTap { get; set; }
+    public SwipeRecognizer TwoFingerSwipe { get; set; }
+    public LongPressRecognizer TwoFingerLongPress { get; set; }
 
     GameObject CreateChildNode( string name )
     {

@@ -1,6 +1,6 @@
-// FingerGestures v2.3b
+// FingerGestures v3.1
 // The FingerGestures library is copyright (c) of William Ravaine
-// Please send feedback or bug reports to spk@fatalfrog.com
+// Please send feedback or bug reports to fingergestures@fatalfrog.com
 // More FingerGestures information at http://fingergestures.fatalfrog.com
 using UnityEngine;
 using System.Collections;
@@ -15,6 +15,19 @@ using System.Collections.Generic;
 [AddComponentMenu( "FingerGestures/Finger Gestures Singleton" )]
 public class FingerGestures : MonoBehaviour
 {
+    /// <summary>
+    /// This is a list of all the platforms that will use touch-based input instead of mouse
+    /// </summary>
+    public static readonly RuntimePlatform[] TouchScreenPlatforms = 
+    { 
+        RuntimePlatform.IPhonePlayer,
+        RuntimePlatform.Android,
+#if !UNITY_3_5
+        RuntimePlatform.BlackBerryPlayer,
+        RuntimePlatform.WP8Player,
+#endif
+    };
+
     public enum FingerPhase
     {
         None = 0,
@@ -22,11 +35,14 @@ public class FingerGestures : MonoBehaviour
         Moving,
         Stationary,
     }
-
+    
     #region Global Events
 
     public static event Gesture.EventHandler OnGestureEvent;
     public static event FingerEventDetector<FingerEvent>.FingerEventHandler OnFingerEvent;
+    
+    public delegate void EventHandler();
+    public static event EventHandler OnInputProviderChanged;
 
     internal static void FireEvent( Gesture gesture )
     {
@@ -70,9 +86,6 @@ public class FingerGestures : MonoBehaviour
 
     void Init()
     {
-        if( adjustPixelScaleForRetinaDisplay && IsRetinaDisplay() )
-            PixelDistanceScale = retinaPixelScale;
-
         InitInputProvider();
 
         fingerClusterManager = GetComponent<FingerClusterManager>();
@@ -95,21 +108,25 @@ public class FingerGestures : MonoBehaviour
         public FGInputProvider inputProviderPrefab;
     }
 
+    public static bool IsTouchScreenPlatform( RuntimePlatform platform )
+    {
+        for( int i = 0; i < TouchScreenPlatforms.Length; ++i )
+        {
+            if( platform == TouchScreenPlatforms[i] )
+                return true;
+        }
+
+        return false;
+    }
+
     void InitInputProvider()
     {
         InputProviderEvent e = new InputProviderEvent();
-        
-        switch( Application.platform )
-        {
-            case RuntimePlatform.Android:
-            case RuntimePlatform.IPhonePlayer:
-                e.inputProviderPrefab = touchInputProviderPrefab;
-                break;
 
-            default:
-                e.inputProviderPrefab = mouseInputProviderPrefab;
-                break;
-        }
+        if( IsTouchScreenPlatform( Application.platform ) )
+            e.inputProviderPrefab = touchInputProviderPrefab;
+        else
+            e.inputProviderPrefab = mouseInputProviderPrefab;
 
         // let other scripts on the same game object override the e.inputProviderPrefab if they want to install a different one
         gameObject.SendMessage( "OnSelectInputProvider", e, SendMessageOptions.DontRequireReceiver );
@@ -138,6 +155,9 @@ public class FingerGestures : MonoBehaviour
 
         // Create fingers & gesture recognizers
         InitFingers( MaxFingers );
+
+        if( OnInputProviderChanged != null )
+            OnInputProviderChanged();
     }
     
     #endregion
@@ -348,6 +368,11 @@ public class FingerGestures : MonoBehaviour
             return "Finger" + index;
         }
 
+        public static implicit operator bool( Finger finger )
+        {
+            return finger != null;
+        }
+
         internal void Update( bool newDownState, Vector2 newPos )
         {
             // stop ignoring this touch when the finger is no longer touching the screen
@@ -380,6 +405,7 @@ public class FingerGestures : MonoBehaviour
 
                     startTime = Time.time;
                     elapsedTimeStationary = 0;
+                    distFromStart = 0;
                 }
                 else
                 {
@@ -467,45 +493,6 @@ public class FingerGestures : MonoBehaviour
     {
         gestureRecognizers.Remove( recognizer );
     }
-    
-    
-    #region Pixel Scale (used to scale down pixel distances on retina displays to compensate for increased pixel density)
-
-    float pixelDistanceScale = 1.0f;
-
-    public static float PixelDistanceScale
-    {
-        get { return instance.pixelDistanceScale; }
-        set { instance.pixelDistanceScale = value; }
-    }
-
-    public static float GetAdjustedPixelDistance( float rawPixelDistance )
-    {
-        return PixelDistanceScale * rawPixelDistance;
-    }
-
-    public bool adjustPixelScaleForRetinaDisplay = true;
-    public float retinaPixelScale = 0.5f;    // retina is twice the pixel density of regular displays, so gestures on retina will travel twice as many pixels
-
-    bool IsRetinaDisplay()
-    {
-#if UNITY_IPHONE
-        if( Application.platform == RuntimePlatform.IPhonePlayer )
-        {
-            switch( UnityEngine.iOS.Device.generation )
-            {
-                case UnityEngine.iOS.DeviceGeneration.iPad3Gen:
-                case UnityEngine.iOS.DeviceGeneration.iPhone4:
-                case UnityEngine.iOS.DeviceGeneration.iPhone4S:
-                //case iPhoneGeneration.iPhone5: //TODO (Unity 3.6+)
-                    return true;
-            }
-        }
-#endif
-        return false;
-    }
-
-    #endregion
 
     #region Engine Callbacks
 
@@ -549,6 +536,7 @@ public class FingerGestures : MonoBehaviour
             Debug.Log( "UnityRemote presence detected. Switching to touch input." );
             InstallInputProvider( touchInputProviderPrefab );
             detectUnityRemote = false;
+            
             return; // skip a frame
         }
 #endif
@@ -588,8 +576,10 @@ public class FingerGestures : MonoBehaviour
         touches.Clear();
 
         // update all fingers
-        foreach( Finger finger in fingers )
+        for( int i = 0; i < fingers.Length; ++i )
         {
+            Finger finger = fingers[i];
+
             Vector2 pos = Vector2.zero;
             bool down = false;
 
@@ -597,7 +587,7 @@ public class FingerGestures : MonoBehaviour
             inputProvider.GetInputState( finger.Index, out down, out pos );
 
             finger.Update( down, pos );
-            
+
             if( finger.IsDown )
                 touches.Add( finger );
         }
@@ -793,15 +783,15 @@ public class FingerGestures : MonoBehaviour
         }
 
         public delegate T FingerPropertyGetterDelegate<T>( Finger finger );
-
+        
         public Vector2 AverageVector( FingerPropertyGetterDelegate<Vector2> getProperty )
         {
             Vector2 avg = Vector2.zero;
 
             if( Count > 0 )
             {
-                foreach( Finger finger in list )
-                    avg += getProperty( finger );
+                for( int i = 0; i < list.Count; ++i )
+                    avg += getProperty( list[i] );
 
                 avg /= Count;
             }
@@ -815,8 +805,8 @@ public class FingerGestures : MonoBehaviour
 
             if( Count > 0 )
             {
-                foreach( Finger finger in list )
-                    avg += getProperty( finger );
+                for( int i = 0; i < list.Count; ++i )
+                    avg += getProperty( list[i] );
 
                 avg /= Count;
             }
@@ -824,44 +814,35 @@ public class FingerGestures : MonoBehaviour
             return avg;
         }
 
-        static Vector2 GetFingerStartPosition( Finger finger )
-        {
-            return finger.StartPosition;
-        }
+        // cache delegates so we do not allocate them at runtime on each call
+        static FingerPropertyGetterDelegate<Vector2> delGetFingerStartPosition = GetFingerStartPosition;
+        static FingerPropertyGetterDelegate<Vector2> delGetFingerPosition = GetFingerPosition;
+        static FingerPropertyGetterDelegate<Vector2> delGetFingerPreviousPosition = GetFingerPreviousPosition;
+        static FingerPropertyGetterDelegate<float> delGetFingerDistanceFromStart = GetFingerDistanceFromStart;
 
-        static Vector2 GetFingerPosition( Finger finger )
-        {
-            return finger.Position;
-        }
-
-        static Vector2 GetFingerPreviousPosition( Finger finger )
-        {
-            return finger.PreviousPosition;
-        }
-
-        static float GetFingerDistanceFromStart( Finger finger )
-        {
-            return finger.DistanceFromStart;
-        }
+        static Vector2 GetFingerStartPosition( Finger finger ) { return finger.StartPosition; }
+        static Vector2 GetFingerPosition( Finger finger ) { return finger.Position; }
+        static Vector2 GetFingerPreviousPosition( Finger finger ) { return finger.PreviousPosition; }
+        static float GetFingerDistanceFromStart( Finger finger ) { return finger.DistanceFromStart; }
 
         public Vector2 GetAverageStartPosition()
         {
-            return AverageVector( GetFingerStartPosition );
+            return AverageVector( delGetFingerStartPosition );
         }
 
         public Vector2 GetAveragePosition()
         {
-            return AverageVector( GetFingerPosition );
+            return AverageVector( delGetFingerPosition );
         }
 
         public Vector2 GetAveragePreviousPosition()
         {
-            return AverageVector( GetFingerPreviousPosition );
+            return AverageVector( delGetFingerPreviousPosition );
         }
 
         public float GetAverageDistanceFromStart()
         {
-            return AverageFloat( GetFingerDistanceFromStart );
+            return AverageFloat( delGetFingerDistanceFromStart );
         }
 
         public Finger GetOldest()
@@ -905,9 +886,9 @@ public class FingerGestures : MonoBehaviour
                 return false;
 
             // all touches must be moving
-            foreach( FingerGestures.Finger touch in list )
+            for( int i = 0; i < list.Count; ++i )
             {
-                if( !touch.IsMoving )
+                if( !list[i].IsMoving )
                     return false;
             }
 
@@ -1045,21 +1026,11 @@ public class FingerGestures : MonoBehaviour
     }
 
     /// <summary>
-    /// Check if all the fingers in the list are moving
+    /// Check if all the fingers are moving
     /// </summary>
-    public static bool AllFingersMoving( params Finger[] fingers )
+    public static bool AllFingersMoving( Finger finger0, Finger finger1 )
     {
-        if( fingers.Length == 0 )
-            return false;
-
-        foreach( Finger finger in fingers )
-        {
-            // found at least one finger not moving...
-            if( !finger.IsMoving )
-                return false;
-        }
-
-        return true;
+        return finger0.IsMoving && finger1.IsMoving;
     }
 
     /// <summary>
@@ -1093,4 +1064,204 @@ public class FingerGestures : MonoBehaviour
     }
 
     #endregion
+
+    #region DPI & Distance Units
+
+    /*
+iPhone3        320x480  163 ppi
+iPhone4        640�960  326 ppi 
+iPhone4S       640�960  326 ppi 
+iPhone5        640�1136 326 ppi 
+iPhone5S       640x1136 326 ppi
+iPad          1024x768  132 ppi
+iPad2         1024x768  132 ppi
+iPad (3gen)   2048x1536 264 ppi
+iPad (4gen)   2048x1536 264 ppi
+iPad mini     1024x768  163 ppi
+iPad mini2    2048x1536 326 ppi
+         */
+
+    const float DESKTOP_SCREEN_STANDARD_DPI = 96; // default win7 dpi
+    const float INCHES_TO_CENTIMETERS = 2.54f; // 1 inch = 2.54 cm
+    const float CENTIMETERS_TO_INCHES = 1.0f / INCHES_TO_CENTIMETERS; // 1 cm = 0.3937... inches
+
+    static float screenDPI = 0;
+
+    /// <summary>
+    /// Screen Dots-Per-Inch
+    /// </summary>
+    public static float ScreenDPI
+    {
+        get 
+        {
+            // not intialized?
+            if( screenDPI <= 0 )
+            {
+                screenDPI = Screen.dpi;
+
+                // on desktop, dpi can be 0 - default to a standard dpi for screens
+                if( screenDPI <= 0 )
+                    screenDPI = DESKTOP_SCREEN_STANDARD_DPI;
+
+#if UNITY_IPHONE
+                // try to detect some devices that aren't supported by Unity (yet)
+                if( iPhone.generation == iPhoneGeneration.Unknown ||
+                    iPhone.generation == iPhoneGeneration.iPadUnknown ||
+                    iPhone.generation == iPhoneGeneration.iPhoneUnknown )
+                {
+                    // ipad mini 2 ?
+                    if( Screen.width == 2048 && Screen.height == 1536 && screenDPI == 260 )
+                        screenDPI = 326;
+                }
+#endif
+            }
+
+            return FingerGestures.screenDPI; 
+        }
+
+        set { FingerGestures.screenDPI = value; }
+    }
+
+    
+    public static float Convert( float distance, DistanceUnit fromUnit, DistanceUnit toUnit )
+    {
+        float dpi = ScreenDPI;
+        float pixelDistance; 
+
+        switch( fromUnit )
+        {
+            case DistanceUnit.Centimeters:
+                pixelDistance = distance * CENTIMETERS_TO_INCHES * dpi; // cm -> in -> px
+                break;
+
+            case DistanceUnit.Inches:
+                pixelDistance = distance * dpi; // in -> px
+                break;
+
+            case DistanceUnit.Pixels:
+            default:
+                pixelDistance = distance;
+                break;
+        }
+
+        switch( toUnit )
+        {
+            case DistanceUnit.Inches:
+                return pixelDistance / dpi; // px -> in
+
+            case DistanceUnit.Centimeters:
+                return ( pixelDistance / dpi ) * INCHES_TO_CENTIMETERS;  // px -> in -> cm
+            
+            case DistanceUnit.Pixels:
+                return pixelDistance;
+        }
+
+        return pixelDistance;
+    }
+
+    // convert a 2D motion vector from one distance unit to another one
+    public static Vector2 Convert( Vector2 v, DistanceUnit fromUnit, DistanceUnit toUnit )
+    {
+        return new Vector2( Convert( v.x, fromUnit, toUnit ),
+                            Convert( v.y, fromUnit, toUnit ) );
+    }
+
+    #endregion
+}
+
+public enum DistanceUnit
+{
+    Pixels,
+    Inches,
+    Centimeters,
+}
+
+/// <summary>
+/// Utility extension methods
+/// </summary>
+public static class FingerGesturesExtensions
+{
+    /// <summary>
+    /// Return short version of unit name (cm, in, px)
+    /// </summary>
+    public static string Abreviation( this DistanceUnit unit )
+    {
+        switch( unit )
+        {
+            case DistanceUnit.Centimeters:
+                return "cm";
+
+            case DistanceUnit.Inches:
+                return "in";
+
+            case DistanceUnit.Pixels:
+                return "px";
+        }
+
+        return unit.ToString();
+    }
+
+    /// <summary>
+    /// Convert the current value from 'fromUnit' to 'toUnit'
+    /// </summary>
+    public static float Convert( this float value, DistanceUnit fromUnit, DistanceUnit toUnit )
+    {
+        return FingerGestures.Convert( value, fromUnit, toUnit );
+    }
+
+    /// <summary>
+    /// Convert the current pixel-distance based value to the desired unit
+    /// </summary>
+    public static float In( this float valueInPixels, DistanceUnit toUnit )
+    {
+        return valueInPixels.Convert( DistanceUnit.Pixels, toUnit );
+    }
+
+    /// <summary>
+    /// Convert the current pixel-distance based value to centimeters
+    /// </summary>
+    public static float Centimeters( this float valueInPixels )
+    {
+        return valueInPixels.In( DistanceUnit.Centimeters );
+    }
+
+    /// <summary>
+    /// Convert the current pixel-distance based value to inches
+    /// </summary>
+    public static float Inches( this float valueInPixels )
+    {
+        return valueInPixels.In( DistanceUnit.Inches );
+    }
+
+    /// <summary>
+    /// Convert the current Vector2 from 'fromUnit' to 'toUnit'
+    /// </summary>
+    public static Vector2 Convert( this Vector2 v, DistanceUnit fromUnit, DistanceUnit toUnit )
+    {
+        return FingerGestures.Convert( v, fromUnit, toUnit );
+    }
+
+    /// <summary>
+    /// Convert the current pixel-based Vector2 to the desired unit
+    /// </summary>
+    public static Vector2 In( this Vector2 vecInPixels, DistanceUnit toUnit )
+    {
+        return vecInPixels.Convert( DistanceUnit.Pixels, toUnit );
+    }
+
+    /// <summary>
+    /// Convert the current pixel-based Vector2 to centimeters
+    /// </summary>
+    public static Vector2 Centimeters( this Vector2 vecInPixels )
+    {
+        return vecInPixels.In( DistanceUnit.Centimeters );
+    }
+
+    /// <summary>
+    /// Convert the current pixel-based Vector2 to inches
+    /// </summary>
+    public static Vector2 Inches( this Vector2 vecInPixels )
+    {
+        return vecInPixels.In( DistanceUnit.Inches );
+    }
 }

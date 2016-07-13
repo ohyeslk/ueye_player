@@ -80,15 +80,23 @@ public class CardboardHead : MonoBehaviour {
 
 //			transform.forward = to;
 //			handDelta = transform.localRotation * Quaternion.Inverse( rot );
+			Vector3 top = Vector3.up;
+			if ( Application.platform == RuntimePlatform.IPhonePlayer || Application.platform == RuntimePlatform.Android )
+			{
+				Vector3 acc = Input.acceleration;
+				acc.z = 0;
+				acc.x = - acc.x ;
+				top = acc.normalized;
+			}
 
-			Quaternion towardRotation = Quaternion.LookRotation( to );
+			Quaternion towardRotation = Quaternion.LookRotation( to , top );
 			handDelta = towardRotation * Quaternion.Inverse( rot );
-			Debug.Log("set hand Delta " + handDelta );
+//			Debug.Log("set hand Delta " + handDelta );
 
 		}
 	}
 
-  [SerializeField] float verticalYThreshod = 0.7f;
+	[SerializeField] float verticalYThreshod = 0.7f;
 	[SerializeField]float FreeAngleThreshod = 0.4f;
 	[SerializeField]float MoveSensity = 0.2f;
 
@@ -188,7 +196,6 @@ public class CardboardHead : MonoBehaviour {
 		else {
 				
 			if (target == null) {
-				Debug.Log("Update in non lock ");
 				Vector3 temToward = transform.localRotation.eulerAngles;
 				Vector3 toToward = (handDelta * rot).eulerAngles;
 				if ( Vector3.Angle( temToward , toToward ) > FreeAngleThreshod )

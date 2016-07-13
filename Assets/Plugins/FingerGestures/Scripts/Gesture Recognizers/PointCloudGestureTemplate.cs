@@ -44,6 +44,16 @@ public class PointCloudGestureTemplate : ScriptableObject
         get { return size.y; }
     }
 
+    void Awake()
+    {
+        // initialize the collections properly in case we're creating this by code
+        if( positions == null )
+            positions = new List<Vector2>();
+
+        if( strokeIds == null )
+            strokeIds = new List<int>();
+    }
+
     public void BeginPoints()
     {
         positions.Clear();
@@ -69,7 +79,7 @@ public class PointCloudGestureTemplate : ScriptableObject
 
         // count strokes
         List<int> uniqueStrokesFound = new List<int>();
-        
+
         for( int i = 0; i < strokeIds.Count; ++i )
         {
             int id = strokeIds[i];
@@ -108,8 +118,9 @@ public class PointCloudGestureTemplate : ScriptableObject
         Vector2 min = new Vector2( float.PositiveInfinity, float.PositiveInfinity );
         Vector2 max = new Vector2( float.NegativeInfinity, float.NegativeInfinity );
 
-        foreach( Vector2 p in positions )
+        for( int i = 0; i < positions.Count; ++i )
         {
+            Vector2 p = positions[i];
             min.x = Mathf.Min( min.x, p.x );
             min.y = Mathf.Min( min.y, p.y );
             max.x = Mathf.Max( max.x, p.x );
@@ -124,7 +135,7 @@ public class PointCloudGestureTemplate : ScriptableObject
 
         size.x = width * invSize;
         size.y = height * invSize;
-        
+
         Vector2 offset = -0.5f * size;
 
         // scale & center around origin
@@ -134,8 +145,8 @@ public class PointCloudGestureTemplate : ScriptableObject
 
     void MakeDirty()
     {
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
         EditorUtility.SetDirty( this );
-    #endif
+#endif
     }
 }

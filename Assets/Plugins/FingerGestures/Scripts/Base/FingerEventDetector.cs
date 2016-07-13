@@ -38,7 +38,7 @@ public class FingerEvent
     #region Object Picking / Raycasting
 
     GameObject selection;       // object picked at current Position
-    RaycastHit hit = new RaycastHit();
+    ScreenRaycastData raycast = new ScreenRaycastData();
     
     /// <summary>
     /// GameObject currently located at this gesture position
@@ -52,10 +52,10 @@ public class FingerEvent
     /// <summary>
     /// Last raycast hit result
     /// </summary>
-    public RaycastHit Hit
+    public ScreenRaycastData Raycast
     {
-        get { return hit; }
-        internal set { hit = value; }
+        get { return raycast; }
+        internal set { raycast = value; }
     }
     
     #endregion
@@ -80,10 +80,26 @@ public abstract class FingerEventDetector<T> : FingerEventDetector where T : Fin
     protected override void Start()
     {
         base.Start();
-        InitFingerEventsList( FingerGestures.Instance.MaxFingers );
+        FingerGestures.OnInputProviderChanged += FingerGestures_OnInputProviderChanged;
+        Init();
     }
 
-    protected virtual void InitFingerEventsList( int fingersCount )
+    protected virtual void OnDestroy()
+    {
+        FingerGestures.OnInputProviderChanged -= FingerGestures_OnInputProviderChanged;
+    }
+
+    void FingerGestures_OnInputProviderChanged()
+    {
+        Init();
+    }
+
+    protected virtual void Init()
+    {
+        Init( FingerGestures.Instance.MaxFingers );
+    }
+
+    protected virtual void Init( int fingersCount )
     {
         fingerEventsList = new List<T>( fingersCount );
 
@@ -116,7 +132,7 @@ public abstract class FingerEventDetector : MonoBehaviour
     public GameObject MessageTarget = null;
 
     FingerGestures.Finger activeFinger;
-    RaycastHit lastHit = new RaycastHit();
+    ScreenRaycastData lastRaycast = new ScreenRaycastData();
 
     protected abstract void ProcessFinger( FingerGestures.Finger finger );
 
@@ -132,7 +148,6 @@ public abstract class FingerEventDetector : MonoBehaviour
 
         if( !MessageTarget )
             MessageTarget = this.gameObject;
-
     }
 
     protected virtual void Start()
@@ -174,9 +189,9 @@ public abstract class FingerEventDetector : MonoBehaviour
         }
     }
 
-    internal RaycastHit LastHit
+    internal ScreenRaycastData Raycast
     {
-        get { return lastHit; }
+        get { return lastRaycast; }
     }
 
     public GameObject PickObject( Vector2 screenPos )
@@ -184,30 +199,15 @@ public abstract class FingerEventDetector : MonoBehaviour
         if( !Raycaster || !Raycaster.enabled )
             return null;
 
-		if( !Raycaster.Raycast( screenPos, out lastHit ) )
+        if( !Raycaster.Raycast( screenPos, out lastRaycast ) )
             return null;
 
-        return lastHit.collider.gameObject;
+        return lastRaycast.GameObject;
     }
-
-
-	public GameObject PickObject( Vector2 screenPos , Vector2 deltaPos )
-	{
-		if( !Raycaster || !Raycaster.enabled )
-			return null;
-//		if( Raycaster.Raycast( screenPos, out lastHit ) )
-//			return lastHit.collider.gameObject;
-
-		if( Raycaster.Raycast( screenPos, deltaPos , out lastHit ) )
-			return lastHit.collider.gameObject;
-
-		return null;
-	}
 
     protected void UpdateSelection( FingerEvent e )
     {
-		e.Selection = PickObject( e.Position , e.Finger.DeltaPosition );
-
-        e.Hit = LastHit;
+        e.Selection = PickObject( e.Position );
+        e.Raycast = Raycast;
     }
 }

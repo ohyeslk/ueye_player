@@ -1,6 +1,28 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+public struct ScreenRaycastData
+{
+    public bool Is2D;
+    public RaycastHit Hit3D;
+
+#if !UNITY_3_5
+    public RaycastHit2D Hit2D;
+#endif
+
+    public GameObject GameObject
+    {
+        get
+        {
+#if !UNITY_3_5
+            if( Is2D )
+                return Hit2D.collider ? Hit2D.collider.gameObject : null;
+#endif
+            return Hit3D.collider ? Hit3D.collider.gameObject : null;
+        }
+    }
+}
+
 [AddComponentMenu( "FingerGestures/Components/Screen Raycaster" )]
 public class ScreenRaycaster : MonoBehaviour
 {
@@ -28,6 +50,11 @@ public class ScreenRaycaster : MonoBehaviour
     /// Toggles the visualization of the raycasts as red lines for misses, and green lines for hits (visible in scene view only)
     /// </summary>
     public bool VisualizeRaycasts = true;
+
+    /// <summary>
+    /// Raycast using Physics2D on orthographic cameras (Unity 4.X+ only)
+    /// </summary>
+    public bool UsePhysics2D = true;
     
     void Start()
     {
@@ -36,56 +63,86 @@ public class ScreenRaycaster : MonoBehaviour
             Cameras = new Camera[] { Camera.main };
     }
 
-    public bool Raycast( Vector2 screenPos, out RaycastHit hit )
+    public bool Raycast( Vector2 screenPos, out ScreenRaycastData hitData )
     {
-        foreach( Camera cam in Cameras )
+        for( int i = 0; i < Cameras.Length; ++i )
         {
-            if( Raycast( cam, screenPos, out hit ) )
+            Camera cam = Cameras[i];
+
+            // dont raycast from disabled cams
+            if( !cam || !cam.enabled )
+                continue;
+
+#if UNITY_3_5
+            if( !cam.gameObject.active )
+                continue;
+#else
+            if( !cam.gameObject.activeInHierarchy )
+                continue;
+#endif
+
+            if( Raycast( cam, screenPos, out hitData ) )
                 return true;
         }
 
-        hit = new RaycastHit();
+        hitData = new ScreenRaycastData();
         return false;
     }
 
-	public bool Raycast( Vector2 screenPos, Vector2 deltaPos , out RaycastHit hit )
-	{
-
-		Vector3 pos = Camera.main.ScreenToWorldPoint( new Vector3( screenPos.x , screenPos.y , 0 ) ); 
-		Vector3 delta = Camera.main.ScreenToWorldPoint( screenPos - deltaPos);
-		delta = pos - delta;
-		delta.z = pos.z = 0;
-		// show the detection line
-		Debug.DrawLine( pos , pos - delta , Color.blue, 1f );
-
-		foreach( Camera cam in Cameras )
-		{
-			if ( Physics.Raycast( pos , - delta.normalized , out hit , delta.magnitude ) )
-				return true;
-		}
-
-		hit = new RaycastHit();
-		return false;
-	}
-
-    bool Raycast( Camera cam, Vector2 screenPos, out RaycastHit hit )
+    bool Raycast( Camera cam, Vector2 screenPos, out ScreenRaycastData hitData )
     {
         Ray ray = cam.ScreenPointToRay( screenPos );
         bool didHit = false;
 
-        if( RayThickness > 0 )
-            didHit = Physics.SphereCast( ray, 0.5f * RayThickness, out hit, Mathf.Infinity, ~IgnoreLayerMask );
-        else
-            didHit = Physics.Raycast( ray, out hit, Mathf.Infinity, ~IgnoreLayerMask );
+        hitData = new ScreenRaycastData();
+
+#if !UNITY_3_5
+        // try to raycast 2D first - this only makes sense on orthographic cameras (physics2D doesnt work with perspective cameras)
+        if( UsePhysics2D && cam.orthographic )
+        {
+            hitData.Hit2D = Physics2D.Raycast( ray.origin, Vector2.zero, Mathf.Infinity, ~IgnoreLayerMask );
+
+            if( hitData.Hit2D.collider )
+            {
+                hitData.Is2D = true;
+                didHit = true;
+            }
+        }
+#endif
+
+        // regular 3D raycast
+        if( !didHit )
+        {
+            hitData.Is2D = false;   // ensure this is false
+
+            if( RayThickness > 0 )
+                didHit = Physics.SphereCast( ray, 0.5f * RayThickness, out hitData.Hit3D, Mathf.Infinity, ~IgnoreLayerMask );
+            else
+                didHit = Physics.Raycast( ray, out hitData.Hit3D, Mathf.Infinity, ~IgnoreLayerMask );
+        }
 
         // vizualise ray
     #if UNITY_EDITOR
         if( VisualizeRaycasts )
         {
             if( didHit )
-                Debug.DrawLine( ray.origin, hit.point, Color.green, 0.5f );
+            {
+                Vector3 hitPos = hitData.Hit3D.point;
+
+#if !UNITY_3_5
+                if( hitData.Is2D )
+                {
+                    hitPos = hitData.Hit2D.point;
+                    hitPos.z = hitData.GameObject.transform.position.z;
+                }
+#endif
+
+                Debug.DrawLine( ray.origin, hitPos, Color.green, 0.5f );
+            }
             else
+            {
                 Debug.DrawLine( ray.origin, ray.origin + ray.direction * 9999.0f, Color.red, 0.5f );
+            }
         }
     #endif
 

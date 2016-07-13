@@ -12,9 +12,9 @@ using System.Collections;
 public class TBDragView : MonoBehaviour
 {
     public bool allowUserInput = true;  // set this to false to prevent the user from dragging the view
-    public float sensitivity = 8.0f;
+    public float sensitivity = 360.0f;
     public float dragAcceleration = 40.0f;
-    public float dragDeceleration = 10.0f;
+    public float dragDeceleration = 15.0f;
     public bool reverseControls = false;
     public float minPitchAngle = -60.0f;
     public float maxPitchAngle = 60.0f;
@@ -72,7 +72,7 @@ public class TBDragView : MonoBehaviour
 
             if( Dragging )
             {
-                idealAngularVelocity = sensitivity * dragGesture.DeltaMove;
+                idealAngularVelocity = sensitivity * dragGesture.DeltaMove.Centimeters();
                 accel = dragAcceleration;
             }
 

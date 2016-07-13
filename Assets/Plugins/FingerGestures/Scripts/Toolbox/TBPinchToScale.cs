@@ -58,6 +58,6 @@ public class TBPinchToScale : MonoBehaviour
 
     void OnPinch( PinchGesture gesture )
     {  
-        IdealScaleAmount += 0.01f * sensitivity * gesture.Delta;
+        IdealScaleAmount += sensitivity * gesture.Delta.Centimeters();
     }
 }

@@ -53,19 +53,22 @@ public class SwipeRecognizer : DiscreteGestureRecognizer<SwipeGesture>
 
     /// <summary>
     /// Minimum distance the finger must travel in order to produce a valid swipe
+    /// <seealso cref="DistanceUnit"/>
     /// </summary>
-    public float MinDistance = 1.0f;
+    public float MinDistance = 0.5f;
 
     /// <summary>
     /// Finger travel distance beyond which the swipe recognition will fail.
     /// Setting this to 0 disables the MaxDistance constraint
+    /// <seealso cref="DistanceUnit"/>
     /// </summary>
     public float MaxDistance = 0;
 
     /// <summary>
     /// Minimum speed the finger motion must maintain in order to generate a valid swipe
+    /// <seealso cref="DistanceUnit"/>
     /// </summary>
-    public float MinVelocity = 100.0f;
+    public float MinVelocity = 5.0f;    // 5 cm/s
 
     /// <summary>
     /// Amount of tolerance used when determining whether or not the current swipe motion is still moving in a valid direction
@@ -111,6 +114,9 @@ public class SwipeRecognizer : DiscreteGestureRecognizer<SwipeGesture>
 
     protected override GestureRecognitionState OnRecognize( SwipeGesture gesture, FingerGestures.IFingerList touches )
     {
+        float minDistanceInPixels = ToPixels( MinDistance );
+        float maxDistanceInPixels = ToPixels( MaxDistance );
+
         if( touches.Count != RequiredFingerCount )
         {
             // more fingers were added - fail right away
@@ -122,7 +128,7 @@ public class SwipeRecognizer : DiscreteGestureRecognizer<SwipeGesture>
             //
 
             // didn't swipe far enough
-            if( FingerGestures.GetAdjustedPixelDistance( gesture.Move.magnitude ) < Mathf.Max( 1, MinDistance ) )
+            if( gesture.Move.magnitude < Mathf.Max( 1, minDistanceInPixels ) )
                 return GestureRecognitionState.Failed;
 
             // get approx swipe direction
@@ -133,11 +139,12 @@ public class SwipeRecognizer : DiscreteGestureRecognizer<SwipeGesture>
         Vector2 previousMotion = gesture.Move;
         gesture.Position = touches.GetAveragePosition();
         gesture.Move = gesture.Position - gesture.StartPosition;
-        
-        float distance = FingerGestures.GetAdjustedPixelDistance( gesture.Move.magnitude );
+
+        // pixel-adjusted distance
+        float distance = gesture.Move.magnitude;
 
         // moved too far
-        if( MaxDistance > MinDistance && distance > MaxDistance )
+        if( maxDistanceInPixels > minDistanceInPixels && distance > maxDistanceInPixels )
         {
             //Debug.LogWarning( "Too far: " + distance );
             return GestureRecognitionState.Failed;
@@ -149,22 +156,12 @@ public class SwipeRecognizer : DiscreteGestureRecognizer<SwipeGesture>
             gesture.Velocity = 0;
         
         // we're going too slow
-        if( gesture.MoveCounter > 2 && gesture.Velocity < MinVelocity )
+        if( gesture.MoveCounter > 2 && gesture.Velocity < ToPixels( MinVelocity ) )
         {
             //Debug.LogWarning( "Too slow: " + gesture.Velocity );
             return GestureRecognitionState.Failed;
         }
         
-        /*
-        FingerGestures.SwipeDirection newDirection = FingerGestures.GetSwipeDirection( Move.normalized, DirectionTolerance );
-
-        // we went in a bad direction
-        if( !IsValidDirection( newDirection ) || ( direction != FingerGestures.SwipeDirection.None && newDirection != direction ) )
-            return GestureRecognitionState.Failed;
-
-        direction = newDirection;
-        */
-
         // check if we have deviated too much from our initial direction
         if( distance > 50.0f && gesture.MoveCounter > 2 )
         {

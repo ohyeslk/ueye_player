@@ -35,8 +35,9 @@ public class DragRecognizer : ContinuousGestureRecognizer<DragGesture>
 {
     /// <summary>
     /// How far the finger is allowed to move from its <see cref="AveragedGestureRecognizer.StartPosition">initial position</see> without making the gesture fail
+    /// <seealso cref="DistanceUnit"/>
     /// </summary>
-    public float MoveTolerance = 5.0f;
+    public float MoveTolerance = 0.25f; // (in cm by default - see DistanceUnit)
 
     /// <summary>
     /// Applies for multi-finger drag gestures only:
@@ -60,9 +61,9 @@ public class DragRecognizer : ContinuousGestureRecognizer<DragGesture>
             return false;
 
         // must have moved beyond move tolerance threshold
-        if( touches.GetAverageDistanceFromStart() < MoveTolerance )
+        if( touches.GetAverageDistanceFromStart() < ToPixels( MoveTolerance ) )
             return false;
-
+        
         // all touches must be moving
         if( !touches.AllMoving() )
             return false;

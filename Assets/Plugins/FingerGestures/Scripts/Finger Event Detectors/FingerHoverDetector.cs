@@ -58,7 +58,7 @@ public class FingerHoverDetector : FingerEventDetector<FingerHoverEvent>
         FingerHoverEvent e = GetEvent( finger );
 
         GameObject prevSelection = e.PreviousSelection;
-		GameObject newSelection = finger.IsDown ? PickObject( finger.Position , finger.DeltaPosition ) : null;
+        GameObject newSelection = finger.IsDown ? PickObject( finger.Position ) : null;
 
         if( newSelection != prevSelection )
         {
@@ -68,7 +68,7 @@ public class FingerHoverDetector : FingerEventDetector<FingerHoverEvent>
             if( newSelection )
             {
                 e.Selection = newSelection;
-                e.Hit = LastHit;
+                e.Raycast = Raycast;
 
                 FireEvent( e, FingerHoverPhase.Enter );
             }

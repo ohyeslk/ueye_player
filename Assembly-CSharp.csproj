@@ -46,6 +46,25 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\EasyMovieTexture\Scripts\SeekBarCtrl.cs" />
+     <Compile Include="Assets\FingerGestures Samples\1) Finger Events\Scripts\FingerEventsSamplePart1.cs" />
+     <Compile Include="Assets\FingerGestures Samples\1) Finger Events\Scripts\FingerEventsSamplePart2.cs" />
+     <Compile Include="Assets\FingerGestures Samples\2) Gestures\Scripts\BasicGesturesSample.cs" />
+     <Compile Include="Assets\FingerGestures Samples\2) Gestures\Scripts\PinchTwistSample.cs" />
+     <Compile Include="Assets\FingerGestures Samples\2) Gestures\Scripts\PointCloudGestureRenderer.cs" />
+     <Compile Include="Assets\FingerGestures Samples\2) Gestures\Scripts\PointCloudGestureSample.cs" />
+     <Compile Include="Assets\FingerGestures Samples\3) Toolbox\Scripts\DragTrail.cs" />
+     <Compile Include="Assets\FingerGestures Samples\3) Toolbox\Scripts\EmitParticlesOnSwipe.cs" />
+     <Compile Include="Assets\FingerGestures Samples\3) Toolbox\Scripts\ToolboxDragSample.cs" />
+     <Compile Include="Assets\FingerGestures Samples\3) Toolbox\Scripts\ToolboxFingerEventsSample.cs" />
+     <Compile Include="Assets\FingerGestures Samples\3) Toolbox\Scripts\ToolboxOneFingerGestureSample.cs" />
+     <Compile Include="Assets\FingerGestures Samples\Assets\Scripts\BasicSample.cs" />
+     <Compile Include="Assets\FingerGestures Samples\Assets\Scripts\EmitParticles.cs" />
+     <Compile Include="Assets\FingerGestures Samples\Assets\Scripts\MaxFPS.cs" />
+     <Compile Include="Assets\FingerGestures Samples\Assets\Scripts\MenuNode.cs" />
+     <Compile Include="Assets\FingerGestures Samples\Assets\Scripts\SampleBase.cs" />
+     <Compile Include="Assets\FingerGestures Samples\Assets\Scripts\SampleUI.cs" />
+     <Compile Include="Assets\FingerGestures Samples\Assets\Scripts\StartMenu.cs" />
+     <Compile Include="Assets\FingerGestures Samples\Assets\Scripts\SwipeParticlesEmitter.cs" />
      <Compile Include="Assets\Script\CommentLine.cs" />
      <Compile Include="Assets\Script\Comment_Manager.cs" />
      <Compile Include="Assets\Script\Core\EffectManager.cs" />

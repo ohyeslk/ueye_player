@@ -1,5 +1,5 @@
 =============================================================================
- FingerGestures v3.0 (March 10th 2012)
+ FingerGestures v3.1 (December 3rd 2013)
   http://fingergestures.fatalfrog.com 
 
  copyright (c) William Ravaine / Fatal Frog Software
@@ -53,8 +53,9 @@ In order to use the sample browser, you must do this setup manually:
 =====================
 Contact & Support
 =====================
-For feedback or support request, please use the FingerGestures forum at http://forum.fatalfrog.com. 
-For private inquiries, you may use the contact form at http://fingergestures.fatalfrog.com/contact. 
+If you need technical support, please visit http://fingergestures.fatalfrog.com/support. 
+For more general inquiries or feedback, please use the forum at http://forum.fatalfrog.com. 
+You may also contact me directly at fingergestures@fatalfrog.com if all else fails :)
 
 Thank you for using FingerGestures!
 William Ravaine

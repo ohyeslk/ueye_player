@@ -20,8 +20,9 @@ public class LongPressRecognizer : DiscreteGestureRecognizer<LongPressGesture>
 
     /// <summary>
     /// How far the finger is allowed to move around its starting position without breaking the gesture
+    /// <seealso cref="DistanceUnit"/>
     /// </summary>
-    public float MoveTolerance = 5.0f;
+    public float MoveTolerance = 0.5f;
 
     public override string GetDefaultEventMessageName()
     {
@@ -43,7 +44,7 @@ public class LongPressRecognizer : DiscreteGestureRecognizer<LongPressGesture>
             return GestureRecognitionState.Recognized;
 
         // check if we moved too far from initial position
-        if( touches.GetAverageDistanceFromStart() > MoveTolerance )
+        if( touches.GetAverageDistanceFromStart() > ToPixels( MoveTolerance ) )
             return GestureRecognitionState.Failed;
 
         return GestureRecognitionState.InProgress;

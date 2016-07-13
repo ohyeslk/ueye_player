@@ -11,6 +11,8 @@ public class TBDragToMove : MonoBehaviour
     public float DragPlaneOffset = 0.0f;    // distance between dragged object and drag constraint plane
     public Camera RaycastCamera;
 
+    public bool DragFromObjectCenter = false;
+
     // are we being dragged?
     bool dragging = false;
     FingerGestures.Finger draggingFinger = null;
@@ -97,26 +99,37 @@ public class TBDragToMove : MonoBehaviour
 		return true;
     }
 
-    void HandleDrag( DragGesture gesture )
+void HandleDrag( DragGesture gesture )
+{
+    if( !enabled )
+        return;
+
+    if( gesture.Phase == ContinuousGesturePhase.Started )
     {
-        if( !enabled )
+        Dragging = true;
+        draggingFinger = gesture.Fingers[0];
+    }
+    else if( Dragging )
+    {
+        // make sure this is the finger we started dragging with
+        if( gesture.Fingers[0] != draggingFinger )
             return;
 
-        if( gesture.Phase == ContinuousGesturePhase.Started )
+        if( gesture.Phase == ContinuousGesturePhase.Updated )
         {
-            Dragging = true;
-            draggingFinger = gesture.Fingers[0];
-        }
-        else if( Dragging )
-        {
-            // make sure this is the finger we started dragging with
-            if( gesture.Fingers[0] != draggingFinger )
-                return;
+            Transform tf = transform;
+            Vector3 move = Vector3.zero;
 
-            if( gesture.Phase == ContinuousGesturePhase.Updated )
+            if( DragFromObjectCenter )
             {
-                Transform tf = transform;
-
+                Vector3 fingerPos3d;
+                if( ProjectScreenPointOnDragPlane( tf.position, draggingFinger.Position, out fingerPos3d ) )
+                {
+                    move = fingerPos3d - tf.position;
+                }
+            }
+            else
+            {
                 // figure out our previous screen space finger position
                 Vector3 fingerPos3d, prevFingerPos3d;
 
@@ -124,20 +137,21 @@ public class TBDragToMove : MonoBehaviour
                 if( ProjectScreenPointOnDragPlane( tf.position, draggingFinger.PreviousPosition, out prevFingerPos3d ) &&
                     ProjectScreenPointOnDragPlane( tf.position, draggingFinger.Position, out fingerPos3d ) )
                 {
-                    Vector3 move = fingerPos3d - prevFingerPos3d;
-
-                    if( GetComponent<Rigidbody>() )
-                        physxDragMove += move; // this will be used in FixedUpdate() to properly move the rigidbody
-                    else
-                        tf.position += move;
+                    move = fingerPos3d - prevFingerPos3d;
                 }
             }
+
+            if( GetComponent<Rigidbody>() )
+                physxDragMove += move; // this will be used in FixedUpdate() to properly move the rigidbody
             else
-            {
-                Dragging = false;
-            }
+                tf.position += move;
+        }
+        else
+        {
+            Dragging = false;
         }
     }
+}
 
     void FixedUpdate()
     {

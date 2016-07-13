@@ -24,6 +24,7 @@ public class PointCloudRegognizer : DiscreteGestureRecognizer<PointCloudGesture>
 {
     /// <summary>
     /// Minimum distance between two consecutive sample points (used while recording the user's current gesture)
+    ///  in pixels
     /// </summary>
     public float MinDistanceBetweenSamples = 5;
 
@@ -151,8 +152,9 @@ public class PointCloudRegognizer : DiscreteGestureRecognizer<PointCloudGesture>
             Vector2 min = new Vector2( float.PositiveInfinity, float.PositiveInfinity );
             Vector2 max = new Vector2( float.NegativeInfinity, float.NegativeInfinity );
 
-            foreach( Point p in points )
+            for( int i = 0; i < points.Count; ++i )
             {
+                Point p = points[i];
                 min.x = Mathf.Min( min.x, p.Position.x );
                 min.y = Mathf.Min( min.y, p.Position.y );
                 max.x = Mathf.Max( max.x, p.Position.x );
@@ -188,8 +190,8 @@ public class PointCloudRegognizer : DiscreteGestureRecognizer<PointCloudGesture>
         {
             Vector2 c = Vector2.zero;
 
-            foreach( Point p in points )
-                c += p.Position;
+            for( int i = 0; i < points.Count; ++i )
+                c += points[i].Position;
 
             c /= points.Count;
             return c;
@@ -268,8 +270,9 @@ public class PointCloudRegognizer : DiscreteGestureRecognizer<PointCloudGesture>
 
         float bestDist = float.PositiveInfinity;
 
-        foreach( NormalizedTemplate template in normalizedTemplates )
+        for( int i = 0; i < normalizedTemplates.Count; ++i )
         {
+            NormalizedTemplate template = normalizedTemplates[i];
             float d = GreedyCloudMatch( gesture.NormalizedPoints, template.Points );
             
             if( d < bestDist )
@@ -390,11 +393,12 @@ public class PointCloudRegognizer : DiscreteGestureRecognizer<PointCloudGesture>
         // update current gesture position
         gesture.Position = touches.GetAveragePosition();
 
-        float minSampleDelta = FingerGestures.GetAdjustedPixelDistance( MinDistanceBetweenSamples );
         Vector2 lastSamplePos = gesture.RawPoints[gesture.RawPoints.Count - 1].Position;
 
         // check if we should take a new sample
-        if( Vector2.SqrMagnitude( gesture.Position - lastSamplePos ) > minSampleDelta * minSampleDelta )
+        float dist = Vector2.SqrMagnitude( gesture.Position - lastSamplePos );
+
+        if( dist > MinDistanceBetweenSamples * MinDistanceBetweenSamples )
         {
             int strokeId = 0;   //TODO increment this after each finger up>down
             gesture.RawPoints.Add( new Point( strokeId, gesture.Position ) );

@@ -7,7 +7,7 @@ public class PinchGesture : ContinuousGesture
     float gap = 0;
     
     /// <summary>
-    /// Gap difference since last frame
+    /// Gap difference since last frame, in pixels
     /// </summary>
     public float Delta
     {
@@ -16,7 +16,7 @@ public class PinchGesture : ContinuousGesture
     }
 
     /// <summary>
-    /// Current gap distance between the two pinching fingers
+    /// Current gap distance between the two pinching fingers, in pixels
     /// </summary>
     public float Gap
     {
@@ -42,13 +42,9 @@ public class PinchRecognizer : ContinuousGestureRecognizer<PinchGesture>
 
     /// <summary>
     /// Minimum pinch distance required to trigger the pinch gesture
+    /// <seealso cref="DistanceUnit"/>
     /// </summary>
-    public float MinDistance = 5.0f;
-
-    /// <summary>
-    /// How much to scale the internal pinch delta by before raising the OnPinchMove event
-    /// </summary>
-    public float DeltaScale = 1.0f;
+    public float MinDistance = 0.25f;
 
     public override string GetDefaultEventMessageName()
     {
@@ -59,7 +55,11 @@ public class PinchRecognizer : ContinuousGestureRecognizer<PinchGesture>
     public override int RequiredFingerCount
     {
         get { return 2; }
-        set { Debug.LogWarning( "Not Supported" ); }
+        set 
+        { 
+            if( Application.isPlaying )
+                Debug.LogWarning( "Pinch only supports 2 fingers" ); 
+        }
     }
 
     // TEMP: multi-gesture tracking is not supported for Pinch gesture yet
@@ -92,10 +92,10 @@ public class PinchRecognizer : ContinuousGestureRecognizer<PinchGesture>
         if( !FingersMovedInOppositeDirections( finger0, finger1 ) )
             return false;
 
-        float startGap = Vector2.SqrMagnitude( finger0.StartPosition - finger1.StartPosition );
-        float curGap = Vector2.SqrMagnitude( finger0.Position - finger1.Position );
+        float startGapSqr = Vector2.SqrMagnitude( finger0.StartPosition - finger1.StartPosition );
+        float curGapSqr = Vector2.SqrMagnitude( finger0.Position - finger1.Position );
 
-        if( FingerGestures.GetAdjustedPixelDistance( Mathf.Abs( startGap - curGap ) ) < ( MinDistance * MinDistance ) )
+        if( Mathf.Abs( startGapSqr - curGapSqr ) < ToSqrPixels( MinDistance ) )
             return false;
 
         return true;
@@ -109,9 +109,9 @@ public class PinchRecognizer : ContinuousGestureRecognizer<PinchGesture>
         gesture.StartPosition = 0.5f * ( finger0.StartPosition + finger1.StartPosition );
         gesture.Position = 0.5f * ( finger0.Position + finger1.Position );
 
-        gesture.Gap = Vector2.Distance( finger0.StartPosition, finger1.StartPosition );
+        float prevGap = Vector2.Distance( finger0.PreviousPosition, finger1.PreviousPosition );
         float curGap = Vector2.Distance( finger0.Position, finger1.Position );
-        gesture.Delta = FingerGestures.GetAdjustedPixelDistance( DeltaScale * ( curGap - gesture.Gap ) );
+        gesture.Delta = curGap - prevGap;
         gesture.Gap = curGap;
     }
 
@@ -139,7 +139,7 @@ public class PinchRecognizer : ContinuousGestureRecognizer<PinchGesture>
             return GestureRecognitionState.InProgress;
 
         float curGap = Vector2.Distance( finger0.Position, finger1.Position );
-        float newDelta = FingerGestures.GetAdjustedPixelDistance( DeltaScale * ( curGap - gesture.Gap ) );
+        float newDelta = curGap - gesture.Gap;
         gesture.Gap = curGap;
 
         if( Mathf.Abs( newDelta ) > 0.001f )
