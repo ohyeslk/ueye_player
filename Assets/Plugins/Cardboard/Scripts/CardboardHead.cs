@@ -80,19 +80,25 @@ public class CardboardHead : MonoBehaviour {
 
 //			transform.forward = to;
 //			handDelta = transform.localRotation * Quaternion.Inverse( rot );
-			Vector3 top = Vector3.up;
-			if ( Application.platform == RuntimePlatform.IPhonePlayer || Application.platform == RuntimePlatform.Android )
-			{
-				Vector3 acc = Input.acceleration;
-				acc.z = 0;
-				acc.x = - acc.x ;
-				top = acc.normalized;
-			}
 
-			Quaternion towardRotation = Quaternion.LookRotation( to , top );
+
+			Quaternion towardRotation = Quaternion.LookRotation( to , Top );
 			handDelta = towardRotation * Quaternion.Inverse( rot );
 //			Debug.Log("set hand Delta " + handDelta );
 
+		}
+	}
+
+	public static Vector3 Top
+	{
+		get {
+			Vector3 _top = Vector3.up;
+//			if ( Application.platform == RuntimePlatform.IPhonePlayer || Application.platform == RuntimePlatform.Android )
+//			{
+//				Vector3 acc = Input.acceleration;
+//				_top = - acc.normalized;
+//			}
+			return _top;
 		}
 	}
 
@@ -168,7 +174,10 @@ public class CardboardHead : MonoBehaviour {
 	}
 	public void ResetCenterHand()
 	{
-		DOTween.To( ()=>  handDelta , x=> handDelta = x , Vector3.zero , 0.5f );
+		Quaternion toward = Quaternion.LookRotation( Vector3.forward , Top );
+		var rot = Cardboard.SDK.HeadPose.Orientation;
+
+		DOTween.To( ()=>  handDelta , x=> handDelta = x , ( toward * Quaternion.Inverse( rot )).eulerAngles , 0.5f );
 	}
 
   // Compute new head pose.

@@ -60,6 +60,8 @@ public class Global {
 		}
 		return hash >> 0 ;
 	}
+
+
 }
 
 [System.Serializable]

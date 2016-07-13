@@ -426,4 +426,16 @@ public class VideoSelectWindow : VRUIWindow  {
 		liveTopButton.SetHighlighted( true );
 	}
 
+	public void StartRecord()
+	{
+		Debug.Log("Start Record");
+		if ( Application.platform == RuntimePlatform.Android )
+		{
+			Debug.Log("Begin Record in Android");
+			AndroidJavaClass jc = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+			AndroidJavaObject jo = jc.GetStatic<AndroidJavaObject>("currentActivity");
+			jo.Call("showRecord", "rtmp://ec2-54-183-98-223.us-west-1.compute.amazonaws.com/liveout/s");
+		}
+	}
+
 }
