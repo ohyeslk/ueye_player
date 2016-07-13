@@ -5,6 +5,7 @@ using System.IO;
 using System.Net;
 using System;
 using System.Text;
+using Newtonsoft.Json;
 
 public class HTTPManager : MonoBehaviour {
 
@@ -34,6 +35,55 @@ public class HTTPManager : MonoBehaviour {
 		VREvents.RequestLogin += RequestLogin;
 		VREvents.RequestBaiduYuyinToken += RequestBaiduYuyin;
 		VREvents.RequestBaiduYuyinTranslate += RequestBaiduYuyinTranslate;
+		VREvents.RequestByURLInPOST += OnRequestByURLInPOST;
+	}
+
+	void OnRequestByURLInPOST (URLRequestMessage msg)
+	{
+		string url = msg.url;
+		if ( string.IsNullOrEmpty( url ) )
+			msg.GetMessage(Global.MSG_REQUEST_BY_URL_IN_POST_URL_KEY).ToString();
+		JSONObject json = (JSONObject)msg.GetMessage( Global.MSG_REQUEST_BY_URL_IN_POST_JSON_KEY);
+		Debug.Log("Request " + json.ToString() );
+		SendPostRequest( msg , url , json );
+	}
+
+	void SendPostRequest( URLRequestMessage msg, string url , JSONObject obj )
+	{
+		System.Net.HttpWebRequest request;
+		request = (System.Net.HttpWebRequest) WebRequest.Create( url );
+		request.Method = "POST";
+
+		request.Headers.Add("apikey", "9scx4TOCR18A2EZNlXkOYjUK");
+		request.ContentType = "application/json";
+
+
+		Debug.Log( "Send Post " );
+		byte[] payload;
+
+		payload = System.Text.Encoding.UTF8.GetBytes(obj.ToString());
+		request.ContentLength = payload.Length;
+
+		Stream writer = request.GetRequestStream();
+		writer.Write(payload, 0, payload.Length);
+		writer.Close();
+
+		Debug.Log("set write stream");
+		StartCoroutine( ReadStreamPostRequest( msg , request ));
+	}
+
+	IEnumerator ReadStreamPostRequest(URLRequestMessage msg, System.Net.HttpWebRequest request )
+	{
+		HttpHelperStream helper = new HttpHelperStream( request );
+		helper.AsyBegin();
+
+		Debug.Log("Begin Read Stream Post Request");
+		while( !helper.Done ) { yield return null ; }
+
+		string strValue = helper.Result;
+		JSONObject json = new JSONObject( strValue );
+		msg.AddMessage( Global.MSG_POST_BY_URL_IN_POST_JSON_KEY , json );
+		VREvents.FirePostByURLInPOST( msg );
 	}
 
 	void RequestBaiduYuyinTranslate (URLRequestMessage msg)
@@ -48,7 +98,6 @@ public class HTTPManager : MonoBehaviour {
 		request.Headers.Add("apikey", "9scx4TOCR18A2EZNlXkOYjUK");
 		request.ContentType = "application/json";
 
-		Debug.Log( "Send Post " );
 		byte[] payload;
 
 		payload = System.Text.Encoding.UTF8.GetBytes(strJson);
@@ -58,24 +107,17 @@ public class HTTPManager : MonoBehaviour {
 		writer.Write(payload, 0, payload.Length);
 		writer.Close();
 
-		Debug.Log("set write stream");
-		StartCoroutine( ReadStream( msg , request ));
-
+		StartCoroutine( ReadStreamBaiduTranslate( msg , request ) );
 	}
 
-	IEnumerator ReadStream(URLRequestMessage msg, System.Net.HttpWebRequest request )
+	IEnumerator ReadStreamBaiduTranslate(URLRequestMessage msg, System.Net.HttpWebRequest request )
 	{
 		HttpHelperStream helper = new HttpHelperStream(request );
 		helper.AsyBegin();
 
-		Debug.Log("Begin Ask Asy");
-
 		while( !helper.Done ) { yield return null ; }
 
-		Debug.Log("Get reply from BDY");
-
 		string strValue = helper.Result;
-		Debug.Log("Get Result " + strValue );
 		msg.AddMessage( Global.MSG_BAIDU_YYIN_TRANSLATE_RESULT , strValue );
 		VREvents.FirePostBaiduYuyinTranslate( msg );
 

@@ -143,6 +143,7 @@ public class VideoSelectWindow : VRUIWindow  {
 		VREvents.PostVideoList -= RecieveVideoList;
 		VREvents.RequestCategoryVideoList -= ResetVideoList;
 		VREvents.RequestVideoList -= ResetVideoList;
+		VREvents.PostByURLInPOST -= OnPostByURLInPOST;
 	}
 
 	override protected void OnEnable()
@@ -151,6 +152,22 @@ public class VideoSelectWindow : VRUIWindow  {
 		VREvents.PostVideoList += RecieveVideoList;
 		VREvents.RequestCategoryVideoList += ResetVideoList;
 		VREvents.RequestVideoList += ResetVideoList;
+		VREvents.PostByURLInPOST += OnPostByURLInPOST;
+	}
+
+	void OnPostByURLInPOST (URLRequestMessage msg)
+	{
+		if ( msg.sender == this )
+		{
+			JSONObject json = (JSONObject)msg.GetMessage(Global.MSG_POST_BY_URL_IN_POST_JSON_KEY);
+
+			string streamURL = json.GetField("streamurl").str;
+			long channelID = json.GetField("channelid").i;
+
+			Debug.Log(" URL IS " + streamURL + " Channel ID " +  channelID );
+
+			OpenRecordApp( streamURL );
+		}
 	}
 
 	void ResetVideoList (URLRequestMessage msg)
@@ -421,20 +438,33 @@ public class VideoSelectWindow : VRUIWindow  {
 	{
 		RequestLiveVideoList( 50 );
 		m_videoManager.ToLive();
-//		RefreshAndShowVideo();
 		videoTopButton.SetHighlighted( false );
 		liveTopButton.SetHighlighted( true );
 	}
 
 	public void StartRecord()
 	{
-		Debug.Log("Start Record");
+		Debug.Log("StartRecord");
+
+		URLRequestMessage msg = new URLRequestMessage(this);
+
+		msg.url = Global.OpenLiveChannelURL;
+		JSONObject json = new JSONObject("{}");
+		Debug.Log("Add Json " + json );
+		msg.AddMessage( Global.MSG_REQUEST_BY_URL_IN_POST_JSON_KEY , json );
+
+		VREvents.FireRequestByURLInPOST( msg );
+	}
+
+	public void OpenRecordApp( string url )
+	{
+		Debug.Log("Open Record");
 		if ( Application.platform == RuntimePlatform.Android )
 		{
 			Debug.Log("Begin Record in Android");
 			AndroidJavaClass jc = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
 			AndroidJavaObject jo = jc.GetStatic<AndroidJavaObject>("currentActivity");
-			jo.Call("showRecord", "rtmp://ec2-54-183-98-223.us-west-1.compute.amazonaws.com/liveout/s");
+			jo.Call("showRecord", url );
 		}
 	}
 

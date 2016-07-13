@@ -94,6 +94,12 @@ public class VREvents
 	public static event URLEventHandler PostBaiduYuyinTranslate;
 	public static void FirePostBaiduYuyinTranslate(URLRequestMessage arg){if ( PostBaiduYuyinTranslate != null ) PostBaiduYuyinTranslate(arg) ; }
 
+	public static event URLEventHandler RequestByURLInPOST;
+	public static void FireRequestByURLInPOST(URLRequestMessage arg){if ( RequestByURLInPOST != null ) RequestByURLInPOST(arg) ; }
+
+	public static event URLEventHandler PostByURLInPOST;
+	public static void FirePostByURLInPOST(URLRequestMessage arg){if ( PostByURLInPOST != null ) PostByURLInPOST(arg) ; }
+
 
 	/// <summary>
 	/// Active window event handler. Handle the window events

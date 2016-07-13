@@ -251,21 +251,30 @@ public class HttpHelperStream
 
 	private void GetRequestStreamCallback(IAsyncResult asynchronousResult)
 	{
-		Debug.Log("On Get Request Stream Call Back " );
-		HttpWebRequest request = (HttpWebRequest)asynchronousResult.AsyncState;
+		try
+		{
+			Debug.Log("On Get Request Stream Call Back ");
 
-		HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asynchronousResult);
-		Stream streamResponse = response.GetResponseStream();
-		StreamReader streamRead = new StreamReader(streamResponse);
-		m_result = streamRead.ReadToEnd();
+			HttpWebRequest request = (HttpWebRequest)asynchronousResult.AsyncState;
 
-		// close stream object
-		streamResponse.Close();
-		streamRead.Close();
+			HttpWebResponse response = (HttpWebResponse)request.EndGetResponse(asynchronousResult);
+			Stream streamResponse = response.GetResponseStream();
+			StreamReader streamRead = new StreamReader(streamResponse);
+			m_result = streamRead.ReadToEnd();
 
-		//reset the HttpWebResponse
-		response.Close();
-		m_Done = true;
+			// close stream object
+			streamResponse.Close();
+			streamRead.Close();
+
+			//reset the HttpWebResponse
+			response.Close();
+
+			Debug.Log("Finish closing the streams" );
+			m_Done = true;
+		}catch( Exception e )
+		{
+			Debug.Log( "Error Request" + e.ToString());
+		}
 	}
 
 

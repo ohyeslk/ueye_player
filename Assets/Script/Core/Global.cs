@@ -26,6 +26,10 @@ public class Global {
 	public static string MSG_BAIDU_YYIN_TRANSLATE_JSON = "json";
 	public static string MSG_BAIDU_YYIN_TRANSLATE_RESULT = "result";
 
+	public static string MSG_REQUEST_BY_URL_IN_POST_URL_KEY = "url";
+	public static string MSG_REQUEST_BY_URL_IN_POST_JSON_KEY = "send_json";
+	public static string MSG_POST_BY_URL_IN_POST_JSON_KEY = "get_json";
+
 	public static string MSG_USER_VOTE_OPTION = "option";
 
 	public static string RootHttp = "http://balaladev.dbetfcnmgm.us-west-1.elasticbeanstalk.com";
@@ -37,6 +41,8 @@ public class Global {
 	public static string LiveVideoRequestURL = RootHttp + "/api/v1/channels/livestreams?index=0&days=NUMBER";
 	public static string ChatSocketURL = RootWS + "/socket.io/?EIO=3&transport=websocket";
 	public static string LoginURL = RootHttp + "/login";
+	public static string OpenLiveChannelURL = RootHttp + "/api/v1/channels/openLiveChannel";
+	public static string CloseLiveChannelURL = RootHttp + "/api/v1/channels/closeLiveChannel";
 	public static string BaiduYuyinURL = "https://openapi.baidu.com/oauth/2.0/token?grant_type=client_credentials" +
 		"&client_id=" +
 		"9scx4TOCR18A2EZNlXkOYjUK" +
