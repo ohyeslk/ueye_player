@@ -53,6 +53,7 @@
      <Compile Include="Assets\Script\Core\HTTPManager.cs" />
      <Compile Include="Assets\Script\Core\HttpHelper.cs" />
      <Compile Include="Assets\Script\Core\LogicManager.cs" />
+     <Compile Include="Assets\Script\Core\PresentManager.cs" />
      <Compile Include="Assets\Script\Core\SocketManager.cs" />
      <Compile Include="Assets\Script\Core\TopUIInput.cs" />
      <Compile Include="Assets\Script\Core\UIInputModel.cs" />
@@ -60,6 +61,10 @@
      <Compile Include="Assets\Script\Core\VREvents.cs" />
      <Compile Include="Assets\Script\Core\VoiceManager.cs" />
      <Compile Include="Assets\Script\Core\WindowManager.cs" />
+     <Compile Include="Assets\Script\Present\PresentEffect.cs" />
+     <Compile Include="Assets\Script\Present\PresentInput.cs" />
+     <Compile Include="Assets\Script\Present\PresentSensor.cs" />
+     <Compile Include="Assets\Script\Present\PresentUnit.cs" />
      <Compile Include="Assets\Script\UI\Basic\CameraHolder.cs" />
      <Compile Include="Assets\Script\UI\Basic\FollowView.cs" />
      <Compile Include="Assets\Script\UI\Basic\Grid.cs" />
