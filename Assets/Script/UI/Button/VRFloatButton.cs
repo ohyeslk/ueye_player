@@ -2,11 +2,6 @@
 using System.Collections;
 using UnityEngine.UI;
 
-/// <summary>
-/// The Fill Image cannot work in the curved UI
-/// The float button contains a flowImage with an animator
-/// and the fill amount is controlled by the animator system
-/// </summary>
 public class VRFloatButton : VRFunctionButton {
 
 	[SerializeField] Image flowImage;

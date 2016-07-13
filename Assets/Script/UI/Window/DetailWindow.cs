@@ -150,8 +150,7 @@ public class DetailWindow : VRUIWindow {
 
 		{
 			ChatArg msg = new ChatArg(this);
-//			msg.chanelID = (ulong)Global.GetHashFromString( m_info.playUrl );
-			msg.chanelID = m_info.channelID;
+			msg.chanelID = Global.GetHashFromString( m_info.playUrl );
 			VREvents.FireEnterChanel( msg );
 		}
 

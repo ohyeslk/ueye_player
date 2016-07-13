@@ -365,7 +365,6 @@ public class VideoPlayWindow : VRUIWindow {
 		}
 
 		{
-			Debug.Log("Exit Channel");
 			ChatArg msg = new ChatArg(this);
 			VREvents.FireExitChanel(msg);
 		}

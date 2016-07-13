@@ -259,9 +259,6 @@ public class HTTPManager : MonoBehaviour {
 				info.coverUrl = video.GetField("coverForFeed").str;
 				info.isLive = video.GetField("islive").i == 1;
 				info.id = video.GetField("id").i;
-				info.channelID = video.GetField("channelID").i.ToString();
-				Debug.Log("Channel ID" + info.channelID);
-				Debug.Log(video.ToString());
 //				if ( info.isLive )
 //					Debug.Log( info.title + " is live " + info.isLive );
 				res.Add( info );

@@ -3,10 +3,6 @@ using System.Collections;
 using UnityEngine.UI;
 using DG.Tweening;
 
-/// <summary>
-/// The group button is controlled by the Group enum
-/// only one button in a group would be highlightend 
-/// </summary>
 public class GroupButton : VRFloatButton {
 
 	[SerializeField] Group group;
