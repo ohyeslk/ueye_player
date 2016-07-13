@@ -29,20 +29,21 @@ public class PresentUnit : MonoBehaviour {
 		if ( e.Phase == FingerMotionPhase.Started )
 		{
 			col.radius *= 3f;
+			CardboardHead.Lock();
 		}
-		else if ( e.Phase == FingerMotionPhase.Ended )
+		else if ( e.Phase == FingerMotionPhase.Updated )
 		{
 			Vector3 screenPos = Camera.main.WorldToScreenPoint( transform.position );
-			Vector3 newScreenPos = screenPos + new Vector3( e.Position.x , e.Position.y , 0 );
+			Vector3 newScreenPos = screenPos + new Vector3( e.Finger.DeltaPosition.x , e.Finger.DeltaPosition.y , 0 );
 			Vector3 toward = Camera.main.ScreenPointToRay( newScreenPos ).direction;
 
 			float distance = ( transform.position - Camera.main.transform.position ).magnitude;
 			transform.position = Camera.main.transform.position + distance * toward;
-
 		}
-		else if ( e.Phase == FingerMotionPhase.Updated )
+		else if ( e.Phase == FingerMotionPhase.Ended )
 		{
 			col.radius /= 3f;
+			CardboardHead.UnLock();
 		}
 	}
 }

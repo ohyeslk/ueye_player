@@ -102,10 +102,19 @@ public class CardboardHead : MonoBehaviour {
 		}
 	}
 
-	[SerializeField] float verticalYThreshod = 0.7f;
+	[SerializeField]float verticalYThreshod = 0.7f;
 	[SerializeField]float FreeAngleThreshod = 0.4f;
 	[SerializeField]float MoveSensity = 0.2f;
 
+	static public void Lock()
+	{
+		Instance.trackRotation = false;
+	}
+
+	static public void UnLock()
+	{
+		Instance.trackRotation = true;
+	}
 //	static public float FreeAngleThreshod = 0 ;
 //	static public float MoveSensity = 0;
 
@@ -162,6 +171,7 @@ public class CardboardHead : MonoBehaviour {
       UpdateHead();
     }
   }
+
 
   // Normally, update head pose now.
   void LateUpdate() {
