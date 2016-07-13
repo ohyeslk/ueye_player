@@ -26,8 +26,7 @@ public class Comment_Manager : MonoBehaviour
             this._content = content;
             this._userName = "";
         }
-
-
+	
         public int _fontSize;
         public string _content;
         public string _userName;

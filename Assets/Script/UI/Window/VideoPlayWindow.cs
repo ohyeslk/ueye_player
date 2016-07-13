@@ -18,6 +18,7 @@ public class VideoPlayWindow : VRUIWindow {
 	[SerializeField] VRBasicButton refreshButton;
 
 	[SerializeField] FollowView FollowView;
+	[SerializeField] GameObject AdsPanel;
 	[SerializeField] Image PlayPanelBack;
 
 	/// <summary>
@@ -61,6 +62,7 @@ public class VideoPlayWindow : VRUIWindow {
 	void Start()
 	{
 		FollowView.gameObject.SetActive ( false );
+		AdsPanel.SetActive( false );
 //		panelButtons = FollowView.gameObject.GetComponentsInChildren<VRBasicButton>();
 		HidePlayPanel(0);
 		HideLoadAnimation();
@@ -300,6 +302,8 @@ public class VideoPlayWindow : VRUIWindow {
 		FollowView.gameObject.SetActive( true );
 		lastDegree = 90f;
 		HidePlayPanel( 0 );
+
+		AdsPanel.SetActive( true );
 	}
 
 	protected override void OnBecomeInvsible ( float time )
@@ -322,6 +326,8 @@ public class VideoPlayWindow : VRUIWindow {
 		{
 			btn.OnBecomeInvisible( time );
 		}
+
+		AdsPanel.SetActive( false );
 	}
 
 	public void DisablePlayPanel()
@@ -340,8 +346,7 @@ public class VideoPlayWindow : VRUIWindow {
 			videoPlayer.Play();
 
 		UpdatePlayButtonActive();
-//		playButton.gameObject.SetActive(false);
-//		pauseButton.gameObject.SetActive(true);
+
 	}
 
 	public void OnPauseVideo()

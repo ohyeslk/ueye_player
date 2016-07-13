@@ -52,7 +52,7 @@ public class EffectManager : MonoBehaviour {
 			BGPMeshRender.gameObject.SetActive( true );
 		}else if ( arg.type == WindowArg.Type.PLAY_WINDOW )
 		{
-			BGPMeshRender.gameObject.SetActive( false );
+			BGPMeshRender.gameObject.SetActive( true );
 		}
 
 

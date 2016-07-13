@@ -60,6 +60,9 @@
      <Compile Include="Assets\Script\Core\VREvents.cs" />
      <Compile Include="Assets\Script\Core\VoiceManager.cs" />
      <Compile Include="Assets\Script\Core\WindowManager.cs" />
+     <Compile Include="Assets\Script\Present\PresentEffect.cs" />
+     <Compile Include="Assets\Script\Present\PresentSensor.cs" />
+     <Compile Include="Assets\Script\Present\PresentUnit.cs" />
      <Compile Include="Assets\Script\UI\Basic\CameraHolder.cs" />
      <Compile Include="Assets\Script\UI\Basic\FollowView.cs" />
      <Compile Include="Assets\Script\UI\Basic\Grid.cs" />
