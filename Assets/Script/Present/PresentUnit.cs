@@ -155,6 +155,8 @@ public class PresentUnit : MonoBehaviour {
 
 	void Update()
 	{
-		FingerSelectTimer += Mathf.Clamp( Time.deltaTime , 0 , 2f );
+		if ( FingerSelectTimer <= 2f )
+			FingerSelectTimer += Time.deltaTime;
+
 	}
 }
