@@ -42,6 +42,10 @@ public class VoiceManager : MonoBehaviour {
 	void Start()
 	{
 		VREvents.FireRequestBaiduYuyinToken(new URLRequestMessage(this));
+
+		// Get the microphone Premission
+		Microphone.Start(Microphone.devices[0], true , 600 , 8000);
+		Microphone.End( Microphone.devices[0] );
 	}
 
 	void OnEnable()
@@ -95,14 +99,14 @@ public class VoiceManager : MonoBehaviour {
 
 		if ( isOn )
 		{
-			BeginRecord( msg );
+			BeginRecord( );
 		}else
 		{
-			EndRecord( msg );
+			EndRecord( );
 		}
 	}
 
-	void BeginRecord( Message msg )
+	void BeginRecord( )
 	{
 		if ( !IsRecording )
 		{
@@ -118,7 +122,7 @@ public class VoiceManager : MonoBehaviour {
 		}
 	}
 
-	void EndRecord( Message msg )
+	void EndRecord( )
 	{
 		if ( IsRecording )
 		{
