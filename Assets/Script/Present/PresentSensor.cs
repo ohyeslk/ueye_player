@@ -19,7 +19,6 @@ public class PresentSensor : MonoBehaviour {
 	}
 
 	void OnFingerMove( FingerMotionEvent e ) {
-		Debug.Log("On Finger Move");
 		parent.OnFingerMove( e );
 	}
 }

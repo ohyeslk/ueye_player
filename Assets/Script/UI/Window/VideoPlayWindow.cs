@@ -8,6 +8,7 @@ public class VideoPlayWindow : VRUIWindow {
 
 	[SerializeField] GameObject screenPrefab;
 	[SerializeField] GameObject liveScreenPrefab;
+	[SerializeField] GameObject presentPrefab;
 	[SerializeField] VoteWindow voteWindow;
 	MediaPlayerCtrl videoPlayer;
 	VideoInfo tempInfo;
@@ -533,5 +534,33 @@ public class VideoPlayWindow : VRUIWindow {
 		pos += Vector3.back * 1f ;
 		videoPlayer.transform.position = pos;
 	}
+
+	public void OnPresent()
+	{
+		if ( LogicManager.VRMode == VRMode.VR_2D )
+		{
+			CreatePresentAhead( presentPrefab );
+		}
+	}
+
+	public void CreatePresentAhead( GameObject prefab )
+	{
+		GameObject present = Instantiate( prefab );
+		present.transform.position = Camera.main.transform.forward.normalized * 1f ;
+
+		Debug.Log("Forward " + Camera.main.transform.forward );
+
+//		present.transform.DOMoveY( 0.5f , 2f ).From().SetRelative( true ).SetEase( Ease.InBack );
+
+	}
+
+	void Update()
+	{
+		if ( Input.GetKeyDown( KeyCode.H ) )
+		{
+			OnPresent ();
+		}
+	}
+
 
 }

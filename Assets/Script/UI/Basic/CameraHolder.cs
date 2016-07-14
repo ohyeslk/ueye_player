@@ -93,7 +93,6 @@ public class CameraHolder : MonoBehaviour {
 
 		if ( e.Phase == FingerMotionPhase.Updated )
 		{
-			Debug.Log("Finger Move");
 			Vector2 delta = e.Finger.DeltaPosition;
 	
 			head.UpdateHead( delta );

@@ -65,7 +65,7 @@ public class CardboardHead : MonoBehaviour {
 
 	public void UpdateHead( Vector2 deltaPos )
 	{
-		if ( deltaPos.magnitude > 0 )
+		if ( deltaPos.magnitude > 0 && trackRotation )
 		{
 			deltaPos *= 4.7f; // to make the movement more sensible
 			if ( isLockVertical )
