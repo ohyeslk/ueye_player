@@ -20,12 +20,17 @@ public class TopUIInput : MonoBehaviour {
 
 	void OnSwitchVRMode (Message msg)
 	{
+
+		VRMode to = (VRMode)msg.GetMessage(Global.MSG_SWITCHVRMODE_MODE_KEY);
+		bool ifShow = to == VRMode.VR_2D;
+
+		resetBtn.gameObject.SetActive( ifShow );
+
+
 		if ( Application.platform == RuntimePlatform.Android )
 		{
-			VRMode to = (VRMode)msg.GetMessage(Global.MSG_SWITCHVRMODE_MODE_KEY);
-			bool ifShow = to == VRMode.VR_2D;
-			resetBtn.gameObject.SetActive( ifShow );
-			switchBtn.gameObject.SetActive( ifShow );
+			// TODO: This is required when change back to the Google Cardboard Android Manifesto
+//			switchBtn.gameObject.SetActive( ifShow );
 		}
 	}
 

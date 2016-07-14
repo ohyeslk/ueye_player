@@ -8,6 +8,7 @@ public class EffectManager : MonoBehaviour {
 	[SerializeField] float rippleEffectTime;
 
 	[SerializeField] MeshRenderer BGPMeshRender;
+	[SerializeField] Material BGPMaterial;
 	[SerializeField] Color BGPFadeToColor;
 	[SerializeField] float BGPFadeTime;
 
@@ -41,18 +42,27 @@ public class EffectManager : MonoBehaviour {
 			seq.AppendInterval( rippleEffectTime );
 			seq.AppendCallback( DisableRippleEffect );
 		}
+
+		if ( arg.type == WindowArg.Type.DETAIL_WINDOWS )
+		{
+			DOTween.To( () => BGPMaterial.GetFloat( "_Exposure" ) , (x) => BGPMaterial.SetFloat( "_Exposure" , x ) , 0.5f , BGPFadeTime );
+		}else
+		{
+			DOTween.To( () => BGPMaterial.GetFloat( "_Exposure" ) , (x) => BGPMaterial.SetFloat( "_Exposure" , x ) , 1.0f , BGPFadeTime );
+		}
+
 		// background image color
 		if ( arg.type == WindowArg.Type.DETAIL_WINDOWS )
 		{
-			BGPMeshRender.material.DOColor( BGPFadeToColor , BGPFadeTime );
-			BGPMeshRender.gameObject.SetActive( true );
+//			BGPMeshRender.material.DOColor( BGPFadeToColor , BGPFadeTime );
+//			BGPMeshRender.gameObject.SetActive( true );
 		}else if ( arg.type == WindowArg.Type.SELECT_WINDOW )
 		{
-			BGPMeshRender.material.DOColor( Color.white , BGPFadeTime );
-			BGPMeshRender.gameObject.SetActive( true );
+//			BGPMeshRender.material.DOColor( Color.white , BGPFadeTime );
+//			BGPMeshRender.gameObject.SetActive( true );
 		}else if ( arg.type == WindowArg.Type.PLAY_WINDOW )
 		{
-			BGPMeshRender.gameObject.SetActive( true );
+//			BGPMeshRender.gameObject.SetActive( true );
 		}
 
 

@@ -4,6 +4,7 @@ using System.Collections;
 public class PresentUnit : MonoBehaviour {
 
 	[SerializeField]SphereCollider col;
+	[SerializeField] PresentEffect effect;
 
 	void Start()
 	{
@@ -15,14 +16,25 @@ public class PresentUnit : MonoBehaviour {
 			PresentSensor sensor = col.gameObject.AddComponent<PresentSensor>();
 			sensor.Init( this );
 		}
+
+		if ( effect == null )
+		{
+			effect = gameObject.AddComponent<PresentEffect>();
+		}
 	}
 
 	public void OnFingerDown( FingerDownEvent e ) {
-		
+		if ( effect != null )
+		{
+			effect.OnFingerDown( e );
+		}
 	}
 
 	public void OnFingerUp( FingerUpEvent e ) {
-
+		if ( effect != null )
+		{
+			effect.OnFingerUp( e );
+		}
 	}
 
 	public void OnFingerMove( FingerMotionEvent e ) {
@@ -44,6 +56,11 @@ public class PresentUnit : MonoBehaviour {
 		{
 			col.radius /= 3f;
 			CardboardHead.UnLock();
+		}
+
+		if ( effect != null )
+		{
+			effect.OnFingerMove( e );
 		}
 	}
 }
