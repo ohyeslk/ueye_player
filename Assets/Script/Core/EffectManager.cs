@@ -11,6 +11,7 @@ public class EffectManager : MonoBehaviour {
 	[SerializeField] Material BGPMaterial;
 	[SerializeField] Color BGPFadeToColor;
 	[SerializeField] float BGPFadeTime;
+	[SerializeField] float ExposureMin;
 
 	void OnEnable()
 	{
@@ -43,9 +44,9 @@ public class EffectManager : MonoBehaviour {
 			seq.AppendCallback( DisableRippleEffect );
 		}
 
-		if ( arg.type == WindowArg.Type.DETAIL_WINDOWS )
+		if ( arg.type == WindowArg.Type.DETAIL_WINDOWS || arg.type == WindowArg.Type.PLAY_WINDOW )
 		{
-			DOTween.To( () => BGPMaterial.GetFloat( "_Exposure" ) , (x) => BGPMaterial.SetFloat( "_Exposure" , x ) , 0.5f , BGPFadeTime );
+			DOTween.To( () => BGPMaterial.GetFloat( "_Exposure" ) , (x) => BGPMaterial.SetFloat( "_Exposure" , x ) , ExposureMin , BGPFadeTime );
 		}else
 		{
 			DOTween.To( () => BGPMaterial.GetFloat( "_Exposure" ) , (x) => BGPMaterial.SetFloat( "_Exposure" , x ) , 1.0f , BGPFadeTime );
