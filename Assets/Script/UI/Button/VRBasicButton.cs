@@ -240,8 +240,6 @@ public class VRBasicButton : MonoBehaviour {
 		}
 	}
 
-
-
 	protected void ResetSubButton()
 	{
 		if ( subButtonAnimation.subButton != null )
@@ -266,7 +264,9 @@ public class VRBasicButton : MonoBehaviour {
 		}
 	}
 
-
+	virtual public void OnHoverV3( Vector3 p )
+	{
+	}
 
 	public void OnBecomeVisible( float time , bool setEnableTo)
 	{

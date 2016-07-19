@@ -54,8 +54,6 @@ public class GroupButton : VRFloatButton {
 	{
 		base.OnConfirm();
 
-	
-
 		Message groupMsg = new Message(this);
 		groupMsg.AddMessage(MSG_GROUP,group);
 		VREvents.FireGroupButtonConfirm( groupMsg );
@@ -153,8 +151,6 @@ public class GroupButton : VRFloatButton {
 //
 //		FlowHelp.enabled = false;
 //	}
-
-
 }
 
 public enum Group

@@ -8,7 +8,8 @@ public class VideoLoopSelectWindow : VRUIWindow {
 	[SerializeField] Transform bottomPanel;
 	[SerializeField] Transform videoPanel;
 	[SerializeField] Text videoTitle;
-	[SerializeField] float UnitProcessInterval = 0.2f;
+	[SerializeField] CurvedUI.CurvedUISettings CurvedSetting;
+//	[SerializeField] float UnitProcessInterval = 0.2f;
 
 	[SerializeField] GameObject VideoInfoUnitPrefab;
 	VideoLoopUnitManager videoUnitManager = new VideoLoopUnitManager();
@@ -42,6 +43,11 @@ public class VideoLoopSelectWindow : VRUIWindow {
 	}
 
 	void Start() {
+		if ( CurvedSetting != null )
+		{
+			CurvedSetting = GetComponent<CurvedUI.CurvedUISettings>();
+		}
+
 		RequestVideoList();
 	}
 
@@ -78,7 +84,6 @@ public class VideoLoopSelectWindow : VRUIWindow {
 
 	void RecieveVideoList( URLRequestMessage msg )
 	{
-//		Debug.Log("Recieve Video List");
 		videoInfoManager.SetVideoList( (List<VideoInfo>)msg.GetMessage( Global.MSG_POSTVIDEO_VIDEO_KEY ) 
 			, msg.GetMessage( Global.MSG_POSTVIDEO_NAME_KEY ).ToString() );
 
@@ -96,14 +101,15 @@ public class VideoLoopSelectWindow : VRUIWindow {
 			CreateVideoInfoUnit( videoList[i] );
 		}
 			
-		videoUnitManager.UpdateUnitPosition( 0 , UnitProcessInterval );
+		videoUnitManager.UpdateUnitPosition( 0  );
+
+		CurvedSetting.AddEffectToChildren();
 	}
 
 	void CreateVideoInfoUnit( VideoInfo info )
 	{
 		if ( VideoInfoUnitPrefab != null )
 		{
-
 			GameObject unitObj = Instantiate( VideoInfoUnitPrefab ) as GameObject;
 			unitObj.transform.SetParent( videoPanel  );
 			unitObj.transform.localScale = Vector3.one;
@@ -116,14 +122,18 @@ public class VideoLoopSelectWindow : VRUIWindow {
 		}
 	}
 
-
 	float offset = 0;
 	void Update()
 	{
 		if ( Input.GetKey( KeyCode.G ) )
 		{
-			offset += 0.01f;
-			videoUnitManager.UpdateUnitPosition( offset , UnitProcessInterval );
+			offset += 0.05f;
+			videoUnitManager.UpdateUnitPosition( offset  );
+		}
+		if ( Input.GetKey( KeyCode.F ) )
+		{
+			offset -= 0.05f;
+			videoUnitManager.UpdateUnitPosition( offset  );
 		}
 	}
 }
@@ -190,13 +200,27 @@ public class VideoLoopUnitManager
 		}
 	}
 
-	public void UpdateUnitPosition( float offset , float interval )
+	public void UpdateUnitPosition( float offset  )
 	{
 		float mid = ( videoLoopUnitList.Count - 1 ) * 0.5f + offset ;
+		float interval = videoLoopUnitList[0].GetInterval();
+
 		for( int i = videoLoopUnitList.Count - 1 ; i >= 0 ; --i )
 		{
 			float p = ( mid - i ) * interval ;
 			videoLoopUnitList[i].UpdatePosition( p );
 		}
+		for( int i = 12 ; i >= 0 ; -- i )
+		{
+			for( int j = videoLoopUnitList.Count - 1 ; j >= 0 ; -- j )
+			{
+				if ( videoLoopUnitList[j].GetSiblingIndex() == i )
+				{
+					videoLoopUnitList[j].transform.SetAsLastSibling();
+				}
+			}
+		}
 	}
+
+
 }

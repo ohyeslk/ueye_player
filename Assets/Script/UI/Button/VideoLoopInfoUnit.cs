@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 using DG.Tweening;
 
-public class VideoLoopInfoUnit : VRBasicButton {
+public class VideoLoopInfoUnit : VRFloatButton {
 
 	/// <summary>
 	/// Components 
@@ -11,7 +11,7 @@ public class VideoLoopInfoUnit : VRBasicButton {
 	[SerializeField] protected Image img;
 //	[SerializeField] protected Image frame;
 //	[SerializeField] protected Image help;
-	[SerializeField] protected Image blackCover;
+	[SerializeField] protected Image whiteCover;
 	[SerializeField] protected Transform TouchFrame3D;
 	[SerializeField] protected Text text;
 	[SerializeField] protected AudioSource initSound;
@@ -101,6 +101,7 @@ public class VideoLoopInfoUnit : VRBasicButton {
 		public AnimationCurve alphaCurve;
 		public AnimationCurve scaleCurve;
 		public AnimationCurve positionCurve;
+		public float interval;
 		public float width;
 	}
 		
@@ -116,23 +117,35 @@ public class VideoLoopInfoUnit : VRBasicButton {
 		// TODO remove event listener here
 	}
 
-
-	public void UpdatePosition( float process )
+	public int GetSiblingIndex( )
 	{
-		if ( process > 0.4f && process < 0.6f )
+		int index = ( int )  ( Mathf.Abs( 0.5f - m_process ) / ( loopAnimation.interval / 2f ) );
+		name = index.ToString();
+		return index;
+	}
+
+
+	float m_process = 0;
+		
+	public void UpdatePosition( float process  )
+	{
+		m_process = process;
+
+		if ( process > 0.5f - loopAnimation.interval / 2f  && process < 0.5f + loopAnimation.interval / 2f )
 		{
-			transform.SetAsLastSibling();
 			m_Enable = true;
-		}
-		else
+		}else
 		{
 			m_Enable = false;
 		}
-		
+
 		{
-			Color col = img.color;
-			col.a = loopAnimation.alphaCurve.Evaluate( process );
-			img.color = col;
+//			Color col = img.color;
+//			col.a = loopAnimation.alphaCurve.Evaluate( process );
+//			img.color = col;
+			Color col = whiteCover.color;
+			col.a = 1f - loopAnimation.alphaCurve.Evaluate( process );
+			whiteCover.color = col;
 		}
 
 		{
@@ -288,6 +301,11 @@ public class VideoLoopInfoUnit : VRBasicButton {
 
 	public void Clear()
 	{
+	}
+
+	public float GetInterval()
+	{
+		return loopAnimation.interval;
 	}
 
 }
