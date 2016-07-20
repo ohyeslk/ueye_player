@@ -51,6 +51,15 @@ public class VRFloatButton : VRFunctionButton {
 		}
 	}
 
+	public override void OnExitSub ()
+	{
+		base.OnExitSub ();
+		if ( !isSelected )
+		{
+			FlowFadeOut();
+		}
+	}
+
 	protected virtual void UpdateByProcess()
 	{
 		if ( flowImageAnimator != null )
@@ -69,7 +78,6 @@ public class VRFloatButton : VRFunctionButton {
 	{
 		while( true )
 		{
-
 			UpdateByProcess();
 
 			flowProcess -= Time.deltaTime / totalTime;

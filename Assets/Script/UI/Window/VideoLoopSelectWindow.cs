@@ -101,7 +101,7 @@ public class VideoLoopSelectWindow : VRUIWindow {
 			CreateVideoInfoUnit( videoList[i] );
 		}
 			
-		videoUnitManager.UpdateUnitPosition( 0  );
+		videoUnitManager.UpdateUnitPosition( 0 );
 
 		CurvedSetting.AddEffectToChildren();
 	}
@@ -122,19 +122,25 @@ public class VideoLoopSelectWindow : VRUIWindow {
 		}
 	}
 
-	float offset = 0;
+	float m_offset = 0;
 	void Update()
 	{
 		if ( Input.GetKey( KeyCode.G ) )
 		{
-			offset += 0.05f;
-			videoUnitManager.UpdateUnitPosition( offset  );
+			m_offset += 0.05f;
+			UpdateUnits( m_offset );
 		}
 		if ( Input.GetKey( KeyCode.F ) )
 		{
-			offset -= 0.05f;
-			videoUnitManager.UpdateUnitPosition( offset  );
+			m_offset -= 0.05f;
+			UpdateUnits( m_offset );
 		}
+	}
+
+	public void UpdateUnits( float offset )
+	{
+		videoUnitManager.UpdateUnitPosition( m_offset );
+		videoTitle.text = videoUnitManager.GetTitle();
 	}
 }
 
@@ -220,6 +226,16 @@ public class VideoLoopUnitManager
 				}
 			}
 		}
+	}
+
+	public string GetTitle()
+	{
+		for( int i = videoLoopUnitList.Count - 1 ; i >= 0 ; --i )
+		{
+			if ( videoLoopUnitList[i].GetSiblingIndex() == 0 )
+				return videoLoopUnitList[i].Info.title;
+		}
+		return "";
 	}
 
 

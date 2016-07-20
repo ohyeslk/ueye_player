@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 using DG.Tweening;
 
-public class GroupButton : VRFloatButton {
+public class GroupButton : FloatButtonWithEffect {
 
 	[SerializeField] Group group;
 	[SerializeField] Sprite NormalSprite;
