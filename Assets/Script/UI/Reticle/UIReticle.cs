@@ -251,7 +251,7 @@ public class UIReticle : MonoBehaviour, ICardboardPointer
 		mesh.vertices = vertices;
 		mesh.triangles = indices;
 		mesh.RecalculateBounds ();
-		mesh.Optimize ();
+		;
 	}
 
 	private void UpdateDiameters ()
